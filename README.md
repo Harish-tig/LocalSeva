@@ -1087,3 +1087,25 @@ or
   "updated_at": "datetime"
 }
 ```
+
+### review model
+{
+  "id": "integer",
+  "booking": "foreign key to Booking (one-to-one)",
+  "user": "foreign key to UserModel",
+  "provider": "foreign key to ServiceProvider",
+  "rating": "integer (1 to 5)",
+  "comment": "string",
+  "created_at": "datetime"
+}
+```
+
+---
+
+## Additional Notes
+
+### Date/Time Format
+All datetime fields use ISO 8601 format:
+```
+YYYY-MM-DDTHH:MM:SSZ
+Example: 2024-01-25T14:30:00Z   
