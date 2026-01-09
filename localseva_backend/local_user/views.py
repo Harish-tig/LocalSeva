@@ -8,14 +8,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from django.db import models
+
+
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, ProfileSerializer,
-    ServiceProviderSerializer, ServiceCategorySerializer,
-    BookingSerializer, ReviewSerializer
+    ServiceProviderSerializer, BookingSerializer, ReviewSerializer
 )
-from .models import Profile, ServiceCategory, ServiceProvider, Booking, Review
-from .permissions import IsOwnerOrReadOnly, IsProviderOrReadOnly
+from .models import Profile, Booking, Review
 
 User = get_user_model()
 
@@ -65,127 +66,114 @@ class LoginView(APIView):
 
 
 class ProfileUpdateView(APIView):
+    """
+    Single profile endpoint for all users
+    Regular users can upgrade to service providers by setting role=SERVICE
+    and providing required service provider details
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """Get user's profile"""
         profile = request.user.profile
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
     def put(self, request):
+        """Update profile - can upgrade to service provider"""
         profile = request.user.profile
-        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        data = request.data.copy()
+        print(data)
+        # If user is becoming a service provider
+        if data.get('role') == 'SERVICE' and profile.role != 'SERVICE':
+            #set role to service
+            profile.role = "SERVICE"
+            profile.save()
+            # Update user model flag
+            request.user.is_service_provider = True
+            request.user.save()
+
+        serializer = ProfileSerializer(profile, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
+
+            # Update user's is_service_provider flag based on role
+            if 'role' in data:
+                request.user.is_service_provider = (data['role'] == 'SERVICE')
+                request.user.save()
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BecomeServiceProviderView(APIView):
+    """
+    Quick endpoint to mark user as service provider
+    User still needs to fill service provider details via ProfileUpdateView
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user
+        profile = request.user.profile
 
-        # Check if already a service provider
-        if hasattr(user, 'service_provider'):
-            return Response(
-                {"message": "You are already a service provider"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if profile.role == "SERVICE":
+            return Response({
+                "message": "You are already a service provider",
+                "next_step": "Update your profile to add service provider details"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Update user profile
-        profile = user.profile
-        profile.role = "SERVICE"
-        profile.save()
-
-        # Update user model
-        user.is_service_provider = True
-        user.save()
+        request.user.is_service_provider = True
+        request.user.save()
 
         return Response({
-            "message": "Profile updated to service provider",
-            "is_service_provider": True
+            "message": "You are now marked as a service provider!",
+            "next_step": "Please update your profile to add service provider details:",
+            "required_fields": {
+                "experience_years": "Required",
+                "pricing_type": "Required (FIXED, HOURLY, PROJECT, or FLEXIBLE)",
+                "base_price": "Required if pricing_type is FIXED",
+                "hourly_rate": "Required if pricing_type is HOURLY",
+                "bio": "Recommended to describe your services",
+                "phone": "Recommended for clients to contact you",
+                "location": "Recommended to show where you provide services"
+            }
         }, status=status.HTTP_200_OK)
 
 
-class ServiceProviderProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        try:
-            provider = ServiceProvider.objects.get(user=request.user)
-            serializer = ServiceProviderSerializer(provider)
-            return Response(serializer.data)
-        except ServiceProvider.DoesNotExist:
-            return Response(
-                {"error": "Service provider profile not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-    def post(self, request):
-        if not request.user.is_service_provider:
-            return Response(
-                {"error": "User is not a service provider"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Check if profile already exists
-        if hasattr(request.user, 'service_provider'):
-            return Response(
-                {"error": "Service provider profile already exists"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        serializer = ServiceProviderSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request):
-        try:
-            provider = ServiceProvider.objects.get(user=request.user)
-            serializer = ServiceProviderSerializer(provider, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except ServiceProvider.DoesNotExist:
-            return Response(
-                {"error": "Service provider profile not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-
-class ServiceCategoryListView(ListAPIView):
-    permission_classes = [permissions.AllowAny]
-    queryset = ServiceCategory.objects.all()
-    serializer_class = ServiceCategorySerializer
-
-
 class ServiceProviderListView(ListAPIView):
+    """List all service providers (profiles with role=SERVICE)"""
     permission_classes = [permissions.AllowAny]
     serializer_class = ServiceProviderSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['categories', 'pricing_type', 'is_available']
-    search_fields = ['user__username', 'description', 'user__profile__location']
+    filterset_fields = ['pricing_type', 'is_available']
+    search_fields = ['user__username', 'bio', 'location']
     ordering_fields = ['rating', 'experience_years', 'base_price']
 
+
     def get_queryset(self):
-        queryset = ServiceProvider.objects.all()
+        queryset = Profile.objects.filter(role='SERVICE')
+
+        #if id
+        provider_id = self.request.query_params.get('id')
+        if provider_id:
+            queryset = queryset.filter(id=provider_id)
 
         # Filter by location if provided
         location = self.request.query_params.get('location', None)
         if location:
-            queryset = queryset.filter(user__profile__location__icontains=location)
+            queryset = queryset.filter(location__icontains=location)
 
-        # Filter by category if provided
-        category_id = self.request.query_params.get('category', None)
-        if category_id:
-            queryset = queryset.filter(categories__id=category_id)
+        # Filter by min experience if provided
+        min_experience = self.request.query_params.get('min_experience', None)
+        if min_experience:
+            queryset = queryset.filter(experience_years__gte=int(min_experience))
 
-        return queryset.distinct()
+        # Filter by max price if provided
+        max_price = self.request.query_params.get('max_price', None)
+        if max_price:
+            queryset = queryset.filter(base_price__lte=float(max_price))
+
+        return queryset
 
 
 class BookingCreateView(CreateAPIView):
@@ -207,56 +195,51 @@ class BookingListView(ListAPIView):
         user_type = self.request.query_params.get('type', 'user')
 
         if user_type == 'provider' and user.is_service_provider:
-            try:
-                provider = ServiceProvider.objects.get(user=user)
-                return Booking.objects.filter(service_provider=provider)
-            except ServiceProvider.DoesNotExist:
-                return Booking.objects.none()
+            # Return bookings where user is the service provider
+            return Booking.objects.filter(service_provider=user.profile)
         else:
+            # Return bookings where user is the customer
             return Booking.objects.filter(user=user)
 
 
 class BookingDetailView(RetrieveAPIView, UpdateAPIView):
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated]
     serializer_class = BookingSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_service_provider:
-            try:
-                provider = ServiceProvider.objects.get(user=user)
-                return Booking.objects.filter(service_provider=provider)
-            except ServiceProvider.DoesNotExist:
-                return Booking.objects.none()
-        return Booking.objects.filter(user=user)
+        # Users can see bookings they made OR bookings they received as service providers
+        return Booking.objects.filter(
+            models.Q(user=user) |
+            models.Q(service_provider=user.profile)
+        )
 
     def put(self, request, *args, **kwargs):
         booking = self.get_object()
         user = request.user
 
-        # Only providers can accept/reject bookings
-        if user.is_service_provider and 'status' in request.data:
-            new_status = request.data['status']
-            if new_status in ['ACCEPTED', 'REJECTED']:
-                booking.status = new_status
+        # Service provider can update status and provider_notes
+        if user.profile == booking.service_provider:
+            allowed_fields = ['status', 'provider_notes']
+            update_data = {k: v for k, v in request.data.items() if k in allowed_fields}
 
-                # Add provider notes if provided
-                if 'provider_notes' in request.data:
-                    booking.provider_notes = request.data['provider_notes']
+            for field, value in update_data.items():
+                setattr(booking, field, value)
 
-                booking.save()
-                serializer = self.get_serializer(booking)
-                return Response(serializer.data)
-
-        # Users can only update their notes
-        if 'user_notes' in request.data:
-            booking.user_notes = request.data['user_notes']
             booking.save()
             serializer = self.get_serializer(booking)
             return Response(serializer.data)
 
+        # Regular user can only update their notes
+        elif user == booking.user:
+            if 'user_notes' in request.data:
+                booking.user_notes = request.data['user_notes']
+                booking.save()
+                serializer = self.get_serializer(booking)
+                return Response(serializer.data)
+
         return Response(
-            {"error": "You can only update status if you are the provider"},
+            {"error": "You don't have permission to update this booking"},
             status=status.HTTP_403_FORBIDDEN
         )
 
@@ -266,13 +249,14 @@ class ReviewCreateView(CreateAPIView):
     serializer_class = ReviewSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        review = serializer.save(user=self.request.user)
 
-        # Update provider rating
-        provider = serializer.validated_data['provider']
+        # Update provider's rating
+        provider = review.provider
         provider.total_reviews += 1
-        provider.rating = (provider.rating * (provider.total_reviews - 1) +
-                           serializer.validated_data['rating']) / provider.total_reviews
+        provider.rating = (
+                                  (provider.rating * (provider.total_reviews - 1)) + review.rating
+                          ) / provider.total_reviews
         provider.save()
 
 

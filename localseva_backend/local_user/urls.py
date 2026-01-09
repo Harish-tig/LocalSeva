@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import (
     RegisterView, LoginView, ProfileUpdateView,
-    BecomeServiceProviderView, ServiceProviderProfileView,
-    ServiceCategoryListView, ServiceProviderListView,
+    BecomeServiceProviderView, ServiceProviderListView,
     BookingCreateView, BookingListView, BookingDetailView,
     ReviewCreateView, ProviderReviewsListView
 )
@@ -13,16 +12,13 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
     path('login/', LoginView.as_view(), name="login"),
 
-    # Profile
+    # Profile Management (single profile for all users)
     path('profile/', ProfileUpdateView.as_view(), name="profile"),
     path('profile/become-provider/', BecomeServiceProviderView.as_view(), name="become-provider"),
-    path('profile/service-provider/', ServiceProviderProfileView.as_view(), name="service-provider-profile"),
 
-    # Service Categories
-    path('categories/', ServiceCategoryListView.as_view(), name="categories"),
-
-    # Service Providers
+    # Service Providers Listing
     path('providers/', ServiceProviderListView.as_view(), name="providers"),
+    # path('providers/<int:id>/', ServiceProviderListView.as_view(), name="providers"),
     path('providers/<int:provider_id>/reviews/', ProviderReviewsListView.as_view(), name="provider-reviews"),
 
     # Bookings
