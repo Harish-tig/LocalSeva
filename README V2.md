@@ -430,6 +430,15 @@ Authorization: Bearer <your_access_token>
   "status": "COMPLETED"
 }
 ```
+### NOTE: -> WHEN PROVIDER SETTING STATAUS FROM IN PROGRESS TO COMPLETED. HE CAN UPDATE FINAL PRICE
+```json
+{
+  "final_price": 500,
+  "status" : "COMPLETED"
+}
+```
+**This will set the final price. if final_price is not provided the backend will automatically register quoted price as final price**
+
 *Only works if status is "IN_PROGRESS"*
 
 **Service Provider rejecting booking:**
