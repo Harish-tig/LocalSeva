@@ -1089,6 +1089,7 @@ or
 ```
 
 ### review model
+```json
 {
   "id": "integer",
   "booking": "foreign key to Booking (one-to-one)",
@@ -1108,4 +1109,4 @@ or
 All datetime fields use ISO 8601 format:
 ```
 YYYY-MM-DDTHH:MM:SSZ
-Example: 2024-01-25T14:30:00Z   
+Example: 2024-01-25T14:30:00Z
