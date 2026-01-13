@@ -182,6 +182,7 @@ class Booking(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="bookings_made")
     service_provider = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="bookings_received",
                                          limit_choices_to={'role': 'SERVICE'})
+    service_category = models.TextField()
     description = models.TextField()
     address = models.TextField()
     scheduled_date = models.DateTimeField()
@@ -206,7 +207,6 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking #{self.id} - {self.user.username} to {self.service_provider.user.username}"
-
 
 class Review(models.Model):
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name="review")

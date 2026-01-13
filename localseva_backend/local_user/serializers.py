@@ -302,10 +302,11 @@ class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Booking
         fields = [
-            'id', 'user', 'user_name', 'service_provider', 'provider_id', 'provider_name',
-            'description', 'address', 'scheduled_date', 'quote_price', 'final_price',
-            'status', 'provider_notes', 'user_notes', 'created_at', 'updated_at',
-            'quoted_at', 'accepted_at', 'started_at', 'completed_at'
+            'id', 'user', 'user_name', 'provider_id', 'provider_name',
+            'service_category', 'description', 'address', 'scheduled_date',
+            'quote_price', 'final_price', 'status', 'provider_notes', 'user_notes',
+            'created_at', 'updated_at', 'quoted_at', 'accepted_at', 'started_at',
+            'completed_at'
         ]
         read_only_fields = [
             'user', 'user_name', 'provider_name', 'created_at', 'updated_at',
@@ -333,6 +334,25 @@ class BookingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"service_provider": "Selected user is not a service provider"}
             )
+
+        # Ensure user has selected a category that the provider offers
+        if 'service_category' in data and service_provider:
+            # Get provider's categories (stored as JSONField/list)
+            provider_categories = service_provider.categories or []
+
+            # If provider has specified categories, validate against them
+            if provider_categories:
+                if data['service_category'] not in provider_categories:
+                    raise serializers.ValidationError({
+                        "service_category": f"Service provider does not offer this category. "
+                                            f"Available categories: {', '.join(provider_categories)}"
+                    })
+
+        # Additional validation for service_category if not checking against provider
+        if 'service_category' in data and not data.get('service_category'):
+            raise serializers.ValidationError({
+                "service_category": "Service category is required"
+            })
 
         return data
 
@@ -425,7 +445,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = [
-            'id', 'booking', 'user', 'user_name', 'provider', 'provider_id',
+            'id', 'booking', 'user', 'user_name', 'provider_id',
             'provider_name', 'rating', 'comment', 'created_at'
         ]
         read_only_fields = ['user', 'user_name', 'provider_name', 'created_at']

@@ -309,6 +309,7 @@ Authorization: Bearer <your_access_token>
 ```json
 {
   "provider_id": 2,
+  "service_category": "Plumbing",
   "description": "Leaking pipe in kitchen sink",
   "address": "123 Main St, New York, NY",
   "scheduled_date": "2023-10-15T10:00:00Z"
@@ -317,6 +318,7 @@ Authorization: Bearer <your_access_token>
 
 **Required Fields:**
 - `provider_id` (int) - Service provider's profile ID
+- `service_category`: "Plumbing",
 - `description` (string) - Service description
 - `address` (string) - Service address
 - `scheduled_date` (datetime) - Future date/time
@@ -469,7 +471,7 @@ Authorization: Bearer <your_access_token>
 ```json
 {
   "booking": 1,
-  "provider": 2,
+  "provider_id": 2,
   "rating": 5,
   "comment": "Excellent service! Fixed my leaking pipe quickly."
 }
