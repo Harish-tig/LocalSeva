@@ -1,0 +1,45 @@
+done - works properly without any issues.
+
+- Authentication
+- Register User/Login
+- Profile Management
+- Get/Update Profile
+- Become Service Provider
+- Service Providers
+- List Service Providers
+- Bookings
+- Create Booking
+- List Bookings
+- Get/Update Booking
+
+
+working on
+
+- MART 
+
+
+
+to be worked on
+- Reviews
+- Create Review
+- Get Provider Reviews
+
+
+
+remaining
+
+- Reports
+- Create Report
+- List My Reports
+
+
+issues faced
+- 
+
+
+
+
+
+
+PAGES UNDER MARKET PLACE - 
+- 

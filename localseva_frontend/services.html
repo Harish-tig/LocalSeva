@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services - Local Services & Marketplace</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
+        <p>Welcome, <span id="userName">Alex</span></p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+          </li>
+        </ul>
+
+        <div class="sidebar-section">
+          <h3>My Activity</h3>
+          <ul>
+            <li>
+              <a href="my-activity.html#serviceTaken"
+                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#serviceProvided" class="provider-only"
+                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#boughtItems"
+                ><i class="fas fa-shopping-cart"></i> Buy Items</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#soldItems"
+                ><i class="fas fa-tag"></i> Sell Items</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>My Services</h3>
+          <ul>
+            <li>
+              <a
+                href="my-services.html"
+                id="myServicesLink"
+                class="provider-only"
+                ><i class="fas fa-briefcase"></i> Provider Dashboard</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <ul>
+            <li>
+              <a href="#" id="logoutBtn"
+                ><i class="fas fa-sign-out-alt"></i> Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <button
+        id="closeSidebar"
+        class="btn btn-outline"
+        style="margin: 1.5rem; display: none"
+      >
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Find Local Services</h1>
+        <div class="header-actions">
+          <button id="themeToggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="search-container" id="searchContainer">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              id="servicesSearch"
+              placeholder="Search services..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-container">
+        <div class="filter-group">
+          <label class="form-label">Category</label>
+          <div class="filter-buttons">
+            <button
+              class="btn btn-outline btn-sm category-filter active"
+              data-category="all"
+            >
+              All
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Cleaning"
+            >
+              <i class="fas fa-broom"></i> Cleaning
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Carpenter"
+            >
+              <i class="fas fa-hammer"></i> Carpenter
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Electrical"
+            >
+              <i class="fas fa-bolt"></i> Electrical
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Plumbing"
+            >
+              <i class="fas fa-faucet"></i> Plumbing
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Ceramic"
+            >
+              <i class="fas fa-tile"></i> Ceramic
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Fitness"
+            >
+              <i class="fas fa-dumbbell"></i> Fitness
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Delivery"
+            >
+              <i class="fas fa-truck"></i> Delivery & Moving
+            </button>
+            <button
+              class="btn btn-outline btn-sm category-filter"
+              data-category="Education"
+            >
+              <i class="fas fa-graduation-cap"></i> Tutor & Education
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label for="locationFilter" class="form-label">Location</label>
+          <select id="locationFilter" class="form-control">
+            <option value="">All Locations</option>
+            <option value="Kandivali">Kandivali</option>
+            <option value="Borivali">Borivali</option>
+            <option value="Mira Road">Mira Road</option>
+            <option value="Bhayender">Bhayender</option>
+            <option value="Malad">Malad</option>
+            <option value="Andheri">Andheri</option>
+          </select>
+        </div>
+
+        <div class="filter-group" style="align-self: flex-end">
+          <button id="clearFilters" class="btn btn-outline btn-sm">
+            <i class="fas fa-times"></i> Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Services Grid -->
+      <div id="servicesContainer" class="cards-grid">
+        <!-- Services will be loaded here by JavaScript -->
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="services.html" class="active">
+        <i class="fas fa-th-large"></i>
+        <span>Services</span>
+      </a>
+      <a href="add-item.html" class="sell-btn">
+        <i class="fas fa-plus"></i>
+      </a>
+      <a href="mart.html">
+        <i class="fas fa-store"></i>
+        <span>Mart</span>
+      </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/services.js"></script>
+  </body>
+</html>

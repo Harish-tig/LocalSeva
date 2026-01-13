@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Services - Provider Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
+        <p>Welcome, <span id="userName">Alex</span></p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+          </li>
+        </ul>
+
+        <div class="sidebar-section">
+          <h3>My Activity</h3>
+          <ul>
+            <li>
+              <a href="my-activity.html#serviceTaken"
+                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#serviceProvided" class="provider-only"
+                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#boughtItems"
+                ><i class="fas fa-shopping-cart"></i> Buy Items</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#soldItems"
+                ><i class="fas fa-tag"></i> Sell Items</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>My Services</h3>
+          <ul>
+            <li>
+              <a
+                href="my-services.html"
+                id="myServicesLink"
+                class="provider-only active"
+                ><i class="fas fa-briefcase"></i> Provider Dashboard</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <ul>
+            <li>
+              <a href="#" id="logoutBtn"
+                ><i class="fas fa-sign-out-alt"></i> Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <button
+        id="closeSidebar"
+        class="btn btn-outline"
+        style="margin: 1.5rem; display: none"
+      >
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Provider Dashboard</h1>
+        <div class="header-actions">
+          <button id="themeToggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="header-stats">
+            <span class="stat-badge">
+              <i class="fas fa-clock"></i>
+              <span id="pendingCount">0</span> Pending
+            </span>
+            <span class="stat-badge">
+              <i class="fas fa-tasks"></i>
+              <span id="workingCount">0</span> Working
+            </span>
+            <span class="stat-badge">
+              <i class="fas fa-check-circle"></i>
+              <span id="completedCount">0</span> Completed
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Provider Stats Overview -->
+      <div class="provider-overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-handshake"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="totalServices">0</div>
+              <div class="stat-label">Total Services</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div
+              class="stat-icon"
+              style="
+                background-color: rgba(76, 201, 240, 0.1);
+                color: var(--success-color);
+              "
+            >
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="avgRating">0.0</div>
+              <div class="stat-label">Avg. Rating</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div
+              class="stat-icon"
+              style="
+                background-color: rgba(248, 150, 30, 0.1);
+                color: var(--warning-color);
+              "
+            >
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="completionRate">0%</div>
+              <div class="stat-label">Completion Rate</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div
+              class="stat-icon"
+              style="
+                background-color: rgba(67, 97, 238, 0.1);
+                color: var(--primary-color);
+              "
+            >
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="totalEarnings">$0</div>
+              <div class="stat-label">Total Earnings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Management Tabs -->
+      <div class="tabs-container" id="servicesTabs">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="pendingServices">
+            <i class="fas fa-clock"></i> Pending
+            <span class="tab-badge" id="pendingBadge">0</span>
+          </button>
+          <button class="tab-btn" data-tab="workingServices">
+            <i class="fas fa-tasks"></i> Working
+            <span class="tab-badge" id="workingBadge">0</span>
+          </button>
+          <button class="tab-btn" data-tab="completedServices">
+            <i class="fas fa-check-circle"></i> Completed
+            <span class="tab-badge" id="completedBadge">0</span>
+          </button>
+        </div>
+
+        <!-- Pending Services Tab -->
+        <div id="pendingServices" class="tab-content active">
+          <div class="tab-header">
+            <h2>Pending Service Requests</h2>
+            <p>New service requests that need your attention</p>
+          </div>
+
+          <div class="services-actions" style="margin-bottom: 1.5rem">
+            <button class="btn btn-primary" id="acceptAllBtn" disabled>
+              <i class="fas fa-check-double"></i> Accept All
+            </button>
+            <button class="btn btn-outline" id="filterPendingBtn">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+            <button class="btn btn-outline" id="refreshPendingBtn">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+
+          <div id="pendingServicesContainer" class="services-list">
+            <!-- Pending services will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Working Services Tab -->
+        <div id="workingServices" class="tab-content">
+          <div class="tab-header">
+            <h2>Services in Progress</h2>
+            <p>Services you're currently working on</p>
+          </div>
+
+          <div class="services-actions" style="margin-bottom: 1.5rem">
+            <button class="btn btn-primary" id="completeAllBtn" disabled>
+              <i class="fas fa-flag-checkered"></i> Mark All Complete
+            </button>
+            <button class="btn btn-outline" id="filterWorkingBtn">
+              <i class="fas fa-filter"></i> Filter
+            </button>
+          </div>
+
+          <div id="workingServicesContainer" class="services-list">
+            <!-- Working services will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Completed Services Tab -->
+        <div id="completedServices" class="tab-content">
+          <div class="tab-header">
+            <h2>Completed Services</h2>
+            <p>Services you've successfully completed</p>
+          </div>
+
+          <div class="filters-container" style="margin-bottom: 1.5rem">
+            <div class="filter-group">
+              <label for="completedDateFilter" class="form-label"
+                >Filter by Date</label
+              >
+              <select id="completedDateFilter" class="form-control">
+                <option value="all">All Time</option>
+                <option value="last-week">Last Week</option>
+                <option value="last-month">Last Month</option>
+                <option value="last-3-months">Last 3 Months</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="completedRatingFilter" class="form-label"
+                >Filter by Rating</label
+              >
+              <select id="completedRatingFilter" class="form-control">
+                <option value="all">All Ratings</option>
+                <option value="5">5 Stars Only</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="completedServicesContainer" class="services-list">
+            <!-- Completed services will be loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Provider Tools -->
+      <div class="provider-tools" style="margin-top: 3rem">
+        <h2>Provider Tools</h2>
+        <div class="tools-grid">
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Schedule Manager</h3>
+              <p>Manage your availability and schedule</p>
+              <button class="btn btn-outline btn-sm">
+                <i class="fas fa-edit"></i> Manage
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Analytics</h3>
+              <p>View your performance metrics</p>
+              <button class="btn btn-outline btn-sm">
+                <i class="fas fa-chart-bar"></i> View
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Invoices</h3>
+              <p>Create and manage invoices</p>
+              <button class="btn btn-outline btn-sm">
+                <i class="fas fa-receipt"></i> Manage
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Settings</h3>
+              <p>Provider account settings</p>
+              <button class="btn btn-outline btn-sm">
+                <i class="fas fa-sliders-h"></i> Configure
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="services.html">
+        <i class="fas fa-th-large"></i>
+        <span>Services</span>
+      </a>
+      <a href="add-item.html" class="sell-btn">
+        <i class="fas fa-plus"></i>
+      </a>
+      <a href="mart.html">
+        <i class="fas fa-store"></i>
+        <span>Mart</span>
+      </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/provider.js"></script>
+
+    <!-- <style>
+      .provider-overview {
+        margin-bottom: 2rem;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+      }
+
+      .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(247, 37, 133, 0.1);
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .stat-content .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-color);
+        line-height: 1;
+      }
+
+      .stat-content .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-top: 0.25rem;
+      }
+
+      .header-stats {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .stat-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+      }
+
+      .tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        padding: 0 0.375rem;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
+
+      .services-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .services-list {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .service-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+      }
+
+      .service-card:hover {
+        box-shadow: var(--shadow-sm);
+      }
+
+      .service-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+      }
+
+      .service-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: var(--text-color);
+      }
+
+      .service-status {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .service-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      .service-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .service-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .service-note {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: rgba(0, 0, 0, 0.03);
+        border-radius: var(--border-radius-sm);
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+      }
+
+      .provider-tools h2 {
+        margin-bottom: 1.5rem;
+      }
+
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .tool-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+      }
+
+      .tool-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .tool-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: rgba(67, 97, 238, 0.1);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      .tool-content h3 {
+        margin-bottom: 0.5rem;
+        font-size: 1.125rem;
+      }
+
+      .tool-content p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+      }
+
+      .empty-services {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+      }
+
+      .empty-services i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      @media (max-width: 768px) {
+        .header-stats {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .services-actions {
+          flex-direction: column;
+        }
+
+        .services-actions button {
+          width: 100%;
+        }
+
+        .service-actions {
+          flex-direction: column;
+        }
+
+        .service-actions button {
+          width: 100%;
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check if user is a provider
+        const userRole = appUtils.getUserRole();
+
+        if (!userRole.isProvider) {
+          // Redirect non-providers
+          window.location.href = "services.html";
+          return;
+        }
+
+        // Load provider services
+        loadProviderServices();
+
+        // Initialize action buttons
+        initActionButtons();
+
+        // Initialize provider tools
+        initProviderTools();
+      });
+
+      async function loadProviderServices() {
+        try {
+          // API PLACEHOLDER: Get provider services
+          const services = await api.getProviderServices();
+
+          // Update stats
+          updateProviderStats(services);
+
+          // Render each service category
+          renderServiceCategory("pendingServices", services.pending, "pending");
+          renderServiceCategory("workingServices", services.working, "working");
+          renderServiceCategory(
+            "completedServices",
+            services.completed,
+            "completed"
+          );
+        } catch (error) {
+          console.error("Error loading provider services:", error);
+          appUtils.showNotification("Error loading your services", "error");
+        }
+      }
+
+      function updateProviderStats(services) {
+        // Calculate stats
+        const totalPending = services.pending ? services.pending.length : 0;
+        const totalWorking = services.working ? services.working.length : 0;
+        const totalCompleted = services.completed
+          ? services.completed.length
+          : 0;
+        const totalServices = totalPending + totalWorking + totalCompleted;
+
+        // Update header badges
+        document.getElementById("pendingCount").textContent = totalPending;
+        document.getElementById("workingCount").textContent = totalWorking;
+        document.getElementById("completedCount").textContent = totalCompleted;
+
+        // Update tab badges
+        document.getElementById("pendingBadge").textContent = totalPending;
+        document.getElementById("workingBadge").textContent = totalWorking;
+        document.getElementById("completedBadge").textContent = totalCompleted;
+
+        // Update overview stats
+        document.getElementById("totalServices").textContent = totalServices;
+
+        // Calculate average rating (mock data)
+        const avgRating = totalCompleted > 0 ? 4.7 : 0;
+        document.getElementById("avgRating").textContent = avgRating.toFixed(1);
+
+        // Calculate completion rate
+        const completionRate =
+          totalServices > 0
+            ? Math.round((totalCompleted / totalServices) * 100)
+            : 0;
+        document.getElementById(
+          "completionRate"
+        ).textContent = `${completionRate}%`;
+
+        // Calculate total earnings (mock data)
+        let totalEarnings = 0;
+        if (services.completed) {
+          services.completed.forEach((service) => {
+            const price = parseFloat(service.price.replace("$", "")) || 0;
+            totalEarnings += price;
+          });
+        }
+        document.getElementById(
+          "totalEarnings"
+        ).textContent = `$${totalEarnings}`;
+
+        // Enable/disable bulk action buttons
+        document.getElementById("acceptAllBtn").disabled = totalPending === 0;
+        document.getElementById("completeAllBtn").disabled = totalWorking === 0;
+      }
+
+      function renderServiceCategory(containerId, services, status) {
+        const container = document.getElementById(containerId + "Container");
+        if (!container) return;
+
+        // Check if we have services
+        if (!services || services.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-services">
+                        <i class="fas fa-${getEmptyIcon(status)}"></i>
+                        <h3>No ${status} services</h3>
+                        <p>${getEmptyMessage(status)}</p>
+                    </div>
+                `;
+          return;
+        }
+
+        // Create service cards
+        container.innerHTML = "";
+
+        services.forEach((service) => {
+          const serviceCard = document.createElement("div");
+          serviceCard.className = "service-card";
+          serviceCard.setAttribute("data-service-id", service.id);
+
+          // Get status color
+          const statusColor = getStatusColor(status);
+          const statusText = getStatusText(status);
+
+          serviceCard.innerHTML = `
+                    <div class="service-header">
+                        <div class="service-title">${service.service}</div>
+                        <div class="service-status" style="color: ${statusColor}">
+                            ${statusText}
+                        </div>
+                    </div>
+                    
+                    <div class="service-meta">
+                        <span><i class="fas fa-user"></i> ${
+                          service.client
+                        }</span>
+                        <span><i class="fas fa-calendar"></i> ${appUtils.formatDate(
+                          service.date
+                        )}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${
+                          service.location
+                        }</span>
+                        <span><i class="fas fa-dollar-sign"></i> ${
+                          service.price
+                        }</span>
+                    </div>
+                    
+                    ${
+                      service.note
+                        ? `
+                    <div class="service-note">
+                        <strong>Client Note:</strong> ${service.note}
+                    </div>
+                    `
+                        : ""
+                    }
+                    
+                    <div class="service-actions" data-service-id="${
+                      service.id
+                    }" data-service-status="${status}">
+                        ${getServiceActions(status)}
+                    </div>
+                `;
+
+          container.appendChild(serviceCard);
+        });
+      }
+
+      function getEmptyIcon(status) {
+        switch (status) {
+          case "pending":
+            return "clock";
+          case "working":
+            return "tasks";
+          case "completed":
+            return "check-circle";
+          default:
+            return "inbox";
+        }
+      }
+
+      function getEmptyMessage(status) {
+        switch (status) {
+          case "pending":
+            return "You don't have any pending service requests at the moment.";
+          case "working":
+            return "You're not currently working on any services.";
+          case "completed":
+            return "You haven't completed any services yet.";
+          default:
+            return "No services found.";
+        }
+      }
+
+      function getStatusColor(status) {
+        switch (status) {
+          case "pending":
+            return "var(--warning-color)";
+          case "working":
+            return "var(--primary-color)";
+          case "completed":
+            return "var(--success-color)";
+          default:
+            return "var(--text-secondary)";
+        }
+      }
+
+      function getStatusText(status) {
+        switch (status) {
+          case "pending":
+            return "Pending";
+          case "working":
+            return "In Progress";
+          case "completed":
+            return "Completed";
+          default:
+            return status;
+        }
+      }
+
+      function getServiceActions(status) {
+        switch (status) {
+          case "pending":
+            return `
+                        <button class="btn btn-success btn-sm accept-btn">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="btn btn-danger btn-sm reject-btn">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="btn btn-outline btn-sm message-btn">
+                            <i class="fas fa-message"></i> Message
+                        </button>
+                        <button class="btn btn-outline btn-sm details-btn">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                    `;
+          case "working":
+            return `
+                        <button class="btn btn-success btn-sm complete-btn">
+                            <i class="fas fa-flag-checkered"></i> Mark Complete
+                        </button>
+                        <button class="btn btn-outline btn-sm message-btn">
+                            <i class="fas fa-message"></i> Message Client
+                        </button>
+                        <button class="btn btn-outline btn-sm reschedule-btn">
+                            <i class="fas fa-calendar-alt"></i> Reschedule
+                        </button>
+                        <button class="btn btn-outline btn-sm details-btn">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                    `;
+          case "completed":
+            return `
+                        <button class="btn btn-outline btn-sm review-btn">
+                            <i class="fas fa-star"></i> View Review
+                        </button>
+                        <button class="btn btn-outline btn-sm invoice-btn">
+                            <i class="fas fa-receipt"></i> Invoice
+                        </button>
+                        <button class="btn btn-outline btn-sm repeat-btn">
+                            <i class="fas fa-redo"></i> Repeat Service
+                        </button>
+                    `;
+          default:
+            return "";
+        }
+      }
+
+      function initActionButtons() {
+        // Delegate event handling for dynamic buttons
+        document.addEventListener("click", function (e) {
+          const serviceActions = e.target.closest(".service-actions");
+          if (!serviceActions) return;
+
+          const serviceId = serviceActions.getAttribute("data-service-id");
+          const currentStatus = serviceActions.getAttribute(
+            "data-service-status"
+          );
+
+          // Handle accept button
+          if (e.target.closest(".accept-btn")) {
+            updateServiceStatus(
+              serviceId,
+              "working",
+              "Service accepted successfully"
+            );
+          }
+
+          // Handle reject button
+          if (e.target.closest(".reject-btn")) {
+            if (
+              confirm("Are you sure you want to reject this service request?")
+            ) {
+              updateServiceStatus(serviceId, "rejected", "Service rejected");
+            }
+          }
+
+          // Handle complete button
+          if (e.target.closest(".complete-btn")) {
+            updateServiceStatus(
+              serviceId,
+              "completed",
+              "Service marked as completed"
+            );
+          }
+
+          // Handle message button
+          if (e.target.closest(".message-btn")) {
+            appUtils.showNotification(
+              "This would open a chat with the client",
+              "info"
+            );
+          }
+
+          // Handle details button
+          if (e.target.closest(".details-btn")) {
+            appUtils.showNotification(
+              `Viewing details for service #${serviceId}`,
+              "info"
+            );
+          }
+
+          // Handle other buttons
+          if (e.target.closest(".review-btn")) {
+            appUtils.showNotification(
+              "This would show the client review",
+              "info"
+            );
+          }
+
+          if (e.target.closest(".invoice-btn")) {
+            appUtils.showNotification("This would generate an invoice", "info");
+          }
+
+          if (e.target.closest(".repeat-btn")) {
+            appUtils.showNotification(
+              "This would create a repeat service request",
+              "info"
+            );
+          }
+
+          if (e.target.closest(".reschedule-btn")) {
+            appUtils.showNotification(
+              "This would open a rescheduling dialog",
+              "info"
+            );
+          }
+        });
+
+        // Bulk action buttons
+        const acceptAllBtn = document.getElementById("acceptAllBtn");
+        const completeAllBtn = document.getElementById("completeAllBtn");
+        const refreshPendingBtn = document.getElementById("refreshPendingBtn");
+
+        if (acceptAllBtn) {
+          acceptAllBtn.addEventListener("click", function () {
+            if (confirm("Accept all pending service requests?")) {
+              appUtils.showNotification(
+                "All pending requests accepted",
+                "success"
+              );
+              // In a real app, this would call an API to accept all
+            }
+          });
+        }
+
+        if (completeAllBtn) {
+          completeAllBtn.addEventListener("click", function () {
+            if (confirm("Mark all working services as complete?")) {
+              appUtils.showNotification(
+                "All working services marked complete",
+                "success"
+              );
+              // In a real app, this would call an API to complete all
+            }
+          });
+        }
+
+        if (refreshPendingBtn) {
+          refreshPendingBtn.addEventListener("click", function () {
+            loadProviderServices();
+            appUtils.showNotification("Services refreshed", "success");
+          });
+        }
+
+        // Filter buttons
+        const filterPendingBtn = document.getElementById("filterPendingBtn");
+        const filterWorkingBtn = document.getElementById("filterWorkingBtn");
+
+        if (filterPendingBtn) {
+          filterPendingBtn.addEventListener("click", function () {
+            appUtils.showNotification(
+              "Filter options would appear here",
+              "info"
+            );
+          });
+        }
+
+        if (filterWorkingBtn) {
+          filterWorkingBtn.addEventListener("click", function () {
+            appUtils.showNotification(
+              "Filter options would appear here",
+              "info"
+            );
+          });
+        }
+
+        // Completed filters
+        const completedDateFilter = document.getElementById(
+          "completedDateFilter"
+        );
+        const completedRatingFilter = document.getElementById(
+          "completedRatingFilter"
+        );
+
+        if (completedDateFilter) {
+          completedDateFilter.addEventListener("change", function () {
+            appUtils.showNotification(`Filtered by: ${this.value}`, "info");
+          });
+        }
+
+        if (completedRatingFilter) {
+          completedRatingFilter.addEventListener("change", function () {
+            appUtils.showNotification(
+              `Filtered by rating: ${this.value}`,
+              "info"
+            );
+          });
+        }
+      }
+
+      async function updateServiceStatus(serviceId, newStatus, successMessage) {
+        try {
+          // API PLACEHOLDER: Update service status
+          const result = await api.updateServiceStatus(serviceId, newStatus);
+
+          appUtils.showNotification(successMessage, "success");
+
+          // Reload services after a short delay
+          setTimeout(() => {
+            loadProviderServices();
+          }, 1000);
+        } catch (error) {
+          console.error("Error updating service status:", error);
+          appUtils.showNotification("Failed to update service status", "error");
+        }
+      }
+
+      function initProviderTools() {
+        const toolButtons = document.querySelectorAll(".tool-card button");
+        toolButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const toolName =
+              this.closest(".tool-card").querySelector("h3").textContent;
+            appUtils.showNotification(`Opening ${toolName}`, "info");
+          });
+        });
+      }
+    </script> -->
+  </body>
+</html>

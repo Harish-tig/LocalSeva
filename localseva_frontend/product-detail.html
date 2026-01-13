@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Details - Local Marketplace</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
+        <p>Welcome, <span id="userName">Alex</span></p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+          </li>
+        </ul>
+
+        <div class="sidebar-section">
+          <h3>My Activity</h3>
+          <ul>
+            <li>
+              <a href="my-activity.html#serviceTaken"
+                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#serviceProvided" class="provider-only"
+                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#boughtItems"
+                ><i class="fas fa-shopping-cart"></i> Buy Items</a
+              >
+            </li>
+            <li>
+              <a href="my-activity.html#soldItems"
+                ><i class="fas fa-tag"></i> Sell Items</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>My Services</h3>
+          <ul>
+            <li>
+              <a
+                href="my-services.html"
+                id="myServicesLink"
+                class="provider-only"
+                ><i class="fas fa-briefcase"></i> Provider Dashboard</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <ul>
+            <li>
+              <a href="#" id="logoutBtn"
+                ><i class="fas fa-sign-out-alt"></i> Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <button
+        id="closeSidebar"
+        class="btn btn-outline"
+        style="margin: 1.5rem; display: none"
+      >
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <a href="shop.html" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Back to Shop
+          </a>
+        </div>
+        <div class="header-actions">
+          <button id="themeToggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Product Details Container -->
+      <div id="productDetail" class="product-detail-container">
+        <!-- Product details will be loaded here by JavaScript -->
+      </div>
+
+      <!-- Similar Products -->
+      <div class="similar-products" style="margin-top: 3rem">
+        <h2>Similar Products</h2>
+        <div id="similarProducts" class="cards-grid">
+          <!-- Similar products will be loaded here -->
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="services.html">
+        <i class="fas fa-th-large"></i>
+        <span>Services</span>
+      </a>
+      <a href="add-item.html" class="sell-btn">
+        <i class="fas fa-plus"></i>
+      </a>
+      <a href="mart.html">
+        <i class="fas fa-store"></i>
+        <span>Mart</span>
+      </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/mart.js"></script>
+
+    <style>
+      .product-detail-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .product-images {
+        margin-bottom: 2rem;
+      }
+
+      .main-image {
+        width: 100%;
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+      }
+
+      .image-thumbnails {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+
+      .image-thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--border-radius-sm);
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: var(--transition);
+      }
+
+      .image-thumbnail:hover,
+      .image-thumbnail.active {
+        border-color: var(--primary-color);
+      }
+
+      .product-info h1 {
+        margin-bottom: 1rem;
+      }
+
+      .product-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 1.5rem 0;
+      }
+
+      .product-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .product-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+      }
+
+      .product-description {
+        margin-bottom: 2rem;
+      }
+
+      .product-description h3 {
+        margin-bottom: 1rem;
+      }
+
+      .seller-info {
+        background-color: rgba(0, 0, 0, 0.03);
+        border-radius: var(--border-radius-sm);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .seller-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .seller-avatar {
+        font-size: 2.5rem;
+        color: var(--text-secondary);
+      }
+
+      .seller-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.25rem;
+      }
+
+      .seller-rating i {
+        color: var(--warning-color);
+        font-size: 0.875rem;
+      }
+
+      .seller-stats {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      .product-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .similar-products h2 {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      @media (min-width: 768px) {
+        .product-detail-container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 3rem;
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        // Get product ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get("id");
+
+        if (productId) {
+          await loadProductDetail(productId);
+          await loadSimilarProducts(productId);
+        } else {
+          // Redirect if no ID provided
+          window.location.href = "mart.html";
+        }
+      });
+
+      async function loadProductDetail(productId) {
+        try {
+          // API PLACEHOLDER: Get product by ID
+          const product = await api.getProductById(productId);
+
+          if (!product) {
+            document.querySelector(".main-content").innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Product not found</h3>
+                            <p>The product you're looking for doesn't exist or has been removed.</p>
+                            <a href="shop.html" class="btn btn-primary">Browse Products</a>
+                        </div>
+                    `;
+            return;
+          }
+
+          // Update page title
+          document.title = `${product.name} - Local Marketplace`;
+
+          // Create image thumbnails HTML
+          const thumbnailsHTML = product.images
+            .map(
+              (img, index) => `
+                    <img src="${img}" alt="Thumbnail ${
+                index + 1
+              }" class="image-thumbnail ${
+                index === 0 ? "active" : ""
+              }" data-image="${img}">
+                `
+            )
+            .join("");
+
+          // Render product details
+          const detailContainer = document.getElementById("productDetail");
+          if (detailContainer) {
+            detailContainer.innerHTML = `
+                        <div class="product-images">
+                            <img src="${product.images[0]}" alt="${
+              product.name
+            }" class="main-image" id="mainImage">
+                            <div class="image-thumbnails">
+                                ${thumbnailsHTML}
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h1>${product.name}</h1>
+                            
+                            <div class="product-meta">
+                                <div class="product-meta-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span>${product.category}</span>
+                                </div>
+                                <div class="product-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${product.location}</span>
+                                </div>
+                                ${
+                                  product.rating
+                                    ? `
+                                <div class="product-meta-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>${product.rating} Rating</span>
+                                </div>
+                                `
+                                    : ""
+                                }
+                                <div class="product-meta-item">
+                                    <i class="fas fa-eye"></i>
+                                    <span>${product.views || 0} views</span>
+                                </div>
+                            </div>
+                            
+                            <div class="product-price">${product.price}</div>
+                            
+                            <div class="product-description">
+                                <h3>Description</h3>
+                                <p>${product.description}</p>
+                            </div>
+                            
+                            <div class="seller-info">
+                                <div class="seller-header">
+                                    <i class="fas fa-user-circle seller-avatar"></i>
+                                    <div>
+                                        <h3>${product.seller}</h3>
+                                        <div class="seller-rating">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <span>4.5 (128 reviews)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="seller-stats">
+                                    <span><i class="fas fa-check-circle"></i> Verified Seller</span>
+                                    <span><i class="fas fa-user-clock"></i> Member since 2022</span>
+                                    <span><i class="fas fa-box"></i> 45 items sold</span>
+                                </div>
+                            </div>
+                            
+                            <div class="product-actions">
+                                <button class="btn btn-primary" id="contactSellerBtn">
+                                    <i class="fas fa-message"></i> Contact Seller
+                                </button>
+                                <button class="btn btn-outline" id="saveItemBtn">
+                                    <i class="fas fa-heart"></i> Save Item
+                                </button>
+                                <button class="btn btn-outline" id="shareItemBtn">
+                                    <i class="fas fa-share"></i> Share
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+            // Add thumbnail click functionality
+            const thumbnails =
+              detailContainer.querySelectorAll(".image-thumbnail");
+            const mainImage = detailContainer.querySelector("#mainImage");
+
+            thumbnails.forEach((thumb) => {
+              thumb.addEventListener("click", function () {
+                const imageUrl = this.getAttribute("data-image");
+                mainImage.src = imageUrl;
+
+                thumbnails.forEach((t) => t.classList.remove("active"));
+                this.classList.add("active");
+              });
+            });
+
+            // Add event listeners for action buttons
+            const contactBtn = document.getElementById("contactSellerBtn");
+            const saveBtn = document.getElementById("saveItemBtn");
+            const shareBtn = document.getElementById("shareItemBtn");
+
+            if (contactBtn) {
+              contactBtn.addEventListener("click", function () {
+                appUtils.showNotification(
+                  "This would open a chat with the seller in a real application",
+                  "info"
+                );
+              });
+            }
+
+            if (saveBtn) {
+              let isSaved = false;
+              saveBtn.addEventListener("click", function () {
+                isSaved = !isSaved;
+                if (isSaved) {
+                  this.innerHTML = '<i class="fas fa-heart"></i> Saved';
+                  this.classList.remove("btn-outline");
+                  this.classList.add("btn-danger");
+                  appUtils.showNotification(
+                    "Item saved to your favorites",
+                    "success"
+                  );
+                } else {
+                  this.innerHTML = '<i class="fas fa-heart"></i> Save Item';
+                  this.classList.remove("btn-danger");
+                  this.classList.add("btn-outline");
+                  appUtils.showNotification(
+                    "Item removed from favorites",
+                    "info"
+                  );
+                }
+              });
+            }
+
+            if (shareBtn) {
+              shareBtn.addEventListener("click", function () {
+                if (navigator.share) {
+                  navigator.share({
+                    title: product.name,
+                    text: `Check out ${product.name} on LocalConnect`,
+                    url: window.location.href,
+                  });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  appUtils.showNotification(
+                    "Link copied to clipboard",
+                    "success"
+                  );
+                }
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Error loading product details:", error);
+          appUtils.showNotification("Error loading product details", "error");
+        }
+      }
+
+      async function loadSimilarProducts(productId) {
+        const container = document.getElementById("similarProducts");
+        if (!container) return;
+
+        try {
+          // API PLACEHOLDER: Get similar products
+          // For demo, we'll get all products and filter
+          const allProducts = await api.getProducts({});
+
+          // Exclude current product and get first 4
+          const similarProducts = allProducts
+            .filter((p) => p.id !== parseInt(productId))
+            .slice(0, 4);
+
+          if (similarProducts.length === 0) {
+            container.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-search"></i>
+                            <p>No similar products found</p>
+                        </div>
+                    `;
+            return;
+          }
+
+          // Render similar products
+          similarProducts.forEach((product) => {
+            const productCard = document.createElement("div");
+            productCard.className = "card";
+            productCard.innerHTML = `
+                        <img src="${product.images[0]}" alt="${product.name}" class="card-img">
+                        <div class="card-content">
+                            <h3 class="card-title">${product.name}</h3>
+                            <div class="card-meta">
+                                <span><i class="fas fa-tag"></i> ${product.category}</span>
+                                <span><i class="fas fa-map-marker-alt"></i> ${product.location}</span>
+                            </div>
+                            <div class="card-footer">
+                                <span class="price">${product.price}</span>
+                                <a href="product-detail.html?id=${product.id}" class="btn btn-primary btn-sm">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    `;
+
+            container.appendChild(productCard);
+          });
+        } catch (error) {
+          console.error("Error loading similar products:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
