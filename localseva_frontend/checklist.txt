@@ -1,3 +1,6 @@
+# what not to touch
+    - any of the mart related pages. i have mentioned them at the end of the document
+
 done - works properly without any issues.
 
 - Authentication
@@ -11,26 +14,21 @@ done - works properly without any issues.
 - Create Booking
 - List Bookings
 - Get/Update Booking
-
-
-working on
-
-- MART 
-
-
-
-to be worked on
 - Reviews
 - Create Review
 - Get Provider Reviews
 
 
+Arin -
+working on - mart
 
-remaining
 
-- Reports
-- Create Report
-- List My Reports
+
+Janvi
+working on
+    - Reports
+    - Create Report
+    - List My Reports
 
 
 issues faced
@@ -42,4 +40,28 @@ issues faced
 
 
 PAGES UNDER MARKET PLACE - 
+# html pages 
+    - mart.html
+    - shop.html
+    - add-item.html
+    - product-detail.html
+    - my-products.html
+
+# js pages
+    - add-item
+    - my-products-comments
+    - my-products
+    - product-details
+    - mart
+
+
+
+
+
+
+
+
+
+UI changes
+- make different pages under my activity and do not keep them as tabs
 - 

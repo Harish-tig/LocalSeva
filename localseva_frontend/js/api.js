@@ -506,7 +506,6 @@ async function getCurrentUser() {
 async function createBooking(bookingData) {
   console.log("=== CREATE BOOKING API CALL ===");
   console.log("Input data (raw):", bookingData);
-  console.log("Provider ID in input:", bookingData.provider_id);
 
   const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
   const endpoint = `${API_BASE_URL}bookings/create/`;
@@ -553,26 +552,14 @@ async function createBooking(bookingData) {
       throw new Error("Provider ID is required and must be valid");
     }
 
-    // Get provider username from bookingData
-    const providerUsername = bookingData.provider_username || "";
-
     // Format the booking data according to API requirements
-    // Now sending BOTH provider_id AND service_provider fields
     const formattedData = {
-      provider_id: providerIdValue, // Required field
-      service_provider: providerIdValue, // Additional field with same value
+      provider_id: providerIdValue,
+      service_category: bookingData.service_category || "", // Still send it
       description: bookingData.description || "",
       address: bookingData.address || "",
       scheduled_date: bookingData.scheduled_date,
-      // Optional fields
-      user_notes: bookingData.user_notes || "",
-      service_category: bookingData.service_category || "",
     };
-
-    // Add provider_username if available
-    if (providerUsername) {
-      formattedData.provider_username = providerUsername;
-    }
 
     console.log("Formatted data being sent:", formattedData);
 
@@ -588,6 +575,30 @@ async function createBooking(bookingData) {
       }
     }
 
+    // Validate all required fields are present and not empty
+    const requiredFields = [
+      "provider_id",
+      "service_category",
+      "description",
+      "address",
+      "scheduled_date",
+    ];
+    const missingFields = [];
+
+    for (const field of requiredFields) {
+      if (
+        !formattedData[field] ||
+        formattedData[field].toString().trim() === ""
+      ) {
+        missingFields.push(field);
+      }
+    }
+
+    if (missingFields.length > 0) {
+      console.error("❌ Missing required fields:", missingFields);
+      throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
+    }
+
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -601,22 +612,76 @@ async function createBooking(bookingData) {
     console.log("Response status text:", response.statusText);
 
     let responseData;
+    let responseText;
+
+    // Read the response body only ONCE
     try {
-      responseData = await response.json();
-      console.log("Response data (JSON):", responseData);
-    } catch (e) {
-      const text = await response.text();
-      console.log("Response text:", text);
-      responseData = { text: text };
+      // First try to read as text
+      responseText = await response.text();
+      console.log(
+        "Response text (raw):",
+        responseText.substring(0, 200) + "..."
+      ); // Log first 200 chars
+
+      // Try to parse as JSON if there's content
+      if (
+        responseText &&
+        responseText.trim() !== "" &&
+        !responseText.startsWith("<!DOCTYPE")
+      ) {
+        responseData = JSON.parse(responseText);
+        console.log("Response data (parsed JSON):", responseData);
+      } else if (responseText.startsWith("<!DOCTYPE")) {
+        // It's an HTML error page
+        console.log("Received HTML error page instead of JSON");
+        // Try to extract error message from HTML
+        const match = responseText.match(
+          /<pre class="exception_value">([^<]+)<\/pre>/
+        );
+        if (match) {
+          responseData = { error: match[1], html: true };
+        } else {
+          responseData = {
+            error: "Server returned HTML error page",
+            html: true,
+          };
+        }
+      } else {
+        responseData = {};
+        console.log("Response body is empty");
+      }
+    } catch (parseError) {
+      console.error("Failed to parse response as JSON:", parseError);
+      console.log(
+        "Response text (could not parse as JSON):",
+        responseText.substring(0, 200) + "..."
+      );
+      responseData = { text: responseText };
     }
 
     if (!response.ok) {
-      console.error("❌ API Error - Full response data:", responseData);
+      console.error("❌ API Error - Response not OK");
+      console.error("Response data:", responseData);
 
       let errorMessage = "Booking failed";
-      let fieldErrors = [];
 
-      if (responseData) {
+      // Check for specific database error
+      if (response.status === 500) {
+        if (
+          responseData.error &&
+          responseData.error.includes("has no column named service_category")
+        ) {
+          errorMessage =
+            "Backend database error: The service_category field is not yet available in the database. Please contact the administrator to run migrations.";
+        } else if (responseData.html) {
+          errorMessage =
+            "Server error (500). The backend returned an HTML error page.";
+        } else {
+          errorMessage = "Server error (500). Please try again later.";
+        }
+      } else if (responseData) {
+        let fieldErrors = [];
+
         // Check for field-specific errors
         if (responseData.provider_id) {
           fieldErrors.push(
@@ -627,23 +692,41 @@ async function createBooking(bookingData) {
             }`
           );
         }
-        if (responseData.service_provider) {
+        if (responseData.service_category) {
           fieldErrors.push(
-            `service_provider: ${
-              Array.isArray(responseData.service_provider)
-                ? responseData.service_provider.join(", ")
-                : responseData.service_provider
+            `service_category: ${
+              Array.isArray(responseData.service_category)
+                ? responseData.service_category.join(", ")
+                : responseData.service_category
             }`
           );
         }
         if (responseData.description) {
-          fieldErrors.push(`description: ${responseData.description}`);
+          fieldErrors.push(
+            `description: ${
+              Array.isArray(responseData.description)
+                ? responseData.description.join(", ")
+                : responseData.description
+            }`
+          );
         }
         if (responseData.address) {
-          fieldErrors.push(`address: ${responseData.address}`);
+          fieldErrors.push(
+            `address: ${
+              Array.isArray(responseData.address)
+                ? responseData.address.join(", ")
+                : responseData.address
+            }`
+          );
         }
         if (responseData.scheduled_date) {
-          fieldErrors.push(`scheduled_date: ${responseData.scheduled_date}`);
+          fieldErrors.push(
+            `scheduled_date: ${
+              Array.isArray(responseData.scheduled_date)
+                ? responseData.scheduled_date.join(", ")
+                : responseData.scheduled_date
+            }`
+          );
         }
         if (responseData.non_field_errors) {
           fieldErrors.push(...responseData.non_field_errors);
@@ -718,13 +801,670 @@ if (typeof window.api === "object") {
 
 /**
  * Get bookings for the current user
- * @returns {Promise} - Array of bookings
  */
 async function getBookings() {
+  console.log("📋 Getting user bookings...");
+
+  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const endpoint = `${API_BASE_URL}bookings/`;
+
+  console.log("API Endpoint:", endpoint);
+
   try {
-    return await apiRequest("bookings/", "GET");
+    // Get the accessToken from localStorage
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      console.error("No access token found!");
+      throw new Error("Authentication required.");
+    }
+
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Response status:", response.status);
+
+    let responseData;
+    try {
+      responseData = await response.json();
+      console.log("Response data (JSON):", responseData);
+    } catch (e) {
+      const text = await response.text();
+      console.log("Response text:", text);
+      responseData = { text: text };
+    }
+
+    if (!response.ok) {
+      let errorMessage = "Failed to fetch bookings";
+
+      if (responseData) {
+        if (responseData.detail) {
+          errorMessage = responseData.detail;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        }
+      }
+
+      console.error("API Error details:", errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    console.log("✅ Bookings fetched successfully");
+    return responseData;
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error("Fetch error in getBookings:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get reviews for a provider
+ */
+async function getProviderReviews(providerId) {
+  console.log("📊 Getting reviews for provider:", providerId);
+
+  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const endpoint = `${API_BASE_URL}providers/${providerId}/reviews/`;
+
+  console.log("API Endpoint:", endpoint);
+
+  try {
+    // Get the accessToken from localStorage
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      console.error("No access token found!");
+      throw new Error("Authentication required.");
+    }
+
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Response status:", response.status);
+
+    let responseData;
+    try {
+      responseData = await response.json();
+      console.log("Response data (JSON):", responseData);
+    } catch (e) {
+      const text = await response.text();
+      console.log("Response text:", text);
+      responseData = { text: text };
+    }
+
+    if (!response.ok) {
+      let errorMessage = "Failed to fetch reviews";
+
+      if (responseData) {
+        if (responseData.detail) {
+          errorMessage = responseData.detail;
+        } else if (responseData.message) {
+          errorMessage = responseData.message;
+        }
+      }
+
+      console.error("API Error details:", errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    console.log("✅ Reviews fetched successfully:", responseData);
+    return responseData;
+  } catch (error) {
+    console.error("Fetch error in getProviderReviews:", error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new review
+ */
+async function createReview(reviewData) {
+  console.log("✍️ Creating new review:", reviewData);
+
+  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const endpoint = `${API_BASE_URL}reviews/create/`;
+
+  console.log("API Endpoint:", endpoint);
+
+  try {
+    // Get the accessToken from localStorage
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      console.error("No access token found!");
+      throw new Error("Authentication required.");
+    }
+
+    // Validate required fields
+    const requiredFields = ["booking", "provider_id", "rating", "comment"];
+    const missingFields = [];
+
+    for (const field of requiredFields) {
+      if (!reviewData[field] || reviewData[field].toString().trim() === "") {
+        missingFields.push(field);
+      }
+    }
+
+    if (missingFields.length > 0) {
+      console.error("❌ Missing required fields:", missingFields);
+      throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
+    }
+
+    // Ensure rating is between 1-5
+    const rating = parseInt(reviewData.rating);
+    if (rating < 1 || rating > 5) {
+      throw new Error("Rating must be between 1 and 5");
+    }
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reviewData),
+    });
+
+    console.log("Response status:", response.status);
+    console.log("Response status text:", response.statusText);
+
+    let responseData;
+    let responseText;
+
+    // Read the response body only ONCE - FIX FOR "body stream already read"
+    try {
+      // First try to read as text
+      responseText = await response.text();
+      console.log(
+        "Response text (first 500 chars):",
+        responseText.substring(0, 500)
+      );
+
+      // Try to parse as JSON if there's content and doesn't look like HTML
+      if (responseText && responseText.trim() !== "") {
+        if (
+          !responseText.startsWith("<!DOCTYPE") &&
+          !responseText.startsWith("<html")
+        ) {
+          try {
+            responseData = JSON.parse(responseText);
+            console.log("Response data (parsed JSON):", responseData);
+          } catch (parseError) {
+            console.error("Failed to parse as JSON:", parseError);
+            responseData = { text: responseText };
+          }
+        } else {
+          // It's an HTML error page
+          console.log("Received HTML error page instead of JSON");
+          // Try to extract error message from HTML
+          const match = responseText.match(
+            /<pre class="exception_value">([^<]+)<\/pre>/
+          );
+          if (match) {
+            responseData = { error: match[1], html: true };
+          } else {
+            responseData = {
+              error: "Server returned HTML error page",
+              html: true,
+            };
+          }
+        }
+      } else {
+        responseData = {};
+        console.log("Response body is empty");
+      }
+    } catch (readError) {
+      console.error("Failed to read response:", readError);
+      throw new Error("Failed to read server response");
+    }
+
+    if (!response.ok) {
+      console.error("❌ API Error - Response not OK");
+      console.error("Response data:", responseData);
+
+      let errorMessage = "Failed to create review";
+
+      // Handle 500 errors specifically
+      if (response.status === 500) {
+        if (responseData.error) {
+          if (responseData.error.includes("has no column")) {
+            errorMessage = "Backend database error: " + responseData.error;
+          } else {
+            errorMessage = "Server error: " + responseData.error;
+          }
+        } else {
+          errorMessage = "Internal server error (500). Please try again later.";
+        }
+      } else if (responseData) {
+        let fieldErrors = [];
+
+        // Check for field-specific errors
+        if (responseData.booking) {
+          fieldErrors.push(
+            `booking: ${
+              Array.isArray(responseData.booking)
+                ? responseData.booking.join(", ")
+                : responseData.booking
+            }`
+          );
+        }
+        if (responseData.provider_id) {
+          fieldErrors.push(
+            `provider_id: ${
+              Array.isArray(responseData.provider_id)
+                ? responseData.provider_id.join(", ")
+                : responseData.provider_id
+            }`
+          );
+        }
+        if (responseData.rating) {
+          fieldErrors.push(
+            `rating: ${
+              Array.isArray(responseData.rating)
+                ? responseData.rating.join(", ")
+                : responseData.rating
+            }`
+          );
+        }
+        if (responseData.comment) {
+          fieldErrors.push(
+            `comment: ${
+              Array.isArray(responseData.comment)
+                ? responseData.comment.join(", ")
+                : responseData.comment
+            }`
+          );
+        }
+        if (responseData.non_field_errors) {
+          fieldErrors.push(...responseData.non_field_errors);
+        }
+        if (responseData.detail) {
+          errorMessage = responseData.detail;
+        }
+
+        if (fieldErrors.length > 0) {
+          errorMessage = fieldErrors.join("; ");
+        }
+      }
+
+      console.error("API Error details:", errorMessage);
+
+      // Handle specific status codes
+      if (response.status === 401 || response.status === 403) {
+        // Token expired or invalid
+        if (typeof clearTokens === "function") {
+          clearTokens();
+        } else {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
+        alert("Session expired. Please login again.");
+        window.location.href = "index.html";
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    console.log("✅ Review created successfully:", responseData);
+    return responseData;
+  } catch (error) {
+    console.error("Fetch error in createReview:", error);
+    console.error("Error stack:", error.stack);
+
+    // Handle network errors
+    if (
+      error.message.includes("NetworkError") ||
+      error.message.includes("Failed to fetch")
+    ) {
+      throw new Error("Network error. Please check your internet connection.");
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Get user's bookings for a specific provider
+ */
+async function getUserBookingsForProvider(providerId) {
+  console.log("📋 Getting user bookings for provider:", providerId);
+
+  try {
+    // Get all user bookings
+    const bookings = await getBookings();
+
+    // Filter bookings for this provider and completed status
+    const providerBookings = bookings.filter(
+      (booking) =>
+        booking.service_provider &&
+        (booking.service_provider.id == providerId ||
+          booking.service_provider == providerId) &&
+        booking.status === "COMPLETED"
+    );
+
+    console.log("📦 Filtered bookings for provider:", providerBookings);
+    return providerBookings;
+  } catch (error) {
+    console.error("Error getting user bookings for provider:", error);
+    return [];
+  }
+}
+
+// ===== MARKETPLACE FUNCTIONS =====
+
+const MARKETPLACE_BASE = "marketplace/";
+
+/**
+ * Get products with filters
+ */
+async function getProducts(filters = {}) {
+  try {
+    // Build query parameters
+    const params = new URLSearchParams();
+
+    // Add filter parameters
+    if (filters.category) params.append("category", filters.category);
+    if (filters.condition) params.append("condition", filters.condition);
+    if (filters.city) params.append("city", filters.city);
+    if (filters.is_sold !== undefined)
+      params.append("is_sold", filters.is_sold);
+    if (filters.min_price !== undefined)
+      params.append("min_price", filters.min_price);
+    if (filters.max_price !== undefined)
+      params.append("max_price", filters.max_price);
+    if (filters.search) params.append("search", filters.search);
+    if (filters.ordering) params.append("ordering", filters.ordering);
+
+    // For featured/recent filters from existing code
+    if (filters.featured) {
+      // You might want to add a featured flag in your API or handle differently
+      params.append("ordering", "-views");
+    }
+    if (filters.recent) {
+      params.append("ordering", "-created_at");
+    }
+
+    const queryString = params.toString();
+    const url = `${MARKETPLACE_BASE}${queryString ? `?${queryString}` : ""}`;
+
+    return await apiRequest(url, "GET");
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get a single product by ID
+ */
+async function getProduct(id) {
+  try {
+    return await apiRequest(`${MARKETPLACE_BASE}${id}/`, "GET");
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new product
+ */
+async function createProduct(productData) {
+  try {
+    console.log("Creating product with data:", productData);
+
+    // For FormData, we need to handle file uploads separately
+    const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+    const endpoint = `${API_BASE_URL}marketplace/create/`;
+
+    // Get the accessToken
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      throw new Error("Authentication required. Please login first.");
+    }
+
+    let response;
+
+    if (productData instanceof FormData) {
+      // Log FormData entries for debugging
+      console.log("FormData entries:");
+      for (let pair of productData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Don't set Content-Type for FormData, let browser set it with boundary
+        },
+        body: productData,
+      });
+    } else {
+      // For non-file data (though API requires FormData for images)
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+    }
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.error("API error response:", errorData);
+      } catch (e) {
+        const text = await response.text();
+        errorData = { text: text };
+      }
+
+      let errorMessage = "Failed to create product";
+      if (errorData) {
+        if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (typeof errorData === "object") {
+          // Try to get first error
+          const firstError = Object.values(errorData)[0];
+          if (Array.isArray(firstError)) {
+            errorMessage = firstError[0];
+          } else if (typeof firstError === "string") {
+            errorMessage = firstError;
+          } else {
+            errorMessage = JSON.stringify(errorData);
+          }
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    console.log("Product created successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("Error creating product:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update a product
+ */
+async function updateProduct(id, productData) {
+  try {
+    console.log("Updating product", id, "with data:", productData);
+
+    const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+    const endpoint = `${API_BASE_URL}marketplace/${id}/`;
+
+    // Get the accessToken
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      throw new Error("Authentication required. Please login first.");
+    }
+
+    let response;
+
+    if (productData instanceof FormData) {
+      // For FormData with files
+      console.log("FormData entries for update:");
+      for (let pair of productData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+
+      response = await fetch(endpoint, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: productData,
+      });
+    } else {
+      // For non-file updates
+      response = await fetch(endpoint, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+    }
+
+    console.log("Update response status:", response.status);
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.error("API error response:", errorData);
+      } catch (e) {
+        const text = await response.text();
+        errorData = { text: text };
+      }
+
+      let errorMessage = "Failed to update product";
+      if (errorData) {
+        if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (typeof errorData === "object") {
+          // Try to get first error
+          const firstError = Object.values(errorData)[0];
+          if (Array.isArray(firstError)) {
+            errorMessage = firstError[0];
+          } else if (typeof firstError === "string") {
+            errorMessage = firstError;
+          } else {
+            errorMessage = JSON.stringify(errorData);
+          }
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    console.log("Product updated successfully:", result);
+    return result;
+  } catch (error) {
+    console.error("Error updating product:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete (deactivate) a product
+ */
+async function deleteProduct(id) {
+  try {
+    return await apiRequest(`${MARKETPLACE_BASE}${id}/`, "DELETE");
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get product comments
+ */
+async function getProductComments(productId) {
+  try {
+    return await apiRequest(`${MARKETPLACE_BASE}${productId}/comments/`, "GET");
+  } catch (error) {
+    console.error("Error fetching product comments:", error);
+    throw error;
+  }
+}
+
+/**
+ * Create a comment
+ */
+async function createComment(commentData) {
+  try {
+    return await apiRequest(
+      `${MARKETPLACE_BASE}comments/create/`,
+      "POST",
+      commentData
+    );
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a comment
+ */
+async function deleteComment(commentId) {
+  try {
+    return await apiRequest(
+      `${MARKETPLACE_BASE}comments/${commentId}/delete/`,
+      "DELETE"
+    );
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get current user's products
+ */
+async function getMyProducts() {
+  try {
+    return await apiRequest(`${MARKETPLACE_BASE}my-products/`, "GET");
+  } catch (error) {
+    console.error("Error fetching user products:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get comments on user's products
+ */
+async function getMyProductComments() {
+  try {
+    return await apiRequest(`${MARKETPLACE_BASE}my-product-comments/`, "GET");
+  } catch (error) {
+    console.error("Error fetching user product comments:", error);
     throw error;
   }
 }
@@ -760,6 +1500,24 @@ window.api = {
   getProviders,
   getProviderById,
   getBookings,
+
+  // Reviews
+  getProviderReviews,
+  createReview,
+  getUserBookingsForProvider,
+
+  // Marketplace functions
+  getProducts,
+  getProduct,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductComments,
+  createComment,
+  deleteComment,
+  getMyProducts,
+  getMyProductComments,
+
   // Core API function
   apiRequest,
 };

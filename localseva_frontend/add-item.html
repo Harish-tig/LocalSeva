@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sell Item - Local Marketplace</title>
+    <title>Sell Item - LocalConnect</title>
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
@@ -20,7 +20,7 @@
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
-        <p>Welcome, <span id="userName">Alex</span></p>
+        <p>Welcome, <span id="userName">User</span></p>
       </div>
 
       <nav class="sidebar-nav">
@@ -71,6 +71,27 @@
         </div>
 
         <div class="sidebar-section">
+          <h3>Marketplace</h3>
+          <ul>
+            <li>
+              <a href="my-products.html"
+                ><i class="fas fa-box"></i> My Products</a
+              >
+            </li>
+            <li>
+              <a href="my-product-comments.html"
+                ><i class="fas fa-comments"></i> Product Comments</a
+              >
+            </li>
+            <li class="active">
+              <a href="add-item.html"
+                ><i class="fas fa-plus-circle"></i> Sell Item</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
           <ul>
             <li>
               <a href="#" id="logoutBtn"
@@ -93,11 +114,10 @@
     <!-- Main Content -->
     <main class="main-content">
       <div class="page-header">
-        <div>
-          <a href="mart.html" class="btn btn-outline btn-sm">
-            <i class="fas fa-arrow-left"></i> Back to Mart
-          </a>
-        </div>
+        <button onclick="window.history.back()" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h1 id="pageTitle">Sell an Item</h1>
         <div class="header-actions">
           <button id="themeToggle" class="theme-toggle">
             <i class="fas fa-moon"></i>
@@ -105,211 +125,374 @@
         </div>
       </div>
 
-      <div class="sell-item-container">
-        <div class="card">
-          <div class="sell-header">
-            <h1><i class="fas fa-plus-circle"></i> Sell an Item</h1>
-            <p>Fill in the details below to list your item for sale</p>
-          </div>
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step active" id="step1">
+          <span class="step-number">1</span>
+          <span>Basic Info</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" id="step2">
+          <span class="step-number">2</span>
+          <span>Price & Location</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" id="step3">
+          <span class="step-number">3</span>
+          <span>Images</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" id="step4">
+          <span class="step-number">4</span>
+          <span>Contact Info</span>
+        </div>
+      </div>
 
-          <form id="addItemForm" class="sell-form">
-            <div class="form-section">
-              <h3>Item Information</h3>
+      <!-- Add Item Form -->
+      <div class="sell-item-container">
+        <div class="sell-header">
+          <h1 id="formTitle">Sell an Item</h1>
+          <p id="formSubtitle">
+            Fill in the details below to list your item for sale
+          </p>
+        </div>
+
+        <form id="addItemForm" enctype="multipart/form-data">
+          <!-- Basic Information Section -->
+          <div class="form-section">
+            <h3>Basic Information</h3>
+            <div class="form-help">
+              <p>
+                Provide clear and accurate details about your item. This helps
+                buyers find and understand what you're selling.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="itemTitle" class="form-label required">Title</label>
+              <input
+                type="text"
+                id="itemTitle"
+                class="form-control"
+                placeholder="e.g., Sofa Set - 3 Seater"
+                required
+                maxlength="100"
+              />
+              <div class="error-message" id="titleError" style="display: none">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Title is required</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="itemDescription" class="form-label required"
+                >Description</label
+              >
+              <textarea
+                id="itemDescription"
+                class="form-control"
+                rows="4"
+                placeholder="Describe your item in detail. Include brand, model, size, color, condition details, and any flaws or issues..."
+                required
+                maxlength="1000"
+              ></textarea>
+              <div class="char-count">
+                <span id="charCount">0</span>/1000 characters
+              </div>
+              <div
+                class="error-message"
+                id="descriptionError"
+                style="display: none"
+              >
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Description is required (max 1000 characters)</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="itemCategory" class="form-label required"
+                  >Category</label
+                >
+                <select id="itemCategory" class="form-control" required>
+                  <option value="">Select Category</option>
+                  <option value="FURNITURE">Furniture</option>
+                  <option value="ELECTRONICS">Electronics</option>
+                  <option value="VEHICLES">Vehicles</option>
+                  <option value="REAL_ESTATE">Real Estate</option>
+                  <option value="HOME_APPLIANCES">Home Appliances</option>
+                  <option value="CLOTHING">Clothing</option>
+                  <option value="BOOKS">Books</option>
+                  <option value="SPORTS">Sports</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                <div
+                  class="error-message"
+                  id="categoryError"
+                  style="display: none"
+                >
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>Please select a category</span>
+                </div>
+              </div>
 
               <div class="form-group">
-                <label for="itemName" class="form-label">Item Name *</label>
+                <label for="itemCondition" class="form-label required"
+                  >Condition</label
+                >
+                <select id="itemCondition" class="form-control" required>
+                  <option value="">Select Condition</option>
+                  <option value="NEW">Brand New</option>
+                  <option value="LIKE_NEW">Like New</option>
+                  <option value="GOOD">Good</option>
+                  <option value="FAIR">Fair</option>
+                  <option value="POOR">Poor</option>
+                </select>
+                <div
+                  class="error-message"
+                  id="conditionError"
+                  style="display: none"
+                >
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>Please select condition</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price & Location Section -->
+          <div class="form-section">
+            <h3>Price & Location</h3>
+            <div class="form-help">
+              <p>
+                Set a fair price and provide accurate location details for
+                buyers.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="itemPrice" class="form-label required"
+                >Price (₹)</label
+              >
+              <div class="price-input">
+                <span class="currency-symbol">₹</span>
                 <input
-                  type="text"
-                  id="itemName"
+                  type="number"
+                  id="itemPrice"
                   class="form-control"
-                  placeholder="e.g., iPhone 13 Pro, Office Chair"
+                  placeholder="15000"
+                  step="0.01"
+                  min="0"
                   required
                 />
               </div>
-
-              <div class="form-group">
-                <label for="itemCategory" class="form-label">Category *</label>
-                <select id="itemCategory" class="form-control" required>
-                  <option value="">Select a category</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Furniture">Furniture</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Books">Books</option>
-                  <option value="Vehicles">Vehicles</option>
-                  <option value="Sports">Sports</option>
-                  <option value="Home Appliances">Home Appliances</option>
-                  <option value="Other">Other</option>
-                </select>
+              <div class="error-message" id="priceError" style="display: none">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Please enter a valid price</span>
               </div>
+            </div>
 
+            <div class="form-row">
               <div class="form-group">
-                <label for="itemCondition" class="form-label">Condition</label>
-                <select id="itemCondition" class="form-control">
-                  <option value="New">New</option>
-                  <option value="Like New">Like New</option>
-                  <option value="Good">Good</option>
-                  <option value="Fair">Fair</option>
-                  <option value="Needs Repair">Needs Repair</option>
+                <label for="itemCity" class="form-label required">City</label>
+                <select id="itemCity" class="form-control" required>
+                  <option value="">Select City</option>
+                  <option value="Kandivali">Kandivali</option>
+                  <option value="Borivali">Borivali</option>
+                  <option value="Mira Road">Mira Road</option>
+                  <option value="Bhayender">Bhayender</option>
+                  <option value="Malad">Malad</option>
+                  <option value="Andheri">Andheri</option>
+                  <option value="New York">New York</option>
+                  <option value="Other">Other City</option>
                 </select>
-              </div>
-
-              <div class="form-group">
-                <label for="itemPrice" class="form-label">Price *</label>
-                <div class="price-input">
-                  <span class="currency-symbol">$</span>
-                  <input
-                    type="number"
-                    id="itemPrice"
-                    class="form-control"
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    required
-                  />
+                <div class="error-message" id="cityError" style="display: none">
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>Please select a city</span>
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="itemDescription" class="form-label"
-                  >Description *</label
+                <label for="itemAddress" class="form-label required"
+                  >Address</label
                 >
-                <textarea
-                  id="itemDescription"
+                <input
+                  type="text"
+                  id="itemAddress"
                   class="form-control"
-                  rows="5"
-                  placeholder="Describe your item in detail. Include any flaws, special features, etc."
+                  placeholder="123 Main St, Area/Locality"
                   required
-                ></textarea>
-                <div class="char-count">
-                  <span id="charCount">0</span> / 1000 characters
+                />
+                <div class="form-text">
+                  This helps buyers know the pickup location
                 </div>
-              </div>
-            </div>
-
-            <div class="form-section">
-              <h3>Location & Contact</h3>
-
-              <div class="form-group">
-                <label for="itemLocation" class="form-label">Location *</label>
-                <select id="itemLocation" class="form-control" required>
-                  <option value="">Select your location</option>
-                  <option value="Downtown">Downtown</option>
-                  <option value="Eastside">Eastside</option>
-                  <option value="Westside">Westside</option>
-                  <option value="Uptown">Uptown</option>
-                  <option value="Midtown">Midtown</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="meetupPreference" class="form-label"
-                  >Meetup Preference</label
+                <div
+                  class="error-message"
+                  id="addressError"
+                  style="display: none"
                 >
-                <select id="meetupPreference" class="form-control">
-                  <option value="Public Place">Public Place</option>
-                  <option value="My Location">My Location</option>
-                  <option value="Buyer's Location">Buyer's Location</option>
-                  <option value="Flexible">Flexible</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">Contact Methods</label>
-                <div class="checkbox-group">
-                  <label
-                    ><input
-                      type="checkbox"
-                      name="contactMethods"
-                      value="in-app"
-                      checked
-                    />
-                    In-app messaging</label
-                  >
-                  <label
-                    ><input
-                      type="checkbox"
-                      name="contactMethods"
-                      value="phone"
-                    />
-                    Phone call</label
-                  >
-                  <label
-                    ><input
-                      type="checkbox"
-                      name="contactMethods"
-                      value="whatsapp"
-                    />
-                    WhatsApp</label
-                  >
-                  <label
-                    ><input
-                      type="checkbox"
-                      name="contactMethods"
-                      value="email"
-                    />
-                    Email</label
-                  >
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>Address is required</span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="form-section">
-              <h3>Item Images</h3>
-              <p class="form-help">
-                Upload up to 3 clear photos of your item. The first image will
-                be the main display image.
-              </p>
-
-              <div class="image-upload-container">
-                <div class="image-upload-box" id="uploadBox1">
-                  <i class="fas fa-camera"></i>
-                  <span>Add Photo 1</span>
-                  <small>Required</small>
-                </div>
-                <div class="image-upload-box" id="uploadBox2">
-                  <i class="fas fa-camera"></i>
-                  <span>Add Photo 2</span>
-                  <small>Optional</small>
-                </div>
-                <div class="image-upload-box" id="uploadBox3">
-                  <i class="fas fa-camera"></i>
-                  <span>Add Photo 3</span>
-                  <small>Optional</small>
-                </div>
-              </div>
-
-              <div class="image-requirements">
-                <p><strong>Photo requirements:</strong></p>
-                <ul>
-                  <li>Clear, well-lit photos</li>
-                  <li>Show any flaws or damage</li>
-                  <li>Include different angles</li>
-                  <li>Max file size: 5MB each</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-check-circle"></i> List Item for Sale
-              </button>
-              <button type="button" id="saveDraft" class="btn btn-outline">
-                <i class="fas fa-save"></i> Save as Draft
-              </button>
-              <button type="button" id="previewListing" class="btn btn-outline">
-                <i class="fas fa-eye"></i> Preview
-              </button>
-            </div>
-
-            <div class="form-note">
+          <!-- Images Section -->
+          <div class="form-section">
+            <h3>Images</h3>
+            <div class="form-help">
               <p>
-                <i class="fas fa-info-circle"></i> By listing your item, you
-                agree to our <a href="#">Seller Terms</a>. Items must comply
-                with our <a href="#">Prohibited Items Policy</a>.
+                Upload clear, well-lit photos from different angles. The first
+                image will be the main display image.
               </p>
             </div>
-          </form>
-        </div>
+
+            <div class="image-upload-container" id="imageUploadContainer">
+              <!-- Main Image -->
+              <div class="image-upload-box" id="mainImageUpload">
+                <i class="fas fa-camera"></i>
+                <span>Main Image *</span>
+                <input
+                  type="file"
+                  id="mainImage"
+                  accept="image/*"
+                  capture="environment"
+                />
+              </div>
+              <div
+                class="image-preview"
+                id="mainImagePreview"
+                style="display: none"
+              >
+                <img id="mainImagePreviewImg" src="" alt="Main Image" />
+                <button
+                  type="button"
+                  class="remove-image"
+                  onclick="removeImage('mainImage')"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <!-- Image 2 -->
+              <div class="image-upload-box" id="image2Upload">
+                <i class="fas fa-image"></i>
+                <span>Image 2 (Optional)</span>
+                <input type="file" id="image2" accept="image/*" />
+              </div>
+              <div
+                class="image-preview"
+                id="image2Preview"
+                style="display: none"
+              >
+                <img id="image2PreviewImg" src="" alt="Image 2" />
+                <button
+                  type="button"
+                  class="remove-image"
+                  onclick="removeImage('image2')"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <!-- Image 3 -->
+              <div class="image-upload-box" id="image3Upload">
+                <i class="fas fa-image"></i>
+                <span>Image 3 (Optional)</span>
+                <input type="file" id="image3" accept="image/*" />
+              </div>
+              <div
+                class="image-preview"
+                id="image3Preview"
+                style="display: none"
+              >
+                <img id="image3PreviewImg" src="" alt="Image 3" />
+                <button
+                  type="button"
+                  class="remove-image"
+                  onclick="removeImage('image3')"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="image-requirements">
+              <h4>Image Guidelines:</h4>
+              <ul>
+                <li>Use clear, well-lit photos</li>
+                <li>Show the item from different angles</li>
+                <li>Include any flaws or damages</li>
+                <li>Supported formats: JPG, PNG, WebP</li>
+                <li>Maximum size: 5MB per image</li>
+              </ul>
+            </div>
+
+            <div class="error-message" id="imageError" style="display: none">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>Please upload at least one image</span>
+            </div>
+          </div>
+
+          <!-- Contact Information Section -->
+          <div class="form-section">
+            <h3>Contact Information</h3>
+            <div class="form-help">
+              <p>
+                Choose how buyers can contact you. Your contact info will only
+                be visible to interested buyers.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label for="contactPhone" class="form-label">Phone Number</label>
+              <input
+                type="tel"
+                id="contactPhone"
+                class="form-control"
+                placeholder="+91 9876543210"
+              />
+              <div class="form-text">Include country code if applicable</div>
+            </div>
+
+            <div class="form-group">
+              <label for="contactWhatsapp" class="form-label"
+                >WhatsApp Number</label
+              >
+              <input
+                type="tel"
+                id="contactWhatsapp"
+                class="form-control"
+                placeholder="+91 9876543210"
+              />
+              <div class="form-text">
+                Optional, but recommended for faster communication
+              </div>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="contactEmail" checked />
+              <label for="contactEmail"
+                >Allow buyers to contact me via email</label
+              >
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-outline"
+              onclick="cancelForm()"
+            >
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <i class="fas fa-plus"></i> List Item
+            </button>
+          </div>
+        </form>
       </div>
     </main>
 
@@ -328,381 +511,155 @@
       </a>
     </nav>
 
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none">
+      <div class="loading-spinner"></div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/mart.js"></script>
-
-    <!-- <style>
-      .sell-item-container {
-        max-width: 800px;
-        margin: 0 auto;
-      }
-
-      .sell-header {
-        text-align: center;
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .sell-header h1 {
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-      }
-
-      .sell-header p {
-        color: var(--text-secondary);
-      }
-
-      .sell-form {
-        margin-top: 2rem;
-      }
-
-      .form-section {
-        margin-bottom: 2.5rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .form-section h3 {
-        margin-bottom: 1.5rem;
-        color: var(--primary-color);
-      }
-
-      .price-input {
-        position: relative;
-      }
-
-      .price-input .currency-symbol {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        font-weight: 600;
-        color: var(--text-secondary);
-      }
-
-      .price-input .form-control {
-        padding-left: 2.5rem;
-      }
-
-      .char-count {
-        text-align: right;
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        margin-top: 0.5rem;
-      }
-
-      .form-help {
-        color: var(--text-secondary);
-        margin-bottom: 1rem;
-        font-size: 0.95rem;
-      }
-
-      .image-requirements {
-        background-color: rgba(0, 0, 0, 0.03);
-        border-radius: var(--border-radius-sm);
-        padding: 1.5rem;
-        margin-top: 1.5rem;
-      }
-
-      .image-requirements ul {
-        margin-top: 0.5rem;
-        padding-left: 1.5rem;
-      }
-
-      .image-requirements li {
-        margin-bottom: 0.25rem;
-        color: var(--text-secondary);
-      }
-
-      .form-actions {
-        display: flex;
-        gap: 1rem;
-        margin: 2.5rem 0;
-        flex-wrap: wrap;
-      }
-
-      .form-note {
-        background-color: rgba(67, 97, 238, 0.05);
-        border-radius: var(--border-radius-sm);
-        padding: 1.5rem;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-      }
-
-      .form-note i {
-        color: var(--primary-color);
-        margin-right: 0.5rem;
-      }
-
-      .form-note a {
-        font-weight: 500;
-      }
-
-      @media (max-width: 768px) {
-        .form-actions {
-          flex-direction: column;
-        }
-
-        .form-actions button {
-          width: 100%;
-        }
-      }
-    </style>
+    <script src="js/add-item.js"></script>
+    <!-- In the script section of add-item.html, update the previewImage and removeImage functions -->
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // Initialize image upload functionality
-        initImageUpload();
+      // Utility functions for image handling
+      function previewImage(event, previewId) {
+        const input = event.target;
+        const preview = document.getElementById(previewId);
+        const previewImg = document.getElementById(previewId + "Img");
+        const uploadBox = document.getElementById(input.id + "Upload");
 
-        // Character count for description
-        const descriptionTextarea = document.getElementById("itemDescription");
-        const charCount = document.getElementById("charCount");
-
-        if (descriptionTextarea && charCount) {
-          descriptionTextarea.addEventListener("input", function () {
-            charCount.textContent = this.value.length;
-
-            if (this.value.length > 1000) {
-              charCount.style.color = "var(--danger-color)";
-            } else if (this.value.length > 800) {
-              charCount.style.color = "var(--warning-color)";
-            } else {
-              charCount.style.color = "var(--text-secondary)";
-            }
-          });
-        }
-
-        // Form submission
-        const addItemForm = document.getElementById("addItemForm");
-        const saveDraftBtn = document.getElementById("saveDraft");
-        const previewBtn = document.getElementById("previewListing");
-
-        if (addItemForm) {
-          addItemForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            if (!validateForm()) {
-              return;
-            }
-
-            const formData = getFormData();
-
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML =
-              '<i class="fas fa-spinner fa-spin"></i> Listing Item...';
-
-            try {
-              // API PLACEHOLDER: Add product
-              const result = await api.addProduct(formData);
-
-              appUtils.showNotification("Item listed successfully!", "success");
-
-              // Redirect to the new product page
-              setTimeout(() => {
-                window.location.href = `product-detail.html?id=${result.productId}`;
-              }, 1500);
-            } catch (error) {
-              console.error("Error adding item:", error);
-              appUtils.showNotification(
-                "Failed to list item. Please try again.",
-                "error"
-              );
-
-              submitBtn.disabled = false;
-              submitBtn.innerHTML = originalText;
-            }
-          });
-        }
-
-        if (saveDraftBtn) {
-          saveDraftBtn.addEventListener("click", function () {
-            const formData = getFormData();
-            // API PLACEHOLDER: Save as draft
-            console.log("API PLACEHOLDER: Save draft", formData);
-            appUtils.showNotification("Draft saved successfully!", "success");
-          });
-        }
-
-        if (previewBtn) {
-          previewBtn.addEventListener("click", function () {
-            if (validateForm(true)) {
-              const formData = getFormData();
-              // In a real app, this would open a preview modal
-              appUtils.showNotification(
-                "Preview would show your listing here",
-                "info"
-              );
-            }
-          });
-        }
-
-        function initImageUpload() {
-          const uploadBoxes = [
-            document.getElementById("uploadBox1"),
-            document.getElementById("uploadBox2"),
-            document.getElementById("uploadBox3"),
-          ];
-
-          let uploadedImages = [null, null, null];
-
-          uploadBoxes.forEach((box, index) => {
-            if (!box) return;
-
-            box.addEventListener("click", function () {
-              const fileInput = document.createElement("input");
-              fileInput.type = "file";
-              fileInput.accept = "image/*";
-              fileInput.style.display = "none";
-
-              fileInput.addEventListener("change", function (e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                // Check file size (5MB max)
-                if (file.size > 5 * 1024 * 1024) {
-                  appUtils.showNotification(
-                    "File size must be less than 5MB",
-                    "error"
-                  );
-                  return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                  // Create image preview
-                  const imagePreview = document.createElement("div");
-                  imagePreview.className = "image-preview";
-                  imagePreview.innerHTML = `
-                                    <img src="${e.target.result}" alt="Uploaded image">
-                                    <button type="button" class="remove-image" data-index="${index}">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                `;
-
-                  // Replace upload box with preview
-                  box.replaceWith(imagePreview);
-
-                  // Store image data
-                  uploadedImages[index] = {
-                    dataUrl: e.target.result,
-                    file: file,
-                    name: file.name,
-                  };
-
-                  // Add remove functionality
-                  imagePreview
-                    .querySelector(".remove-image")
-                    .addEventListener("click", function () {
-                      // Restore upload box
-                      imagePreview.replaceWith(box);
-                      uploadedImages[index] = null;
-                    });
-                };
-                reader.readAsDataURL(file);
-              });
-
-              document.body.appendChild(fileInput);
-              fileInput.click();
-              document.body.removeChild(fileInput);
-            });
-          });
-
-          // Store uploaded images in a variable accessible to validation functions
-          window.uploadedImages = uploadedImages;
-        }
-
-        function validateForm(isPreview = false) {
-          // Basic validation
-          const itemName = document.getElementById("itemName").value.trim();
-          const itemCategory = document.getElementById("itemCategory").value;
-          const itemPrice = document.getElementById("itemPrice").value;
-          const itemDescription = document
-            .getElementById("itemDescription")
-            .value.trim();
-          const itemLocation = document.getElementById("itemLocation").value;
-
-          if (!itemName) {
-            appUtils.showNotification("Please enter item name", "error");
-            return false;
-          }
-
-          if (!itemCategory) {
-            appUtils.showNotification("Please select a category", "error");
-            return false;
-          }
-
-          if (!itemPrice || parseFloat(itemPrice) <= 0) {
-            appUtils.showNotification("Please enter a valid price", "error");
-            return false;
-          }
-
-          if (!itemDescription) {
-            appUtils.showNotification("Please enter item description", "error");
-            return false;
-          }
-
-          if (itemDescription.length > 1000) {
+        if (input.files && input.files[0]) {
+          // Check file size (5MB limit)
+          if (input.files[0].size > 5 * 1024 * 1024) {
             appUtils.showNotification(
-              "Description must be 1000 characters or less",
+              "File size must be less than 5MB",
               "error"
             );
-            return false;
+            input.value = "";
+            return;
           }
 
-          if (!itemLocation) {
-            appUtils.showNotification("Please select a location", "error");
-            return false;
+          // Check file type
+          const validTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+          ];
+          if (!validTypes.includes(input.files[0].type)) {
+            appUtils.showNotification(
+              "Please upload a valid image file (JPG, PNG, or WebP)",
+              "error"
+            );
+            input.value = "";
+            return;
           }
 
-          // Check for at least one image (only for final submission, not preview)
-          if (!isPreview) {
-            const hasImage =
-              window.uploadedImages &&
-              window.uploadedImages.some((img) => img !== null);
-            if (!hasImage) {
-              appUtils.showNotification(
-                "Please upload at least one photo",
-                "error"
-              );
-              return false;
-            }
-          }
+          const reader = new FileReader();
 
-          return true;
-        }
-
-        function getFormData() {
-          const contactMethods = Array.from(
-            document.querySelectorAll('input[name="contactMethods"]:checked')
-          ).map((cb) => cb.value);
-
-          // Filter out null images
-          const images = window.uploadedImages
-            ? window.uploadedImages.filter((img) => img !== null)
-            : [];
-
-          return {
-            name: document.getElementById("itemName").value.trim(),
-            category: document.getElementById("itemCategory").value,
-            condition: document.getElementById("itemCondition").value,
-            price: parseFloat(
-              document.getElementById("itemPrice").value
-            ).toFixed(2),
-            description: document
-              .getElementById("itemDescription")
-              .value.trim(),
-            location: document.getElementById("itemLocation").value,
-            meetupPreference: document.getElementById("meetupPreference").value,
-            contactMethods: contactMethods,
-            images: images,
+          reader.onload = function (e) {
+            previewImg.src = e.target.result;
+            preview.style.display = "block";
+            uploadBox.style.display = "none";
+            hideImageError();
           };
+
+          reader.readAsDataURL(input.files[0]);
         }
+      }
+
+      function removeImage(inputId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(inputId + "Preview");
+        const uploadBox = document.getElementById(inputId + "Upload");
+
+        input.value = "";
+        preview.style.display = "none";
+        uploadBox.style.display = "flex";
+      }
+
+      function hideImageError() {
+        document.getElementById("imageError").style.display = "none";
+      }
+
+      // Update the initialization code
+      document.addEventListener("DOMContentLoaded", function () {
+        // Set up image upload listeners
+        document
+          .getElementById("mainImage")
+          .addEventListener("change", function (e) {
+            previewImage(e, "mainImagePreview");
+          });
+
+        document
+          .getElementById("image2")
+          .addEventListener("change", function (e) {
+            previewImage(e, "image2Preview");
+          });
+
+        document
+          .getElementById("image3")
+          .addEventListener("change", function (e) {
+            previewImage(e, "image3Preview");
+          });
+
+        // Character count for description
+        const description = document.getElementById("itemDescription");
+        const charCount = document.getElementById("charCount");
+
+        if (description && charCount) {
+          description.addEventListener("input", function () {
+            const length = this.value.length;
+            charCount.textContent = length;
+
+            // Update character count color
+            charCount.className = "char-count";
+            if (length > 900) {
+              charCount.classList.add("warning");
+            }
+            if (length > 980) {
+              charCount.classList.add("error");
+            }
+          });
+        }
+
+        // Update step indicator based on scroll
+        window.addEventListener("scroll", updateStepIndicator);
       });
-    </script> -->
+
+      function updateStepIndicator() {
+        const sections = document.querySelectorAll(".form-section");
+        const steps = document.querySelectorAll(".step");
+
+        // Reset all steps
+        steps.forEach((step) => {
+          step.classList.remove("active");
+          step.classList.remove("completed");
+        });
+
+        // Find current section
+        let currentStep = 0;
+        sections.forEach((section, index) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top < window.innerHeight / 2) {
+            currentStep = index + 1;
+          }
+        });
+
+        // Update steps
+        for (let i = 0; i < steps.length; i++) {
+          if (i < currentStep) {
+            steps[i].classList.add("completed");
+          } else if (i === currentStep) {
+            steps[i].classList.add("active");
+          }
+        }
+      }
+
+      // Initial update of step indicator
+      setTimeout(updateStepIndicator, 100);
+    </script>
   </body>
 </html>

@@ -332,6 +332,8 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/service-request.js"></script>
+    <script src="js/review.js"></script>
+    <!-- Add this line -->
     <script src="js/service-detail.js"></script>
 
     <style>
@@ -480,6 +482,83 @@
         .detail-images {
           flex: 0 0 auto;
         }
+      }
+
+      /* Review-specific styles */
+      .review-item {
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .no-booking-message {
+        margin-bottom: 1.5rem;
+      }
+
+      .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+      }
+
+      .alert i {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .alert-info {
+        background-color: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: var(--primary);
+      }
+
+      .loading-skeleton {
+        background: linear-gradient(
+          90deg,
+          #f0f0f0 25%,
+          #e0e0e0 50%,
+          #f0f0f0 75%
+        );
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+
+      @keyframes loading {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+      }
+
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      .empty-state h4 {
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
       }
     </style>
   </body>

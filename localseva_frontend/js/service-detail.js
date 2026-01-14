@@ -26,9 +26,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Load service details
   await loadServiceDetails(serviceId);
-
-  // Initialize review form
-  initReviewForm();
 });
 
 /**
@@ -60,7 +57,7 @@ async function loadServiceDetails(serviceId) {
       throw new Error("Service not found");
     }
 
-    // Store provider globally for use in request service
+    // Store provider globally for use in request service AND review system
     window.currentProvider = provider;
     console.log("💾 Provider stored globally:", window.currentProvider);
 
@@ -68,7 +65,18 @@ async function loadServiceDetails(serviceId) {
     renderServiceDetails(provider);
 
     // Initialize service request functionality
-    initServiceRequest(provider);
+    if (typeof ServiceRequestManager !== "undefined") {
+      ServiceRequestManager.init(provider);
+    } else {
+      console.error("❌ ServiceRequestManager not loaded!");
+    }
+
+    // Initialize review system
+    if (typeof ReviewManager !== "undefined") {
+      ReviewManager.init(provider);
+    } else {
+      console.error("❌ ReviewManager not loaded!");
+    }
   } catch (error) {
     console.error("❌ Error loading service details:", error);
     container.innerHTML = `
@@ -245,54 +253,6 @@ function renderServiceDetails(provider) {
 }
 
 /**
- * Initialize service request functionality
- */
-function initServiceRequest(provider) {
-  console.log(
-    "🔧 Initializing service request for provider:",
-    provider.username
-  );
-
-  // Check if ServiceRequestManager exists
-  if (typeof ServiceRequestManager === "undefined") {
-    console.error("❌ ServiceRequestManager not loaded!");
-    console.log(
-      "📁 Please make sure service-request.js is included in your HTML"
-    );
-
-    // Create a fallback function
-    const requestBtn = document.getElementById("requestServiceBtn");
-    if (requestBtn) {
-      requestBtn.addEventListener("click", function () {
-        console.log("⚠️ Using fallback service request handler");
-        alert(
-          "Service request functionality is not available. Please make sure service-request.js is loaded."
-        );
-      });
-    }
-    return;
-  }
-
-  // Initialize the service request manager
-  try {
-    ServiceRequestManager.init(provider);
-    console.log("✅ Service request system initialized");
-  } catch (error) {
-    console.error("❌ Failed to initialize service request:", error);
-
-    // Fallback to simple alert
-    const requestBtn = document.getElementById("requestServiceBtn");
-    if (requestBtn) {
-      requestBtn.addEventListener("click", function () {
-        alert(
-          `To request service from ${provider.username}, please contact support.`
-        );
-      });
-    }
-  }
-}
-
-/**
  * Get default image URL based on category
  * This is a helper function that's only used if the API doesn't provide an avatar
  */
@@ -332,65 +292,6 @@ function getDefaultImageUrl(categories) {
   return "https://via.placeholder.com/300x200?text=Service";
 }
 
-/**
- * Initialize review form
- */
-function initReviewForm() {
-  console.log("⭐ Initializing review form");
-
-  const stars = document.querySelectorAll(".rating-input i");
-  let selectedRating = 0;
-
-  stars.forEach((star) => {
-    star.addEventListener("click", function () {
-      const rating = parseInt(this.getAttribute("data-rating"));
-      selectedRating = rating;
-      console.log("⭐ Rating selected:", rating);
-
-      stars.forEach((s, index) => {
-        if (index < rating) {
-          s.classList.add("active");
-        } else {
-          s.classList.remove("active");
-        }
-      });
-    });
-  });
-
-  // Handle review form submission
-  const reviewForm = document.getElementById("reviewForm");
-  if (reviewForm) {
-    reviewForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      console.log("📝 Review form submitted");
-
-      if (selectedRating === 0) {
-        appUtils.showNotification("Please select a rating", "error");
-        return;
-      }
-
-      const reviewText = document.getElementById("reviewText").value;
-
-      if (!reviewText.trim()) {
-        appUtils.showNotification("Please enter your review text", "error");
-        return;
-      }
-
-      // API PLACEHOLDER: Submit review
-      console.log("API PLACEHOLDER: POST /api/reviews");
-      console.log("Rating:", selectedRating);
-      console.log("Review:", reviewText);
-
-      appUtils.showNotification("Review submitted successfully!", "success");
-
-      // Reset form
-      reviewForm.reset();
-      stars.forEach((star) => star.classList.remove("active"));
-      selectedRating = 0;
-    });
-  }
-}
-
 // Add console test functions
 window.testServiceDetail = {
   getProviderInfo: function () {
@@ -423,6 +324,7 @@ window.testServiceDetail = {
     );
     console.log("- Current provider:", window.currentProvider);
     console.log("- ServiceRequestManager:", typeof ServiceRequestManager);
+    console.log("- ReviewManager:", typeof ReviewManager);
   },
 };
 

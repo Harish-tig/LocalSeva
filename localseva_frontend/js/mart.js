@@ -5,10 +5,10 @@
 
 document.addEventListener("DOMContentLoaded", async function () {
   // Check authentication
-  // if (!api.isAuthenticated()) {
-  //   window.location.href = "index.html";
-  //   return;
-  // }
+  if (!api.isAuthenticated()) {
+    window.location.href = "index.html";
+    return;
+  }
 
   // Initialize based on current page
   if (window.location.pathname.includes("mart.html")) {
@@ -29,8 +29,21 @@ async function initMartPage() {
   categoryCards.forEach((card) => {
     card.addEventListener("click", function () {
       const category = this.dataset.category;
+      // Map display category to API category
+      const categoryMap = {
+        Electronics: "ELECTRONICS",
+        Furniture: "FURNITURE",
+        Clothing: "CLOTHING",
+        Books: "BOOKS",
+        Vehicles: "VEHICLES",
+        Sports: "SPORTS",
+        "Home Appliances": "HOME_APPLIANCES",
+        Other: "OTHER",
+      };
+
+      const apiCategory = categoryMap[category] || category;
       window.location.href = `shop.html?category=${encodeURIComponent(
-        category
+        apiCategory
       )}`;
     });
   });
@@ -67,15 +80,18 @@ async function initMartPage() {
 }
 
 /**
- * Load featured products
+ * Load featured products (most viewed)
  */
 async function loadFeaturedProducts() {
   const container = document.getElementById("featuredProducts");
   if (!container) return;
 
   try {
-    // Get featured products (you might need to adjust this filter)
-    const products = await api.getProducts({ featured: true });
+    // Get featured products (ordering by views)
+    const products = await api.getProducts({
+      ordering: "-views",
+      is_sold: false,
+    });
 
     if (!products || products.length === 0) {
       container.innerHTML = `
@@ -109,8 +125,11 @@ async function loadRecentProducts() {
   if (!container) return;
 
   try {
-    // Get recent products (you might need to adjust this filter)
-    const products = await api.getProducts({ recent: true });
+    // Get recent products (ordering by creation date)
+    const products = await api.getProducts({
+      ordering: "-created_at",
+      is_sold: false,
+    });
 
     if (!products || products.length === 0) {
       container.innerHTML = `
@@ -145,31 +164,47 @@ function renderProducts(products, container) {
   products.forEach((product) => {
     const productCard = document.createElement("div");
     productCard.className = "card";
+
+    // Format price
+    const price = parseFloat(product.price).toLocaleString("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    });
+
     productCard.innerHTML = `
             <img src="${
-              product.image ||
-              product.images?.[0] ||
-              api.mockData.products[0].image
+              product.main_image ||
+              "https://via.placeholder.com/300x200?text=No+Image"
             }" 
-                 alt="${product.name}" class="card-img">
+                 alt="${product.title}" class="card-img">
             <div class="card-content">
-                <h3 class="card-title">${product.name}</h3>
+                <h3 class="card-title">${product.title}</h3>
                 <div class="card-meta">
-                    <span><i class="fas fa-tag"></i> ${
-                      product.category || "Product"
-                    }</span>
-                    <span><i class="fas fa-map-marker-alt"></i> ${
-                      product.location || "Local"
-                    }</span>
-                </div>
-                <div class="card-footer">
-                    <span class="price">${appUtils.formatCurrency(
-                      product.price
+                    <span><i class="fas fa-tag"></i> ${product.category.replace(
+                      "_",
+                      " "
                     )}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${
+                      product.city
+                    }</span>
+                    <span><i class="fas fa-eye"></i> ${product.views}</span>
+                </div>
+                <p class="service-description-short">
+                    ${
+                      product.description
+                        ? product.description.length > 100
+                          ? product.description.substring(0, 100) + "..."
+                          : product.description
+                        : "No description"
+                    }
+                </p>
+                <div class="card-footer">
+                    <span class="price">${price}</span>
                     <a href="product-detail.html?id=${
                       product.id
                     }" class="btn btn-primary btn-sm">
-                        View
+                        View Details
                     </a>
                 </div>
             </div>
@@ -187,6 +222,14 @@ async function initShopPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const category = urlParams.get("category");
   const search = urlParams.get("search");
+
+  // Update page title if category is selected
+  if (category) {
+    const pageHeader = document.querySelector(".page-header h1");
+    if (pageHeader) {
+      pageHeader.textContent = `${category.replace("_", " ")} - Products`;
+    }
+  }
 
   // Set initial filter values
   if (category) {
@@ -212,8 +255,12 @@ async function initShopPage() {
 function setupShopFilters() {
   const searchInput = document.getElementById("shopSearch");
   const categoryFilter = document.getElementById("shopCategoryFilter");
-  const locationFilter = document.getElementById("shopLocationFilter");
+  const conditionFilter = document.getElementById("shopConditionFilter");
+  const cityFilter = document.getElementById("shopCityFilter");
+  const minPriceFilter = document.getElementById("minPrice");
+  const maxPriceFilter = document.getElementById("maxPrice");
   const sortBy = document.getElementById("sortBy");
+  const showSoldCheckbox = document.getElementById("showSold");
   const clearBtn = document.getElementById("clearShopFilters");
 
   // Debounced search
@@ -228,10 +275,28 @@ function setupShopFilters() {
   }
 
   // Other filters
-  [categoryFilter, locationFilter, sortBy].forEach((filter) => {
+  [
+    categoryFilter,
+    conditionFilter,
+    cityFilter,
+    sortBy,
+    showSoldCheckbox,
+  ].forEach((filter) => {
     if (filter) {
       filter.addEventListener("change", () => {
         loadShopProducts();
+      });
+    }
+  });
+
+  // Price filters with debounce
+  [minPriceFilter, maxPriceFilter].forEach((filter) => {
+    if (filter) {
+      filter.addEventListener("input", function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          loadShopProducts();
+        }, 500);
       });
     }
   });
@@ -241,13 +306,23 @@ function setupShopFilters() {
     clearBtn.addEventListener("click", function () {
       if (searchInput) searchInput.value = "";
       if (categoryFilter) categoryFilter.value = "";
-      if (locationFilter) locationFilter.value = "";
-      if (sortBy) sortBy.value = "recent";
+      if (conditionFilter) conditionFilter.value = "";
+      if (cityFilter) cityFilter.value = "";
+      if (minPriceFilter) minPriceFilter.value = "";
+      if (maxPriceFilter) maxPriceFilter.value = "";
+      if (sortBy) sortBy.value = "-created_at";
+      if (showSoldCheckbox) showSoldCheckbox.checked = false;
 
       // Update URL
       const url = new URL(window.location);
       url.search = "";
       window.history.replaceState({}, "", url);
+
+      // Update page title
+      const pageHeader = document.querySelector(".page-header h1");
+      if (pageHeader) {
+        pageHeader.textContent = "All Products";
+      }
 
       // Reload products
       loadShopProducts();
@@ -264,9 +339,9 @@ async function loadShopProducts() {
 
   // Show loading
   container.innerHTML = `
-        <div class="loading-skeleton" style="height: 250px; border-radius: var(--border-radius); grid-column: 1 / -1;"></div>
-        <div class="loading-skeleton" style="height: 250px; border-radius: var(--border-radius);"></div>
-        <div class="loading-skeleton" style="height: 250px; border-radius: var(--border-radius);"></div>
+        <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius);"></div>
+        <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius);"></div>
+        <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius);"></div>
     `;
 
   // Build filters
@@ -282,19 +357,34 @@ async function loadShopProducts() {
     filters.category = categoryFilter.value;
   }
 
-  const locationFilter = document.getElementById("shopLocationFilter");
-  if (locationFilter && locationFilter.value) {
-    filters.location = locationFilter.value;
+  const conditionFilter = document.getElementById("shopConditionFilter");
+  if (conditionFilter && conditionFilter.value) {
+    filters.condition = conditionFilter.value;
+  }
+
+  const cityFilter = document.getElementById("shopCityFilter");
+  if (cityFilter && cityFilter.value) {
+    filters.city = cityFilter.value;
+  }
+
+  const minPriceFilter = document.getElementById("minPrice");
+  if (minPriceFilter && minPriceFilter.value) {
+    filters.min_price = parseFloat(minPriceFilter.value);
+  }
+
+  const maxPriceFilter = document.getElementById("maxPrice");
+  if (maxPriceFilter && maxPriceFilter.value) {
+    filters.max_price = parseFloat(maxPriceFilter.value);
   }
 
   const sortBy = document.getElementById("sortBy");
   if (sortBy && sortBy.value) {
-    filters.ordering =
-      sortBy.value === "price_low"
-        ? "price"
-        : sortBy.value === "price_high"
-        ? "-price"
-        : "-created_at";
+    filters.ordering = sortBy.value;
+  }
+
+  const showSoldCheckbox = document.getElementById("showSold");
+  if (showSoldCheckbox && !showSoldCheckbox.checked) {
+    filters.is_sold = false;
   }
 
   try {
@@ -306,8 +396,19 @@ async function loadShopProducts() {
                     <i class="fas fa-search"></i>
                     <h3>No products found</h3>
                     <p>Try adjusting your filters or check back later.</p>
+                    <button id="clearFiltersBtn" class="btn btn-outline">
+                        Clear All Filters
+                    </button>
                 </div>
             `;
+
+      // Add event listener to clear filters button
+      document
+        .getElementById("clearFiltersBtn")
+        ?.addEventListener("click", () => {
+          const clearBtn = document.getElementById("clearShopFilters");
+          if (clearBtn) clearBtn.click();
+        });
       return;
     }
 
@@ -336,39 +437,61 @@ function renderShopProducts(products) {
   products.forEach((product) => {
     const productCard = document.createElement("div");
     productCard.className = "card";
+
+    // Format price
+    const price = parseFloat(product.price).toLocaleString("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    });
+
+    // Condition badge
+    const conditionLabels = {
+      NEW: "New",
+      LIKE_NEW: "Like New",
+      GOOD: "Good",
+      FAIR: "Fair",
+      POOR: "Poor",
+    };
+
     productCard.innerHTML = `
+            ${product.is_sold ? '<div class="sold-overlay">SOLD</div>' : ""}
             <img src="${
-              product.image ||
-              product.images?.[0] ||
-              api.mockData.products[0].image
+              product.main_image ||
+              "https://via.placeholder.com/300x200?text=No+Image"
             }" 
-                 alt="${product.name}" class="card-img">
+                 alt="${product.title}" class="card-img">
             <div class="card-content">
-                <h3 class="card-title">${product.name}</h3>
+                <h3 class="card-title">${product.title}</h3>
                 <div class="card-meta">
-                    <span><i class="fas fa-tag"></i> ${
-                      product.category || "Product"
-                    }</span>
-                    <span><i class="fas fa-map-marker-alt"></i> ${
-                      product.location || "Local"
-                    }</span>
-                    ${
-                      product.rating
-                        ? `<span><i class="fas fa-star"></i> ${product.rating}</span>`
-                        : ""
-                    }
-                </div>
-                <p>${
-                  product.description
-                    ? product.description.length > 100
-                      ? product.description.substring(0, 100) + "..."
-                      : product.description
-                    : "No description"
-                }</p>
-                <div class="card-footer">
-                    <span class="price">${appUtils.formatCurrency(
-                      product.price
+                    <span><i class="fas fa-tag"></i> ${product.category.replace(
+                      "_",
+                      " "
                     )}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> ${
+                      product.city
+                    }</span>
+                    <span><i class="fas fa-eye"></i> ${product.views}</span>
+                </div>
+                <div class="product-condition">
+                    <span class="badge badge-primary">
+                        ${
+                          conditionLabels[product.condition] ||
+                          product.condition
+                        }
+                    </span>
+                </div>
+                <p class="service-description-short">
+                    ${
+                      product.description
+                        ? product.description.length > 100
+                          ? product.description.substring(0, 100) + "..."
+                          : product.description
+                        : "No description"
+                    }
+                </p>
+                <div class="card-footer">
+                    <span class="price">${price}</span>
                     <a href="product-detail.html?id=${
                       product.id
                     }" class="btn btn-primary btn-sm">
@@ -380,154 +503,4 @@ function renderShopProducts(products) {
 
     container.appendChild(productCard);
   });
-}
-
-/**
- * Initialize add item page
- */
-function initAddItemPage() {
-  const form = document.getElementById("addItemForm");
-  if (!form) return;
-
-  // Character count for description
-  const description = document.getElementById("itemDescription");
-  const charCount = document.getElementById("charCount");
-
-  if (description && charCount) {
-    description.addEventListener("input", function () {
-      charCount.textContent = this.value.length;
-
-      if (this.value.length > 1000) {
-        charCount.style.color = "var(--danger-color)";
-      } else if (this.value.length > 800) {
-        charCount.style.color = "var(--warning-color)";
-      } else {
-        charCount.style.color = "var(--text-secondary)";
-      }
-    });
-  }
-
-  // Form submission
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    if (!validateItemForm()) {
-      return;
-    }
-
-    const formData = getItemFormData();
-
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML =
-      '<i class="fas fa-spinner fa-spin"></i> Listing Item...';
-
-    try {
-      // Call API to add product
-      const result = await api.addProduct(formData);
-
-      appUtils.showNotification("Item listed successfully!", "success");
-
-      // Redirect to product page
-      setTimeout(() => {
-        window.location.href = `product-detail.html?id=${result.id}`;
-      }, 1500);
-    } catch (error) {
-      console.error("Error adding item:", error);
-      appUtils.showNotification(
-        "Failed to list item. Please try again.",
-        "error"
-      );
-
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
-    }
-  });
-}
-
-/**
- * Validate add item form
- */
-function validateItemForm() {
-  const itemName = document.getElementById("itemName");
-  const itemCategory = document.getElementById("itemCategory");
-  const itemPrice = document.getElementById("itemPrice");
-  const itemDescription = document.getElementById("itemDescription");
-  const itemLocation = document.getElementById("itemLocation");
-
-  let isValid = true;
-
-  // Basic validation
-  if (!itemName.value.trim()) {
-    isValid = false;
-    itemName.classList.add("error");
-  } else {
-    itemName.classList.remove("error");
-  }
-
-  if (!itemCategory.value) {
-    isValid = false;
-    itemCategory.classList.add("error");
-  } else {
-    itemCategory.classList.remove("error");
-  }
-
-  if (!itemPrice.value || parseFloat(itemPrice.value) <= 0) {
-    isValid = false;
-    itemPrice.classList.add("error");
-  } else {
-    itemPrice.classList.remove("error");
-  }
-
-  if (!itemDescription.value.trim()) {
-    isValid = false;
-    itemDescription.classList.add("error");
-  } else if (itemDescription.value.length > 1000) {
-    isValid = false;
-    itemDescription.classList.add("error");
-    appUtils.showNotification(
-      "Description must be 1000 characters or less",
-      "error"
-    );
-  } else {
-    itemDescription.classList.remove("error");
-  }
-
-  if (!itemLocation.value) {
-    isValid = false;
-    itemLocation.classList.add("error");
-  } else {
-    itemLocation.classList.remove("error");
-  }
-
-  if (!isValid) {
-    appUtils.showNotification(
-      "Please fill in all required fields correctly",
-      "error"
-    );
-  }
-
-  return isValid;
-}
-
-/**
- * Get form data from add item form
- */
-function getItemFormData() {
-  const contactMethods = Array.from(
-    document.querySelectorAll('input[name="contactMethods"]:checked')
-  ).map((cb) => cb.value);
-
-  return {
-    name: document.getElementById("itemName").value.trim(),
-    category: document.getElementById("itemCategory").value,
-    condition: document.getElementById("itemCondition").value,
-    price: parseFloat(document.getElementById("itemPrice").value),
-    description: document.getElementById("itemDescription").value.trim(),
-    location: document.getElementById("itemLocation").value,
-    meetup_preference: document.getElementById("meetupPreference").value,
-    contact_methods: contactMethods,
-    // Note: Image upload would need separate handling
-  };
 }

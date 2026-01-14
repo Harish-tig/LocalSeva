@@ -524,25 +524,43 @@ const ServiceRequestManager = {
   handleSubmit: function () {
     console.log("📝 Handling form submission...");
 
-    // Collect form data
+    // Collect ONLY the required form data
+    const providerIdInput = document.getElementById("modalProviderId");
+    const serviceCategoryInput = document.getElementById(
+      "modalServiceCategory"
+    );
+    const descriptionInput = document.getElementById("modalDescription");
+    const addressInput = document.getElementById("modalAddress");
+    const scheduledDateInput = document.getElementById("modalScheduledDate");
+
+    console.log("Provider ID input value:", providerIdInput?.value);
+    console.log("Service Category input value:", serviceCategoryInput?.value);
+    console.log("Description input value:", descriptionInput?.value);
+    console.log("Address input value:", addressInput?.value);
+    console.log("Scheduled Date input value:", scheduledDateInput?.value);
+
     const formData = {
-      provider_id: document.getElementById("modalProviderId")?.value,
-      service_category: document.getElementById("modalServiceCategory")?.value,
-      description: document.getElementById("modalDescription")?.value,
-      address: document.getElementById("modalAddress")?.value,
-      scheduled_date: document.getElementById("modalScheduledDate")?.value,
-      user_notes: document.getElementById("modalUserNotes")?.value,
+      provider_id: providerIdInput?.value,
+      service_category: serviceCategoryInput?.value,
+      description: descriptionInput?.value,
+      address: addressInput?.value,
+      scheduled_date: scheduledDateInput?.value,
     };
 
-    console.log("📦 Form data collected:", formData);
+    console.log("📦 Form data collected (only required fields):", formData);
 
     // Validate
     if (!this.validateForm(formData)) {
       return;
     }
 
-    // Format date
-    formData.scheduled_date = new Date(formData.scheduled_date).toISOString();
+    // Format date to ISO string
+    if (formData.scheduled_date) {
+      const date = new Date(formData.scheduled_date);
+      if (!isNaN(date.getTime())) {
+        formData.scheduled_date = date.toISOString();
+      }
+    }
 
     // Update UI
     const submitBtn = document.getElementById("modalSubmitBtn");
@@ -561,6 +579,7 @@ const ServiceRequestManager = {
   validateForm: function (formData) {
     console.log("🔍 Validating form data...");
 
+    // Only these 5 fields are required
     const requiredFields = [
       "provider_id",
       "service_category",
@@ -572,7 +591,17 @@ const ServiceRequestManager = {
     for (const field of requiredFields) {
       if (!formData[field] || formData[field].trim() === "") {
         console.error(`❌ Validation failed: ${field} is required`);
-        alert(`Please fill in ${field.replace("_", " ")}`);
+
+        // Show user-friendly field names
+        const fieldNames = {
+          provider_id: "Provider",
+          service_category: "Service Category",
+          description: "Description",
+          address: "Address",
+          scheduled_date: "Date & Time",
+        };
+
+        alert(`Please fill in ${fieldNames[field] || field.replace("_", " ")}`);
         return false;
       }
     }
@@ -593,11 +622,6 @@ const ServiceRequestManager = {
   submitToAPI: async function (formData) {
     console.log("🚀 Submitting to API...");
     console.log("Form Data:", formData);
-    console.log("Current Provider:", this.currentProvider);
-
-    // Debug: Log the provider ID to check
-    console.log("Provider ID from form:", formData.provider_id);
-    console.log("Type of provider_id:", typeof formData.provider_id);
 
     // Check authentication
     if (!this.checkAuthentication()) {
@@ -621,21 +645,13 @@ const ServiceRequestManager = {
 
       console.log("📡 Calling api.createBooking...");
 
-      // Get provider username from currentProvider
-      const providerUsername =
-        this.currentProvider?.username || this.currentProvider?.name || "";
-      console.log("Provider Username:", providerUsername);
-
-      // Create booking data with correct field names
+      // Create booking data with all required fields
       const bookingData = {
         provider_id: formData.provider_id,
-        provider_username: providerUsername,
+        service_category: formData.service_category || "",
         description: formData.description || "",
         address: formData.address || "",
         scheduled_date: formData.scheduled_date,
-        // Optional fields
-        user_notes: formData.user_notes || "",
-        service_category: formData.service_category || "",
       };
 
       console.log("📤 Booking data for API:", bookingData);
@@ -686,7 +702,10 @@ const ServiceRequestManager = {
       // Show error to user
       let errorMessage = "Failed to submit service request. ";
 
-      if (error.message.includes("provider_id")) {
+      if (error.message.includes("has no column named service_category")) {
+        errorMessage =
+          "Backend database configuration error. The service_category field is not available in the database yet. Please contact the administrator.";
+      } else if (error.message.includes("provider_id")) {
         errorMessage += "\n\nProvider ID error: " + error.message;
       } else if (
         error.message.includes("Network") ||

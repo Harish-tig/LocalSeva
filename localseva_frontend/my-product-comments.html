@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product Details - LocalConnect</title>
+    <title>Product Comments - LocalConnect</title>
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
@@ -16,7 +16,7 @@
       <i class="fas fa-bars"></i>
     </button>
 
-    <!-- Sidebar (same as other pages) -->
+    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
@@ -49,8 +49,8 @@
               >
             </li>
             <li>
-              <a href="my-activity.html#soldItems"
-                ><i class="fas fa-tag"></i> Sell Items</a
+              <a href="my-products.html"
+                ><i class="fas fa-tag"></i> My Products</a
               >
             </li>
           </ul>
@@ -73,12 +73,7 @@
         <div class="sidebar-section">
           <h3>Marketplace</h3>
           <ul>
-            <li>
-              <a href="my-products.html"
-                ><i class="fas fa-box"></i> My Products</a
-              >
-            </li>
-            <li>
+            <li class="active">
               <a href="my-product-comments.html"
                 ><i class="fas fa-comments"></i> Product Comments</a
               >
@@ -117,7 +112,7 @@
         <button onclick="window.history.back()" class="btn btn-outline">
           <i class="fas fa-arrow-left"></i> Back
         </button>
-        <h1>Product Details</h1>
+        <h1>Product Comments</h1>
         <div class="header-actions">
           <button id="themeToggle" class="theme-toggle">
             <i class="fas fa-moon"></i>
@@ -125,78 +120,79 @@
         </div>
       </div>
 
-      <!-- Product Details -->
-      <div id="productContainer" class="product-detail-container">
-        <!-- Product will be loaded here -->
+      <!-- Stats -->
+      <div class="stats-grid" style="margin-bottom: 2rem">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="totalComments">0</div>
+            <div class="stat-label">Total Comments</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="
+              background-color: rgba(76, 201, 240, 0.1);
+              color: var(--success-color);
+            "
+          >
+            <i class="fas fa-eye"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="visibleComments">0</div>
+            <div class="stat-label">Visible</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="
+              background-color: rgba(248, 150, 30, 0.1);
+              color: var(--warning-color);
+            "
+          >
+            <i class="fas fa-eye-slash"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="hiddenComments">0</div>
+            <div class="stat-label">Hidden</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div
+            class="stat-icon"
+            style="
+              background-color: rgba(114, 9, 183, 0.1);
+              color: var(--secondary-color);
+            "
+          >
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="commentedProducts">0</div>
+            <div class="stat-label">Products</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments List -->
+      <div id="commentsContainer" class="activity-list">
+        <!-- Comments will be loaded here -->
         <div
           class="loading-skeleton"
-          style="height: 400px; border-radius: var(--border-radius)"
+          style="
+            height: 200px;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+          "
         ></div>
-      </div>
-
-      <!-- Comments Section -->
-      <div class="service-section" style="margin-top: 2rem">
-        <h3>Comments & Interest</h3>
-        <div id="commentsContainer">
-          <!-- Comments will be loaded here -->
-          <div
-            class="loading-skeleton"
-            style="height: 200px; border-radius: var(--border-radius)"
-          ></div>
-        </div>
-
-        <!-- Add Comment Form (only if not the seller and product is active) -->
-        <div id="commentFormContainer" style="margin-top: 2rem; display: none">
-          <h4>Express Interest</h4>
-          <form id="addCommentForm">
-            <div class="form-group">
-              <label for="commentText" class="form-label">Your Message *</label>
-              <textarea
-                id="commentText"
-                class="form-control"
-                rows="3"
-                placeholder="I'm interested in this item. Please contact me at..."
-                maxlength="500"
-                required
-              ></textarea>
-              <div class="char-count">
-                <span id="commentCharCount">0</span>/500
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="contactInfo" class="form-label"
-                >Contact Information (Optional)</label
-              >
-              <input
-                type="text"
-                id="contactInfo"
-                class="form-control"
-                placeholder="e.g., WhatsApp: 9876543210"
-              />
-              <div class="form-text">This will be visible to the seller</div>
-            </div>
-
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-paper-plane"></i> Send Message
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Action Buttons (for seller) -->
-      <div id="sellerActions" class="detail-actions" style="display: none">
-        <button id="editProductBtn" class="btn btn-primary">
-          <i class="fas fa-edit"></i> Edit Product
-        </button>
-        <button id="deleteProductBtn" class="btn btn-danger">
-          <i class="fas fa-trash"></i> Delete Product
-        </button>
-        <button id="markSoldBtn" class="btn btn-success">
-          <i class="fas fa-check-circle"></i> Mark as Sold
-        </button>
+        <div
+          class="loading-skeleton"
+          style="height: 200px; border-radius: var(--border-radius)"
+        ></div>
       </div>
     </main>
 
@@ -218,6 +214,6 @@
     <!-- Scripts -->
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/product-detail.js"></script>
+    <script src="js/my-product-comments.js"></script>
   </body>
 </html>

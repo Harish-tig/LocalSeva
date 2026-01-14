@@ -20,7 +20,7 @@
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
-        <p>Welcome, <span id="userName">Alex</span></p>
+        <p>Welcome, <span id="userName">User</span></p>
       </div>
 
       <nav class="sidebar-nav">
@@ -34,24 +34,24 @@
           <h3>My Activity</h3>
           <ul>
             <li>
-              <a href="my-activity.html#serviceTaken"
-                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
-              >
+              <a href="my-activity.html#serviceTaken">
+                <i class="fas fa-hand-holding-heart"></i> Service Taken
+              </a>
             </li>
             <li>
-              <a href="my-activity.html#serviceProvided" class="provider-only"
-                ><i class="fas fa-hand-holding"></i> Service Provided</a
-              >
+              <a href="my-activity.html#serviceProvided" class="provider-only">
+                <i class="fas fa-hand-holding"></i> Service Provided
+              </a>
             </li>
             <li>
-              <a href="my-activity.html#boughtItems"
-                ><i class="fas fa-shopping-cart"></i> Buy Items</a
-              >
+              <a href="my-activity.html#boughtItems">
+                <i class="fas fa-shopping-cart"></i> Buy Items
+              </a>
             </li>
             <li>
-              <a href="my-activity.html#soldItems"
-                ><i class="fas fa-tag"></i> Sell Items</a
-              >
+              <a href="my-products.html">
+                <i class="fas fa-tag"></i> My Products
+              </a>
             </li>
           </ul>
         </div>
@@ -60,12 +60,9 @@
           <h3>My Services</h3>
           <ul>
             <li>
-              <a
-                href="my-services.html"
-                id="myServicesLink"
-                class="provider-only"
-                ><i class="fas fa-briefcase"></i> Provider Dashboard</a
-              >
+              <a href="my-services.html" class="provider-only">
+                <i class="fas fa-briefcase"></i> Provider Dashboard
+              </a>
             </li>
           </ul>
         </div>
@@ -73,9 +70,9 @@
         <div class="sidebar-section">
           <ul>
             <li>
-              <a href="#" id="logoutBtn"
-                ><i class="fas fa-sign-out-alt"></i> Logout</a
-              >
+              <a href="#" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
             </li>
           </ul>
         </div>
@@ -116,49 +113,55 @@
 
       <!-- Category Cards -->
       <div class="category-cards">
-        <div class="category-card" data-category="Electronics">
+        <div class="category-card" data-category="ELECTRONICS">
           <i class="fas fa-laptop"></i>
           <h3>Electronics</h3>
           <p>Phones, laptops, gadgets</p>
         </div>
 
-        <div class="category-card" data-category="Furniture">
+        <div class="category-card" data-category="FURNITURE">
           <i class="fas fa-couch"></i>
           <h3>Furniture</h3>
           <p>Home & office furniture</p>
         </div>
 
-        <div class="category-card" data-category="Clothing">
+        <div class="category-card" data-category="CLOTHING">
           <i class="fas fa-tshirt"></i>
           <h3>Clothing</h3>
           <p>Men, women & kids wear</p>
         </div>
 
-        <div class="category-card" data-category="Books">
+        <div class="category-card" data-category="BOOKS">
           <i class="fas fa-book"></i>
           <h3>Books</h3>
           <p>Textbooks, novels, more</p>
         </div>
 
-        <div class="category-card" data-category="Vehicles">
+        <div class="category-card" data-category="VEHICLES">
           <i class="fas fa-car"></i>
           <h3>Vehicles</h3>
           <p>Cars, bikes, scooters</p>
         </div>
 
-        <div class="category-card" data-category="Sports">
+        <div class="category-card" data-category="SPORTS">
           <i class="fas fa-basketball-ball"></i>
           <h3>Sports</h3>
           <p>Equipment & gear</p>
         </div>
 
-        <div class="category-card" data-category="Home Appliances">
+        <div class="category-card" data-category="HOME_APPLIANCES">
           <i class="fas fa-blender"></i>
           <h3>Home Appliances</h3>
           <p>Kitchen & home items</p>
         </div>
 
-        <div class="category-card" data-category="Other">
+        <div class="category-card" data-category="REAL_ESTATE">
+          <i class="fas fa-home"></i>
+          <h3>Real Estate</h3>
+          <p>Properties & rentals</p>
+        </div>
+
+        <div class="category-card" data-category="OTHER">
           <i class="fas fa-box-open"></i>
           <h3>Other</h3>
           <p>Everything else</p>
@@ -170,6 +173,10 @@
         <h2>Featured Products</h2>
         <div id="featuredProducts" class="cards-grid">
           <!-- Featured products will be loaded here -->
+          <div class="loading-skeleton" style="height: 300px"></div>
+          <div class="loading-skeleton" style="height: 300px"></div>
+          <div class="loading-skeleton" style="height: 300px"></div>
+          <div class="loading-skeleton" style="height: 300px"></div>
         </div>
       </div>
 
@@ -178,6 +185,10 @@
         <h2>Recently Added</h2>
         <div id="recentProducts" class="cards-grid">
           <!-- Recent products will be loaded here -->
+          <div class="loading-skeleton" style="height: 300px"></div>
+          <div class="loading-skeleton" style="height: 300px"></div>
+          <div class="loading-skeleton" style="height: 300px"></div>
+          <div class="loading-skeleton" style="height: 300px"></div>
         </div>
       </div>
     </main>
@@ -199,6 +210,7 @@
 
     <!-- Scripts -->
     <script src="js/api.js"></script>
+    <script src="js/marketplace-api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/mart.js"></script>
   </body>
