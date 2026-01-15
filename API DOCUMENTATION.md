@@ -1,11 +1,6 @@
-# note this document was created with the help of Claude
 
-cat > API_DOCUMENTATION.md << 'EOF'
-# Service Booking Platform API Documentation
-
-## Base URL
 ```
-http://localhost:8000/api/
+http://localhost:8000/api/user
 ```
 
 ## Authentication
@@ -883,52 +878,3 @@ const headers = {
 
 ### 2. Handling Token Expiry
 Implement auto-refresh logic or redirect to login when receiving 401.
-
-### 3. File Uploads
-For image uploads (avatar, product images, evidence), use FormData:
-
-```javascript
-const formData = new FormData();
-formData.append('avatar', imageFile);
-formData.append('bio', 'New bio');
-
-// Headers should NOT include 'Content-Type': 'application/json'
-const headers = {
-  'Authorization': `Bearer ${token}`
-};
-```
-
-### 4. Pagination (if implemented later)
-Check for pagination keys in response:
-
-```json
-{
-  "count": 100,
-  "next": "http://api.example.com/endpoint/?page=2",
-  "previous": null,
-  "results": []
-}
-```
-
----
-
-## Support
-For API support or issues, contact the backend development team.
-
-**Last Updated:** January 2025  
-**API Version:** 1.0
-
-EOF
-
-echo "=========================================="
-echo "✓ API Documentation Generated Successfully!"
-echo "=========================================="
-echo ""
-echo "File created: API_DOCUMENTATION.md"
-echo ""
-echo "You can now:"
-echo "  1. Share this file with your frontend developers"
-echo "  2. Add it to your README.md"
-echo "  3. Use it as standalone API documentation"
-echo ""
-echo "=========================================="
