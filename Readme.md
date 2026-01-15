@@ -328,6 +328,8 @@ pip install -r requirements.txt
 
 ```bash
 # Run migrations to create database tables
+python manage.py makemigration
+#followed by
 python manage.py migrate
 ```
 
@@ -395,7 +397,6 @@ Quit the server with CTRL-BREAK.
 
 **Test the backend:**
 - Visit `http://localhost:8000/admin/` - Django admin panel
-- Visit `http://localhost:8000/api/` - API root (should show available endpoints)
 
 ### Start the Frontend
 
