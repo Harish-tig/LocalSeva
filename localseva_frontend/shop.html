@@ -3,12 +3,192 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shop - Marketplace</title>
+    <title>Shop - LocalConnect</title>
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <style>
+      .filters-container {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+      }
+
+      .filter-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+      }
+
+      .filter-group select,
+      .filter-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-sm);
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        font-family: inherit;
+      }
+
+      .filter-group input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .filter-group input[type="number"]::-webkit-outer-spin-button,
+      .filter-group input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .filter-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .filter-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .filter-actions button {
+        flex: 1;
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .card-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+      }
+
+      .card-image-container {
+        position: relative;
+      }
+
+      .sold-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: var(--danger-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 1;
+      }
+
+      .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+      }
+
+      .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-footer {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+      }
+
+      .price {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+      }
+
+      .product-description-short {
+        color: var(--text-muted);
+        margin: 0.5rem 0;
+        flex: 1;
+      }
+
+      .card-meta {
+        display: flex;
+        gap: 0.75rem;
+        margin: 0.5rem 0;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+      }
+
+      .card-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      .product-condition {
+        margin: 0.5rem 0;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 1rem 0;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: auto;
+      }
+
+      @media (max-width: 768px) {
+        .filter-row {
+          grid-template-columns: 1fr;
+        }
+
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .filter-actions {
+          flex-direction: column;
+        }
+
+        .page-header {
+          flex-direction: column;
+          gap: 1rem;
+          align-items: flex-start;
+        }
+
+        .header-actions {
+          width: 100%;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Mobile Menu Button -->
@@ -19,7 +199,7 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
+        <h2><i class="fas fa-handshake"></i> LocalSeva</h2>
         <p>Welcome, <span id="userName">User</span></p>
       </div>
 
@@ -34,24 +214,49 @@
           <h3>My Activity</h3>
           <ul>
             <li>
-              <a href="my-activity.html#serviceTaken">
-                <i class="fas fa-hand-holding-heart"></i> Service Taken
-              </a>
+              <a href="my-activity.html#serviceTaken"
+                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
+              >
             </li>
             <li>
-              <a href="my-activity.html#serviceProvided" class="provider-only">
-                <i class="fas fa-hand-holding"></i> Service Provided
-              </a>
+              <a href="my-activity.html#serviceProvided" class="provider-only"
+                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>My Services</h3>
+          <ul>
+            <li>
+              <a
+                href="my-services.html"
+                id="myServicesLink"
+                class="provider-only"
+                ><i class="fas fa-briefcase"></i> Provider Dashboard</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Marketplace</h3>
+          <ul>
+            <li>
+              <a href="my-products.html"
+                ><i class="fas fa-box"></i> My Products</a
+              >
             </li>
             <li>
-              <a href="my-activity.html#boughtItems">
-                <i class="fas fa-shopping-cart"></i> Buy Items
-              </a>
+              <a href="my-product-comments.html"
+                ><i class="fas fa-comments"></i> Product Comments</a
+              >
             </li>
-            <li>
-              <a href="my-products.html">
-                <i class="fas fa-tag"></i> My Products
-              </a>
+            <li class="active">
+              <a href="add-item.html"
+                ><i class="fas fa-plus-circle"></i> Sell Item</a
+              >
             </li>
           </ul>
         </div>
@@ -59,9 +264,9 @@
         <div class="sidebar-section">
           <ul>
             <li>
-              <a href="#" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-              </a>
+              <a href="#" id="logoutBtn"
+                ><i class="fas fa-sign-out-alt"></i> Logout</a
+              >
             </li>
           </ul>
         </div>
@@ -79,7 +284,10 @@
     <!-- Main Content -->
     <main class="main-content">
       <div class="page-header">
-        <h1 id="pageTitle">Browse Products</h1>
+        <button onclick="window.history.back()" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h1>All Products</h1>
         <div class="header-actions">
           <button id="themeToggle" class="theme-toggle">
             <i class="fas fa-moon"></i>
@@ -98,106 +306,89 @@
 
       <!-- Filters -->
       <div class="filters-container">
-        <div class="filter-group">
-          <label class="form-label">Category</label>
-          <select class="form-control" id="shopCategoryFilter">
-            <option value="">All Categories</option>
-            <option value="ELECTRONICS">Electronics</option>
-            <option value="FURNITURE">Furniture</option>
-            <option value="CLOTHING">Clothing</option>
-            <option value="BOOKS">Books</option>
-            <option value="VEHICLES">Vehicles</option>
-            <option value="SPORTS">Sports</option>
-            <option value="HOME_APPLIANCES">Home Appliances</option>
-            <option value="REAL_ESTATE">Real Estate</option>
-            <option value="OTHER">Other</option>
-          </select>
-        </div>
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="shopCategoryFilter">Category</label>
+            <select id="shopCategoryFilter" class="form-control">
+              <option value="">All Categories</option>
+              <option value="FURNITURE">Furniture</option>
+              <option value="ELECTRONICS">Electronics</option>
+              <option value="VEHICLES">Vehicles</option>
+              <option value="REAL_ESTATE">Real Estate</option>
+              <option value="HOME_APPLIANCES">Home Appliances</option>
+              <option value="CLOTHING">Clothing</option>
+              <option value="BOOKS">Books</option>
+              <option value="SPORTS">Sports</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
 
-        <div class="filter-group">
-          <label class="form-label">Condition</label>
-          <select class="form-control" id="shopConditionFilter">
-            <option value="">Any Condition</option>
-            <option value="NEW">New</option>
-            <option value="LIKE_NEW">Like New</option>
-            <option value="GOOD">Good</option>
-            <option value="FAIR">Fair</option>
-            <option value="POOR">Poor</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="form-label">City</label>
-          <select class="form-control" id="shopCityFilter">
-            <option value="">All Cities</option>
-            <option value="Mumbai">Mumbai</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Bangalore">Bangalore</option>
-            <option value="Pune">Pune</option>
-            <option value="Kandivali">Kandivali</option>
-            <option value="Borivali">Borivali</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="form-label">Price Range</label>
-          <div style="display: flex; gap: 0.5rem">
-            <input
-              type="number"
-              class="form-control"
-              id="minPrice"
-              placeholder="Min"
-              min="0"
-            />
-            <input
-              type="number"
-              class="form-control"
-              id="maxPrice"
-              placeholder="Max"
-              min="0"
-            />
+          <div class="filter-group">
+            <label for="shopConditionFilter">Condition</label>
+            <select id="shopConditionFilter" class="form-control">
+              <option value="">All Conditions</option>
+              <option value="NEW">Brand New</option>
+              <option value="LIKE_NEW">Like New</option>
+              <option value="GOOD">Good</option>
+              <option value="FAIR">Fair</option>
+              <option value="POOR">Poor</option>
+            </select>
           </div>
         </div>
 
-        <div class="filter-group">
-          <label class="form-label">Sort By</label>
-          <select class="form-control" id="sortBy">
-            <option value="-created_at">Newest First</option>
-            <option value="created_at">Oldest First</option>
-            <option value="price">Price: Low to High</option>
-            <option value="-price">Price: High to Low</option>
-            <option value="-views">Most Viewed</option>
-          </select>
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="shopCityFilter">City</label>
+            <select id="shopCityFilter" class="form-control">
+              <option value="">All Cities</option>
+              <option value="Kandivali">Kandivali</option>
+              <option value="Borivali">Borivali</option>
+              <option value="Mira Road">Mira Road</option>
+              <option value="Bhayender">Bhayender</option>
+              <option value="Malad">Malad</option>
+              <option value="Andheri">Andheri</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="sortBy">Sort By</label>
+            <select id="sortBy" class="form-control">
+              <option value="-created_at">Newest First</option>
+              <option value="created_at">Oldest First</option>
+              <option value="price">Price: Low to High</option>
+              <option value="-price">Price: High to Low</option>
+              <option value="-views">Most Viewed</option>
+            </select>
+          </div>
         </div>
 
-        <div class="filter-group" style="align-self: flex-end">
-          <button class="btn btn-outline" id="clearShopFilters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="minPrice">Min Price (₹)</label>
+            <input type="number" id="minPrice" placeholder="0" min="0" />
+          </div>
+
+          <div class="filter-group">
+            <label for="maxPrice">Max Price (₹)</label>
+            <input type="number" id="maxPrice" placeholder="100000" min="0" />
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="showSold" checked />
+          <label for="showSold">Show sold items</label>
+        </div>
+
+        <div class="filter-actions">
+          <button id="clearShopFilters" class="btn btn-outline">
             <i class="fas fa-times"></i> Clear Filters
           </button>
         </div>
       </div>
 
-      <!-- Active Filters -->
-      <div id="activeFilters" class="filter-chips" style="display: none">
-        <!-- Active filter chips will be shown here -->
-      </div>
-
-      <!-- Results Count -->
-      <div style="margin-bottom: 1.5rem">
-        <p id="resultsCount" style="color: var(--text-secondary)">
-          Loading products...
-        </p>
-      </div>
-
       <!-- Products Grid -->
-      <div id="productsContainer" class="cards-grid">
+      <div id="productsContainer" class="products-grid">
         <!-- Products will be loaded here -->
-        <div class="loading-skeleton" style="height: 350px"></div>
-        <div class="loading-skeleton" style="height: 350px"></div>
-        <div class="loading-skeleton" style="height: 350px"></div>
-        <div class="loading-skeleton" style="height: 350px"></div>
-        <div class="loading-skeleton" style="height: 350px"></div>
-        <div class="loading-skeleton" style="height: 350px"></div>
       </div>
     </main>
 
@@ -210,7 +401,7 @@
       <a href="add-item.html" class="sell-btn">
         <i class="fas fa-plus"></i>
       </a>
-      <a href="mart.html" class="active">
+      <a href="mart.html">
         <i class="fas fa-store"></i>
         <span>Mart</span>
       </a>
@@ -220,6 +411,6 @@
     <script src="js/api.js"></script>
     <script src="js/marketplace-api.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/mart.js"></script>
+    <script src="js/shop.js"></script>
   </body>
 </html>

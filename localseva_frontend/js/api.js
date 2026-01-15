@@ -1162,17 +1162,17 @@ async function getUserBookingsForProvider(providerId) {
 
 // ===== MARKETPLACE FUNCTIONS =====
 
-const MARKETPLACE_BASE = "marketplace/";
-
 /**
  * Get products with filters
  */
 async function getProducts(filters = {}) {
   try {
+    console.log("Getting products with filters:", filters);
+
     // Build query parameters
     const params = new URLSearchParams();
 
-    // Add filter parameters
+    // Add filter parameters based on API documentation
     if (filters.category) params.append("category", filters.category);
     if (filters.condition) params.append("condition", filters.condition);
     if (filters.city) params.append("city", filters.city);
@@ -1185,22 +1185,18 @@ async function getProducts(filters = {}) {
     if (filters.search) params.append("search", filters.search);
     if (filters.ordering) params.append("ordering", filters.ordering);
 
-    // For featured/recent filters from existing code
-    if (filters.featured) {
-      // You might want to add a featured flag in your API or handle differently
-      params.append("ordering", "-views");
-    }
-    if (filters.recent) {
-      params.append("ordering", "-created_at");
-    }
-
     const queryString = params.toString();
-    const url = `${MARKETPLACE_BASE}${queryString ? `?${queryString}` : ""}`;
+    const url = `marketplace/${queryString ? `?${queryString}` : ""}`;
 
-    return await apiRequest(url, "GET");
+    console.log("API URL for getProducts:", url);
+
+    const data = await apiRequest(url, "GET");
+    console.log("Products received:", data);
+    return data;
   } catch (error) {
     console.error("Error fetching products:", error);
-    throw error;
+    // Return empty array for UI to handle gracefully
+    return [];
   }
 }
 
@@ -1209,7 +1205,10 @@ async function getProducts(filters = {}) {
  */
 async function getProduct(id) {
   try {
-    return await apiRequest(`${MARKETPLACE_BASE}${id}/`, "GET");
+    console.log("Getting product with ID:", id);
+    const product = await apiRequest(`marketplace/${id}/`, "GET");
+    console.log("Product received:", product);
+    return product;
   } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
@@ -1219,11 +1218,10 @@ async function getProduct(id) {
 /**
  * Create a new product
  */
-async function createProduct(productData) {
+async function createProduct(formData) {
   try {
-    console.log("Creating product with data:", productData);
+    console.log("Creating product with FormData");
 
-    // For FormData, we need to handle file uploads separately
     const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
     const endpoint = `${API_BASE_URL}marketplace/create/`;
 
@@ -1234,34 +1232,20 @@ async function createProduct(productData) {
       throw new Error("Authentication required. Please login first.");
     }
 
-    let response;
-
-    if (productData instanceof FormData) {
-      // Log FormData entries for debugging
-      console.log("FormData entries:");
-      for (let pair of productData.entries()) {
-        console.log(pair[0] + ": ", pair[1]);
-      }
-
-      response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Don't set Content-Type for FormData, let browser set it with boundary
-        },
-        body: productData,
-      });
-    } else {
-      // For non-file data (though API requires FormData for images)
-      response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(productData),
-      });
+    // Log FormData for debugging
+    console.log("FormData entries:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": ", pair[1]);
     }
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Don't set Content-Type for FormData
+      },
+      body: formData,
+    });
 
     console.log("Response status:", response.status);
 
@@ -1280,14 +1264,17 @@ async function createProduct(productData) {
         if (errorData.detail) {
           errorMessage = errorData.detail;
         } else if (typeof errorData === "object") {
-          // Try to get first error
-          const firstError = Object.values(errorData)[0];
-          if (Array.isArray(firstError)) {
-            errorMessage = firstError[0];
-          } else if (typeof firstError === "string") {
-            errorMessage = firstError;
-          } else {
-            errorMessage = JSON.stringify(errorData);
+          // Get all error messages
+          const errors = [];
+          for (const [field, messages] of Object.entries(errorData)) {
+            if (Array.isArray(messages)) {
+              errors.push(`${field}: ${messages.join(", ")}`);
+            } else if (typeof messages === "string") {
+              errors.push(`${field}: ${messages}`);
+            }
+          }
+          if (errors.length > 0) {
+            errorMessage = errors.join("; ");
           }
         }
       }
@@ -1307,9 +1294,9 @@ async function createProduct(productData) {
 /**
  * Update a product
  */
-async function updateProduct(id, productData) {
+async function updateProduct(id, formData) {
   try {
-    console.log("Updating product", id, "with data:", productData);
+    console.log("Updating product", id);
 
     const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
     const endpoint = `${API_BASE_URL}marketplace/${id}/`;
@@ -1321,33 +1308,19 @@ async function updateProduct(id, productData) {
       throw new Error("Authentication required. Please login first.");
     }
 
-    let response;
-
-    if (productData instanceof FormData) {
-      // For FormData with files
-      console.log("FormData entries for update:");
-      for (let pair of productData.entries()) {
-        console.log(pair[0] + ": ", pair[1]);
-      }
-
-      response = await fetch(endpoint, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: productData,
-      });
-    } else {
-      // For non-file updates
-      response = await fetch(endpoint, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(productData),
-      });
+    // Log FormData for debugging
+    console.log("FormData entries for update:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": ", pair[1]);
     }
+
+    const response = await fetch(endpoint, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
     console.log("Update response status:", response.status);
 
@@ -1361,24 +1334,7 @@ async function updateProduct(id, productData) {
         errorData = { text: text };
       }
 
-      let errorMessage = "Failed to update product";
-      if (errorData) {
-        if (errorData.detail) {
-          errorMessage = errorData.detail;
-        } else if (typeof errorData === "object") {
-          // Try to get first error
-          const firstError = Object.values(errorData)[0];
-          if (Array.isArray(firstError)) {
-            errorMessage = firstError[0];
-          } else if (typeof firstError === "string") {
-            errorMessage = firstError;
-          } else {
-            errorMessage = JSON.stringify(errorData);
-          }
-        }
-      }
-
-      throw new Error(errorMessage);
+      throw new Error(errorData.detail || "Failed to update product");
     }
 
     const result = await response.json();
@@ -1395,7 +1351,8 @@ async function updateProduct(id, productData) {
  */
 async function deleteProduct(id) {
   try {
-    return await apiRequest(`${MARKETPLACE_BASE}${id}/`, "DELETE");
+    console.log("Deleting product", id);
+    return await apiRequest(`marketplace/${id}/`, "DELETE");
   } catch (error) {
     console.error("Error deleting product:", error);
     throw error;
@@ -1407,10 +1364,16 @@ async function deleteProduct(id) {
  */
 async function getProductComments(productId) {
   try {
-    return await apiRequest(`${MARKETPLACE_BASE}${productId}/comments/`, "GET");
+    console.log("Getting comments for product:", productId);
+    const comments = await apiRequest(
+      `marketplace/${productId}/comments/`,
+      "GET"
+    );
+    console.log("Comments received:", comments);
+    return comments;
   } catch (error) {
     console.error("Error fetching product comments:", error);
-    throw error;
+    return [];
   }
 }
 
@@ -1419,11 +1382,14 @@ async function getProductComments(productId) {
  */
 async function createComment(commentData) {
   try {
-    return await apiRequest(
-      `${MARKETPLACE_BASE}comments/create/`,
+    console.log("Creating comment:", commentData);
+    const comment = await apiRequest(
+      `marketplace/comments/create/`,
       "POST",
       commentData
     );
+    console.log("Comment created:", comment);
+    return comment;
   } catch (error) {
     console.error("Error creating comment:", error);
     throw error;
@@ -1435,8 +1401,9 @@ async function createComment(commentData) {
  */
 async function deleteComment(commentId) {
   try {
+    console.log("Deleting comment:", commentId);
     return await apiRequest(
-      `${MARKETPLACE_BASE}comments/${commentId}/delete/`,
+      `marketplace/comments/${commentId}/delete/`,
       "DELETE"
     );
   } catch (error) {
@@ -1450,10 +1417,13 @@ async function deleteComment(commentId) {
  */
 async function getMyProducts() {
   try {
-    return await apiRequest(`${MARKETPLACE_BASE}my-products/`, "GET");
+    console.log("Getting user products");
+    const products = await apiRequest(`marketplace/my-products/`, "GET");
+    console.log("User products received:", products);
+    return products;
   } catch (error) {
     console.error("Error fetching user products:", error);
-    throw error;
+    return [];
   }
 }
 
@@ -1462,10 +1432,16 @@ async function getMyProducts() {
  */
 async function getMyProductComments() {
   try {
-    return await apiRequest(`${MARKETPLACE_BASE}my-product-comments/`, "GET");
+    console.log("Getting user product comments");
+    const comments = await apiRequest(
+      `marketplace/my-product-comments/`,
+      "GET"
+    );
+    console.log("User product comments received:", comments);
+    return comments;
   } catch (error) {
     console.error("Error fetching user product comments:", error);
-    throw error;
+    return [];
   }
 }
 

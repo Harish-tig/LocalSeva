@@ -9,6 +9,352 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <style>
+      /* Additional styles for add-item page */
+      .sell-item-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .sell-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .sell-header h1 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .sell-header p {
+        color: var(--text-secondary);
+      }
+
+      .image-upload-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .image-upload-box {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius-sm);
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: var(--transition);
+        text-align: center;
+        padding: 1rem;
+      }
+
+      .image-upload-box:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background-color: rgba(67, 97, 238, 0.05);
+      }
+
+      .image-upload-box i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .image-upload-box span {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .file-input-hidden {
+        display: none;
+      }
+
+      .image-preview {
+        position: relative;
+        border-radius: var(--border-radius-sm);
+        overflow: hidden;
+        height: 150px;
+      }
+
+      .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .remove-image {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        width: 1.75rem;
+        height: 1.75rem;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border: none;
+        transition: var(--transition);
+      }
+
+      .remove-image:hover {
+        background-color: var(--danger-color);
+        transform: scale(1.1);
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        .form-row {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .price-input {
+        position: relative;
+      }
+
+      .price-input .currency-symbol {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+      }
+
+      .price-input input {
+        padding-left: 2.5rem;
+      }
+
+      .form-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .form-section h3 {
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+      }
+
+      .form-help {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 3rem;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .char-count {
+        text-align: right;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+      }
+
+      .char-count.warning {
+        color: var(--warning-color);
+      }
+
+      .char-count.error {
+        color: var(--danger-color);
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+      }
+
+      .checkbox-group label {
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .form-control.error {
+        border-color: var(--danger-color) !important;
+      }
+
+      .error-message {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .error-message i {
+        font-size: 0.75rem;
+      }
+
+      .required::after {
+        content: " *";
+        color: var(--danger-color);
+      }
+
+      .image-requirements {
+        background-color: rgba(0, 0, 0, 0.02);
+        border-radius: var(--border-radius-sm);
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .image-requirements h4 {
+        margin-bottom: 0.75rem;
+        color: var(--text-color);
+      }
+
+      .image-requirements ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: var(--text-secondary);
+      }
+
+      .image-requirements li {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .step-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .step.active {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      .step.completed {
+        background-color: rgba(76, 201, 240, 0.1);
+        border-color: var(--success-color);
+      }
+
+      .step-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .step.active .step-number {
+        background-color: white;
+        color: var(--primary-color);
+      }
+
+      .step.completed .step-number {
+        background-color: var(--success-color);
+        color: white;
+      }
+
+      .step-divider {
+        width: 30px;
+        height: 2px;
+        background-color: var(--border-color);
+      }
+
+      @media (max-width: 768px) {
+        .step-indicator {
+          display: none;
+        }
+
+        .form-actions {
+          flex-direction: column;
+        }
+
+        .form-actions button {
+          width: 100%;
+        }
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid var(--border-color);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Mobile Menu Button -->
@@ -19,7 +365,7 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <h2><i class="fas fa-handshake"></i> LocalConnect</h2>
+        <h2><i class="fas fa-handshake"></i> LocalSeva</h2>
         <p>Welcome, <span id="userName">User</span></p>
       </div>
 
@@ -41,16 +387,6 @@
             <li>
               <a href="my-activity.html#serviceProvided" class="provider-only"
                 ><i class="fas fa-hand-holding"></i> Service Provided</a
-              >
-            </li>
-            <li>
-              <a href="my-activity.html#boughtItems"
-                ><i class="fas fa-shopping-cart"></i> Buy Items</a
-              >
-            </li>
-            <li>
-              <a href="my-activity.html#soldItems"
-                ><i class="fas fa-tag"></i> Sell Items</a
               >
             </li>
           </ul>
@@ -350,16 +686,20 @@
 
             <div class="image-upload-container" id="imageUploadContainer">
               <!-- Main Image -->
-              <div class="image-upload-box" id="mainImageUpload">
+              <div
+                class="image-upload-box"
+                id="mainImageUpload"
+                onclick="triggerFileInput('mainImage')"
+              >
                 <i class="fas fa-camera"></i>
                 <span>Main Image *</span>
-                <input
-                  type="file"
-                  id="mainImage"
-                  accept="image/*"
-                  capture="environment"
-                />
               </div>
+              <input
+                type="file"
+                id="mainImage"
+                class="file-input-hidden"
+                accept="image/*"
+              />
               <div
                 class="image-preview"
                 id="mainImagePreview"
@@ -376,11 +716,20 @@
               </div>
 
               <!-- Image 2 -->
-              <div class="image-upload-box" id="image2Upload">
+              <div
+                class="image-upload-box"
+                id="image2Upload"
+                onclick="triggerFileInput('image2')"
+              >
                 <i class="fas fa-image"></i>
                 <span>Image 2 (Optional)</span>
-                <input type="file" id="image2" accept="image/*" />
               </div>
+              <input
+                type="file"
+                id="image2"
+                class="file-input-hidden"
+                accept="image/*"
+              />
               <div
                 class="image-preview"
                 id="image2Preview"
@@ -397,11 +746,20 @@
               </div>
 
               <!-- Image 3 -->
-              <div class="image-upload-box" id="image3Upload">
+              <div
+                class="image-upload-box"
+                id="image3Upload"
+                onclick="triggerFileInput('image3')"
+              >
                 <i class="fas fa-image"></i>
                 <span>Image 3 (Optional)</span>
-                <input type="file" id="image3" accept="image/*" />
               </div>
+              <input
+                type="file"
+                id="image3"
+                class="file-input-hidden"
+                accept="image/*"
+              />
               <div
                 class="image-preview"
                 id="image3Preview"
@@ -520,23 +878,24 @@
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/add-item.js"></script>
-    <!-- In the script section of add-item.html, update the previewImage and removeImage functions -->
-
     <script>
-      // Utility functions for image handling
-      function previewImage(event, previewId) {
+      // Global functions for image handling
+      function triggerFileInput(inputId) {
+        console.log("Triggering file input:", inputId);
+        document.getElementById(inputId).click();
+      }
+
+      function previewImage(event) {
         const input = event.target;
-        const preview = document.getElementById(previewId);
-        const previewImg = document.getElementById(previewId + "Img");
-        const uploadBox = document.getElementById(input.id + "Upload");
+        const inputId = input.id;
+        const preview = document.getElementById(inputId + "Preview");
+        const previewImg = document.getElementById(inputId + "PreviewImg");
+        const uploadBox = document.getElementById(inputId + "Upload");
 
         if (input.files && input.files[0]) {
           // Check file size (5MB limit)
           if (input.files[0].size > 5 * 1024 * 1024) {
-            appUtils.showNotification(
-              "File size must be less than 5MB",
-              "error"
-            );
+            alert("File size must be less than 5MB");
             input.value = "";
             return;
           }
@@ -549,10 +908,7 @@
             "image/webp",
           ];
           if (!validTypes.includes(input.files[0].type)) {
-            appUtils.showNotification(
-              "Please upload a valid image file (JPG, PNG, or WebP)",
-              "error"
-            );
+            alert("Please upload a valid image file (JPG, PNG, or WebP)");
             input.value = "";
             return;
           }
@@ -571,6 +927,7 @@
       }
 
       function removeImage(inputId) {
+        console.log("Removing image:", inputId);
         const input = document.getElementById(inputId);
         const preview = document.getElementById(inputId + "Preview");
         const uploadBox = document.getElementById(inputId + "Upload");
@@ -584,25 +941,39 @@
         document.getElementById("imageError").style.display = "none";
       }
 
-      // Update the initialization code
+      function cancelForm() {
+        if (confirm("Are you sure? All unsaved changes will be lost.")) {
+          window.history.back();
+        }
+      }
+
+      function showLoading() {
+        document.getElementById("loadingOverlay").style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loadingOverlay").style.display = "none";
+      }
+
+      // Initialize when DOM is loaded
       document.addEventListener("DOMContentLoaded", function () {
-        // Set up image upload listeners
+        // Set up image upload change listeners
         document
           .getElementById("mainImage")
           .addEventListener("change", function (e) {
-            previewImage(e, "mainImagePreview");
+            previewImage(e);
           });
 
         document
           .getElementById("image2")
           .addEventListener("change", function (e) {
-            previewImage(e, "image2Preview");
+            previewImage(e);
           });
 
         document
           .getElementById("image3")
           .addEventListener("change", function (e) {
-            previewImage(e, "image3Preview");
+            previewImage(e);
           });
 
         // Character count for description
@@ -610,6 +981,9 @@
         const charCount = document.getElementById("charCount");
 
         if (description && charCount) {
+          // Initial count
+          charCount.textContent = description.value.length;
+
           description.addEventListener("input", function () {
             const length = this.value.length;
             charCount.textContent = length;
@@ -627,6 +1001,34 @@
 
         // Update step indicator based on scroll
         window.addEventListener("scroll", updateStepIndicator);
+
+        // Check if editing
+        const urlParams = new URLSearchParams(window.location.search);
+        const editProductId = urlParams.get("edit");
+
+        if (editProductId) {
+          document.getElementById("pageTitle").textContent = "Edit Product";
+          document.getElementById("formTitle").textContent = "Edit Product";
+          document.getElementById("formSubtitle").textContent =
+            "Update your product details";
+          document.getElementById("submitBtn").innerHTML =
+            '<i class="fas fa-save"></i> Update Item';
+        }
+
+        // Test if click handlers are working
+        console.log("Image upload boxes initialized");
+        console.log(
+          "Main image upload box:",
+          document.getElementById("mainImageUpload")
+        );
+        console.log(
+          "Image 2 upload box:",
+          document.getElementById("image2Upload")
+        );
+        console.log(
+          "Image 3 upload box:",
+          document.getElementById("image3Upload")
+        );
       });
 
       function updateStepIndicator() {
