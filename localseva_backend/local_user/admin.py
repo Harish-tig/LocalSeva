@@ -1,10 +1,8 @@
-# admin.py - Updated with prevention for duplicate profiles
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import UserModel, Profile, Booking, Review, Report, Product, ProductComment
 
 
-# ============= MODIFIED PROFILE INLINE =============
 class ProfileInline(admin.StackedInline):
     """Inline admin for Profile - checks if profile exists"""
     model = Profile
