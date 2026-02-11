@@ -380,7 +380,7 @@ async function updateProfile(profileData) {
     if (updatedProfile.is_service_provider !== undefined) {
       localStorage.setItem(
         "userIsProvider",
-        updatedProfile.is_service_provider
+        updatedProfile.is_service_provider,
       );
     }
 
@@ -507,7 +507,7 @@ async function createBooking(bookingData) {
   console.log("=== CREATE BOOKING API CALL ===");
   console.log("Input data (raw):", bookingData);
 
-  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
   const endpoint = `${API_BASE_URL}bookings/create/`;
 
   console.log("API Endpoint:", endpoint);
@@ -518,7 +518,7 @@ async function createBooking(bookingData) {
 
     console.log(
       "Access Token found:",
-      token ? "Yes (length: " + token.length + ")" : "No"
+      token ? "Yes (length: " + token.length + ")" : "No",
     );
 
     if (!token) {
@@ -547,7 +547,7 @@ async function createBooking(bookingData) {
     if (!providerIdValue || providerIdValue === "") {
       console.error(
         "❌ ERROR: provider_id is empty or invalid:",
-        providerIdValue
+        providerIdValue,
       );
       throw new Error("Provider ID is required and must be valid");
     }
@@ -620,7 +620,7 @@ async function createBooking(bookingData) {
       responseText = await response.text();
       console.log(
         "Response text (raw):",
-        responseText.substring(0, 200) + "..."
+        responseText.substring(0, 200) + "...",
       ); // Log first 200 chars
 
       // Try to parse as JSON if there's content
@@ -636,7 +636,7 @@ async function createBooking(bookingData) {
         console.log("Received HTML error page instead of JSON");
         // Try to extract error message from HTML
         const match = responseText.match(
-          /<pre class="exception_value">([^<]+)<\/pre>/
+          /<pre class="exception_value">([^<]+)<\/pre>/,
         );
         if (match) {
           responseData = { error: match[1], html: true };
@@ -654,7 +654,7 @@ async function createBooking(bookingData) {
       console.error("Failed to parse response as JSON:", parseError);
       console.log(
         "Response text (could not parse as JSON):",
-        responseText.substring(0, 200) + "..."
+        responseText.substring(0, 200) + "...",
       );
       responseData = { text: responseText };
     }
@@ -689,7 +689,7 @@ async function createBooking(bookingData) {
               Array.isArray(responseData.provider_id)
                 ? responseData.provider_id.join(", ")
                 : responseData.provider_id
-            }`
+            }`,
           );
         }
         if (responseData.service_category) {
@@ -698,7 +698,7 @@ async function createBooking(bookingData) {
               Array.isArray(responseData.service_category)
                 ? responseData.service_category.join(", ")
                 : responseData.service_category
-            }`
+            }`,
           );
         }
         if (responseData.description) {
@@ -707,7 +707,7 @@ async function createBooking(bookingData) {
               Array.isArray(responseData.description)
                 ? responseData.description.join(", ")
                 : responseData.description
-            }`
+            }`,
           );
         }
         if (responseData.address) {
@@ -716,7 +716,7 @@ async function createBooking(bookingData) {
               Array.isArray(responseData.address)
                 ? responseData.address.join(", ")
                 : responseData.address
-            }`
+            }`,
           );
         }
         if (responseData.scheduled_date) {
@@ -725,7 +725,7 @@ async function createBooking(bookingData) {
               Array.isArray(responseData.scheduled_date)
                 ? responseData.scheduled_date.join(", ")
                 : responseData.scheduled_date
-            }`
+            }`,
           );
         }
         if (responseData.non_field_errors) {
@@ -805,7 +805,7 @@ if (typeof window.api === "object") {
 async function getBookings() {
   console.log("📋 Getting user bookings...");
 
-  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
   const endpoint = `${API_BASE_URL}bookings/`;
 
   console.log("API Endpoint:", endpoint);
@@ -868,7 +868,7 @@ async function getBookings() {
 async function getProviderReviews(providerId) {
   console.log("📊 Getting reviews for provider:", providerId);
 
-  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
   const endpoint = `${API_BASE_URL}providers/${providerId}/reviews/`;
 
   console.log("API Endpoint:", endpoint);
@@ -931,7 +931,7 @@ async function getProviderReviews(providerId) {
 async function createReview(reviewData) {
   console.log("✍️ Creating new review:", reviewData);
 
-  const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
   const endpoint = `${API_BASE_URL}reviews/create/`;
 
   console.log("API Endpoint:", endpoint);
@@ -987,7 +987,7 @@ async function createReview(reviewData) {
       responseText = await response.text();
       console.log(
         "Response text (first 500 chars):",
-        responseText.substring(0, 500)
+        responseText.substring(0, 500),
       );
 
       // Try to parse as JSON if there's content and doesn't look like HTML
@@ -1008,7 +1008,7 @@ async function createReview(reviewData) {
           console.log("Received HTML error page instead of JSON");
           // Try to extract error message from HTML
           const match = responseText.match(
-            /<pre class="exception_value">([^<]+)<\/pre>/
+            /<pre class="exception_value">([^<]+)<\/pre>/,
           );
           if (match) {
             responseData = { error: match[1], html: true };
@@ -1055,7 +1055,7 @@ async function createReview(reviewData) {
               Array.isArray(responseData.booking)
                 ? responseData.booking.join(", ")
                 : responseData.booking
-            }`
+            }`,
           );
         }
         if (responseData.provider_id) {
@@ -1064,7 +1064,7 @@ async function createReview(reviewData) {
               Array.isArray(responseData.provider_id)
                 ? responseData.provider_id.join(", ")
                 : responseData.provider_id
-            }`
+            }`,
           );
         }
         if (responseData.rating) {
@@ -1073,7 +1073,7 @@ async function createReview(reviewData) {
               Array.isArray(responseData.rating)
                 ? responseData.rating.join(", ")
                 : responseData.rating
-            }`
+            }`,
           );
         }
         if (responseData.comment) {
@@ -1082,7 +1082,7 @@ async function createReview(reviewData) {
               Array.isArray(responseData.comment)
                 ? responseData.comment.join(", ")
                 : responseData.comment
-            }`
+            }`,
           );
         }
         if (responseData.non_field_errors) {
@@ -1149,7 +1149,7 @@ async function getUserBookingsForProvider(providerId) {
         booking.service_provider &&
         (booking.service_provider.id == providerId ||
           booking.service_provider == providerId) &&
-        booking.status === "COMPLETED"
+        booking.status === "COMPLETED",
     );
 
     console.log("📦 Filtered bookings for provider:", providerBookings);
@@ -1222,7 +1222,7 @@ async function createProduct(formData) {
   try {
     console.log("Creating product with FormData");
 
-    const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+    const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
     const endpoint = `${API_BASE_URL}marketplace/create/`;
 
     // Get the accessToken
@@ -1298,7 +1298,7 @@ async function updateProduct(id, formData) {
   try {
     console.log("Updating product", id);
 
-    const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+    const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
     const endpoint = `${API_BASE_URL}marketplace/${id}/`;
 
     // Get the accessToken
@@ -1367,7 +1367,7 @@ async function getProductComments(productId) {
     console.log("Getting comments for product:", productId);
     const comments = await apiRequest(
       `marketplace/${productId}/comments/`,
-      "GET"
+      "GET",
     );
     console.log("Comments received:", comments);
     return comments;
@@ -1386,7 +1386,7 @@ async function createComment(commentData) {
     const comment = await apiRequest(
       `marketplace/comments/create/`,
       "POST",
-      commentData
+      commentData,
     );
     console.log("Comment created:", comment);
     return comment;
@@ -1404,7 +1404,7 @@ async function deleteComment(commentId) {
     console.log("Deleting comment:", commentId);
     return await apiRequest(
       `marketplace/comments/${commentId}/delete/`,
-      "DELETE"
+      "DELETE",
     );
   } catch (error) {
     console.error("Error deleting comment:", error);
@@ -1435,7 +1435,7 @@ async function getMyProductComments() {
     console.log("Getting user product comments");
     const comments = await apiRequest(
       `marketplace/my-product-comments/`,
-      "GET"
+      "GET",
     );
     console.log("User product comments received:", comments);
     return comments;

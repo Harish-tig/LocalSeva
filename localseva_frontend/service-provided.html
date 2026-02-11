@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service Provided - Provider Dashboard</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" class="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>LocalSeva</h2>
+        <p>Welcome, <span id="userName">User</span></p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+          </li>
+        </ul>
+
+        <div class="sidebar-section">
+          <h3>My Activity</h3>
+          <ul>
+            <li>
+              <a href="service-taken.html"
+                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
+              >
+            </li>
+            <li class="active">
+              <a href="service-provided.html"
+                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- <div class="sidebar-section">
+          <h3>My Services</h3>
+          <ul>
+            <li>
+              <a
+                href="my-services.html"
+                id="myServicesLink"
+                class="provider-only"
+                ><i class="fas fa-briefcase"></i> Provider Dashboard</a
+              >
+            </li>
+          </ul>
+        </div> -->
+
+        <div class="sidebar-section">
+          <h3>Marketplace</h3>
+          <ul>
+            <li>
+              <a href="my-products.html"
+                ><i class="fas fa-box"></i> My Products</a
+              >
+            </li>
+            <li>
+              <a href="my-product-comments.html"
+                ><i class="fas fa-comments"></i> Product Comments</a
+              >
+            </li>
+            <li>
+              <a href="add-item.html"
+                ><i class="fas fa-plus-circle"></i> Sell Item</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <ul>
+            <li>
+              <a href="#" id="logoutBtn"
+                ><i class="fas fa-sign-out-alt"></i> Logout</a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <button
+        id="closeSidebar"
+        class="btn btn-outline"
+        style="margin: 1.5rem; display: none"
+      >
+        <i class="fas fa-times"></i> Close
+      </button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Services Provided</h1>
+        <div class="header-actions">
+          <button id="themeToggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+          <div class="header-stats">
+            <span class="stat-badge">
+              <i class="fas fa-clock"></i>
+              <span id="pendingCount">0</span> Pending
+            </span>
+            <span class="stat-badge">
+              <i class="fas fa-tasks"></i>
+              <span id="workingCount">0</span> Working
+            </span>
+            <span class="stat-badge">
+              <i class="fas fa-check-circle"></i>
+              <span id="completedCount">0</span> Completed
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Provider Stats Overview -->
+      <div class="provider-overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-handshake"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="totalServices">0</div>
+              <div class="stat-label">Total Services</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div
+              class="stat-icon"
+              style="
+                background-color: rgba(76, 201, 240, 0.1);
+                color: var(--success-color);
+              "
+            >
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="avgRating">0.0</div>
+              <div class="stat-label">Avg. Rating</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div
+              class="stat-icon"
+              style="
+                background-color: rgba(248, 150, 30, 0.1);
+                color: var(--warning-color);
+              "
+            >
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="completionRate">0%</div>
+              <div class="stat-label">Completion Rate</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div
+              class="stat-icon"
+              style="
+                background-color: rgba(67, 97, 238, 0.1);
+                color: var(--primary-color);
+              "
+            >
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value" id="totalEarnings">$0</div>
+              <div class="stat-label">Total Earnings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search and Filters -->
+      <div class="filters-container" style="margin-bottom: 2rem">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            id="activitySearch"
+            placeholder="Search services..."
+            class="form-control"
+          />
+        </div>
+
+        <div class="filter-group" style="margin-top: 1rem">
+          <label for="dateFilter" class="form-label">Date Range</label>
+          <select id="dateFilter" class="form-control">
+            <option value="all">All Time</option>
+            <option value="last-week">Last Week</option>
+            <option value="last-month">Last Month</option>
+            <option value="last-3-months">Last 3 Months</option>
+            <option value="this-year">This Year</option>
+          </select>
+        </div>
+
+        <div class="filter-group" style="margin-top: 1rem">
+          <label for="statusFilter" class="form-label">Status</label>
+          <select id="statusFilter" class="form-control">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="quote_given">Quote Given</option>
+            <option value="accepted">Accepted</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Services Container -->
+      <div id="servicesContainer" class="services-list">
+        <!-- Services will be loaded here -->
+        <div class="loading-skeleton" style="height: 150px"></div>
+        <div class="loading-skeleton" style="height: 150px"></div>
+      </div>
+
+      <!-- Provider Tools -->
+      <div class="provider-tools" style="margin-top: 3rem">
+        <h2>Provider Tools</h2>
+        <div class="tools-grid">
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Schedule Manager</h3>
+              <p>Manage your availability and schedule</p>
+              <button
+                class="btn btn-outline btn-sm"
+                onclick="openScheduleManager()"
+              >
+                <i class="fas fa-edit"></i> Manage
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Analytics</h3>
+              <p>View your performance metrics</p>
+              <button class="btn btn-outline btn-sm" onclick="openAnalytics()">
+                <i class="fas fa-chart-bar"></i> View
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Invoices</h3>
+              <p>Create and manage invoices</p>
+              <button class="btn btn-outline btn-sm" onclick="openInvoices()">
+                <i class="fas fa-receipt"></i> Manage
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-icon">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="tool-content">
+              <h3>Settings</h3>
+              <p>Provider account settings</p>
+              <button
+                class="btn btn-outline btn-sm"
+                onclick="openProviderSettings()"
+              >
+                <i class="fas fa-sliders-h"></i> Configure
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="services.html">
+        <i class="fas fa-th-large"></i>
+        <span>Services</span>
+      </a>
+      <a href="add-item.html" class="sell-btn">
+        <i class="fas fa-plus"></i>
+      </a>
+      <a href="mart.html">
+        <i class="fas fa-store"></i>
+        <span>Mart</span>
+      </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      /**
+       * Service Taken functionality
+       * For users to view their booked services
+       */
+
+      // Cache and state management
+      let serviceTakenData = [];
+      let isDataLoaded = false;
+      let isLoading = false;
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        console.log("Service Taken: DOM loaded - checking authentication");
+
+        // Check authentication
+        if (!api.isAuthenticated()) {
+          console.log("Not authenticated, redirecting to login");
+          window.location.href = "index.html";
+          return;
+        }
+
+        console.log("User is authenticated, initializing service taken page");
+
+        // Initialize service taken page
+        await initServiceTakenPage();
+      });
+
+      /**
+       * Initialize service taken page
+       */
+      async function initServiceTakenPage() {
+        // Setup search and filters
+        setupServiceTakenFilters();
+
+        // Load initial data
+        await loadServiceTakenData();
+      }
+
+      /**
+       * Load service taken data
+       */
+      async function loadServiceTakenData() {
+        if (isLoading) {
+          console.log("Already loading data, skipping...");
+          return;
+        }
+
+        const container = document.getElementById("servicesContainer");
+        if (!container) return;
+
+        // Show loading
+        container.innerHTML = `
+    <div class="loading-skeleton" style="height: 150px;"></div>
+    <div class="loading-skeleton" style="height: 150px;"></div>
+    <div class="loading-skeleton" style="height: 150px;"></div>
+  `;
+
+        isLoading = true;
+        try {
+          console.log("Fetching service taken data...");
+
+          // Fetch user bookings (services taken) - Using the correct API endpoint
+          const response = await api.apiRequest("bookings/?type=user", "GET");
+          console.log("User bookings received:", response);
+
+          // Process user bookings
+          serviceTakenData = [];
+          if (response && Array.isArray(response)) {
+            response.forEach((booking) => {
+              const activityItem = {
+                id: booking.id,
+                name: booking.description || "Service Booking",
+                description: booking.description || "",
+                provider:
+                  booking.provider_name ||
+                  `Provider ${booking.service_provider}`,
+                client: booking.user_name || `User ${booking.user}`,
+                address: booking.address,
+                date: booking.scheduled_date || booking.created_at,
+                quoted_price: booking.quote_price,
+                final_price: booking.final_price,
+                price: booking.final_price || booking.quote_price || "0.00",
+                status: booking.status,
+                provider_notes: booking.provider_notes,
+                user_notes: booking.user_notes,
+                created_at: booking.created_at,
+                updated_at: booking.updated_at,
+                quoted_at: booking.quoted_at,
+                accepted_at: booking.accepted_at,
+                started_at: booking.started_at,
+                completed_at: booking.completed_at,
+                user_id: booking.user,
+                provider_id: booking.service_provider,
+              };
+              serviceTakenData.push(activityItem);
+            });
+          }
+
+          isDataLoaded = true;
+          console.log(
+            "Service taken data loaded:",
+            serviceTakenData.length,
+            "items",
+          );
+
+          // Update stats
+          updateServiceTakenStats();
+
+          // Apply filters and render
+          const filteredData = applyServiceTakenFilters();
+          renderServiceTakenItems(filteredData, container);
+        } catch (error) {
+          console.error("Error fetching service taken data:", error);
+          container.innerHTML = `
+      <div class="empty-activity">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Error Loading Data</h3>
+        <p>${error.message || "Please try again later"}</p>
+        <button class="btn btn-primary mt-2" onclick="loadServiceTakenData()">Retry</button>
+      </div>`;
+          appUtils.showNotification(
+            "Error loading service data: " + error.message,
+            "error",
+          );
+        } finally {
+          isLoading = false;
+        }
+      }
+
+      /**
+       * Update service taken statistics
+       */
+      function updateServiceTakenStats() {
+        const pendingCountEl = document.getElementById("pendingCount");
+        const workingCountEl = document.getElementById("workingCount");
+        const completedCountEl = document.getElementById("completedCount");
+
+        if (!serviceTakenData || serviceTakenData.length === 0) {
+          if (pendingCountEl) pendingCountEl.textContent = "0";
+          if (workingCountEl) workingCountEl.textContent = "0";
+          if (completedCountEl) completedCountEl.textContent = "0";
+          return;
+        }
+
+        const pendingCount = serviceTakenData.filter(
+          (item) => item.status === "PENDING" || item.status === "QUOTE_GIVEN",
+        ).length;
+
+        const inProgressCount = serviceTakenData.filter(
+          (item) => item.status === "ACCEPTED" || item.status === "IN_PROGRESS",
+        ).length;
+
+        const completedCount = serviceTakenData.filter(
+          (item) => item.status === "COMPLETED",
+        ).length;
+
+        if (pendingCountEl) pendingCountEl.textContent = pendingCount;
+        if (workingCountEl) workingCountEl.textContent = inProgressCount;
+        if (completedCountEl) completedCountEl.textContent = completedCount;
+      }
+
+      /**
+       * Setup service taken filters
+       */
+      function setupServiceTakenFilters() {
+        // Search functionality
+        const searchInput = document.getElementById("activitySearch");
+        if (searchInput) {
+          let searchTimer;
+          searchInput.addEventListener("input", function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+              filterServiceTaken();
+            }, 300);
+          });
+        }
+
+        // Status filter
+        const statusFilter = document.getElementById("statusFilter");
+        if (statusFilter) {
+          statusFilter.addEventListener("change", filterServiceTaken);
+        }
+
+        // Date filter
+        const dateFilter = document.getElementById("dateFilter");
+        if (dateFilter) {
+          dateFilter.addEventListener("change", filterServiceTaken);
+        }
+      }
+
+      /**
+       * Apply filters to service taken data
+       */
+      function applyServiceTakenFilters() {
+        if (!serviceTakenData || serviceTakenData.length === 0) {
+          return [];
+        }
+
+        let filteredItems = [...serviceTakenData];
+        const searchInput = document.getElementById("activitySearch");
+        const searchTerm = searchInput?.value.toLowerCase() || "";
+
+        // Apply search filter
+        if (searchTerm) {
+          filteredItems = filteredItems.filter(
+            (item) =>
+              (item.name || "").toLowerCase().includes(searchTerm) ||
+              (item.description || "").toLowerCase().includes(searchTerm) ||
+              (item.address || "").toLowerCase().includes(searchTerm) ||
+              (item.user_notes || "").toLowerCase().includes(searchTerm) ||
+              (item.provider_notes || "").toLowerCase().includes(searchTerm) ||
+              (item.provider || "").toLowerCase().includes(searchTerm),
+          );
+        }
+
+        // Apply status filter
+        const statusFilter = document.getElementById("statusFilter");
+        if (statusFilter && statusFilter.value !== "all") {
+          const filterValue = statusFilter.value.toUpperCase();
+          filteredItems = filteredItems.filter((item) => {
+            const itemStatus = item.status ? item.status.toUpperCase() : "";
+            return itemStatus === filterValue;
+          });
+        }
+
+        // Apply date filter
+        const dateFilter = document.getElementById("dateFilter");
+        if (dateFilter && dateFilter.value !== "all") {
+          filteredItems = filteredItems.filter((item) => {
+            const itemDate = new Date(item.date || item.created_at);
+            const now = new Date();
+
+            switch (dateFilter.value) {
+              case "last-week":
+                const lastWeek = new Date(
+                  now.getTime() - 7 * 24 * 60 * 60 * 1000,
+                );
+                return itemDate >= lastWeek;
+              case "last-month":
+                const lastMonth = new Date(
+                  now.getTime() - 30 * 24 * 60 * 60 * 1000,
+                );
+                return itemDate >= lastMonth;
+              case "last-3-months":
+                const last3Months = new Date(
+                  now.getTime() - 90 * 24 * 60 * 60 * 1000,
+                );
+                return itemDate >= last3Months;
+              case "this-year":
+                return itemDate.getFullYear() === now.getFullYear();
+              default:
+                return true;
+            }
+          });
+        }
+
+        return filteredItems;
+      }
+
+      /**
+       * Filter service taken items
+       */
+      function filterServiceTaken() {
+        const container = document.getElementById("servicesContainer");
+        if (!container) return;
+
+        const filteredData = applyServiceTakenFilters();
+        renderServiceTakenItems(filteredData, container);
+      }
+
+      /**
+       * Render service taken items
+       */
+      function renderServiceTakenItems(items, container) {
+        if (!items || items.length === 0) {
+          container.innerHTML = `
+      <div class="empty-activity">
+        <i class="fas fa-inbox"></i>
+        <h3>No Services Taken</h3>
+        <p>You haven't booked any services yet.</p>
+      </div>
+    `;
+          return;
+        }
+
+        container.innerHTML = "";
+
+        items.forEach((item) => {
+          const activityItem = document.createElement("div");
+          activityItem.className = "activity-item card";
+          activityItem.style.marginBottom = "1rem";
+
+          // Get status badge class
+          const statusClass = getStatusClass(item.status);
+          const statusText = getStatusText(item.status);
+
+          activityItem.innerHTML = `
+      <div class="activity-header">
+        <div class="activity-title">
+          <h4>${item.name || item.description || "Booking"}</h4>
+          <span class="badge ${statusClass}">${statusText}</span>
+        </div>
+        <div class="activity-price">
+          <strong>${appUtils.formatCurrency(item.price)}</strong>
+          ${
+            item.final_price && item.final_price !== item.quoted_price
+              ? `<small class="text-muted">(Quoted: ${appUtils.formatCurrency(
+                  item.quoted_price,
+                )})</small>`
+              : ""
+          }
+        </div>
+      </div>
+      
+      <div class="activity-details">
+        <div class="activity-meta">
+          <span><i class="fas fa-user-tie"></i> Provider: ${item.provider}</span>
+          <span><i class="fas fa-calendar"></i> ${appUtils.formatDate(
+            item.date,
+          )}</span>
+          ${
+            item.completed_at
+              ? `<span><i class="fas fa-check-circle"></i> Completed: ${appUtils.formatDate(
+                  item.completed_at,
+                )}</span>`
+              : ""
+          }
+        </div>
+        
+        ${
+          item.address
+            ? `<p class="activity-address"><i class="fas fa-map-marker-alt"></i> ${item.address}</p>`
+            : ""
+        }
+        
+        ${
+          item.user_notes
+            ? `
+            <div class="activity-notes">
+              <strong><i class="fas fa-sticky-note"></i> Your Notes:</strong>
+              <p>${item.user_notes}</p>
+            </div>`
+            : ""
+        }
+        
+        ${
+          item.provider_notes
+            ? `
+            <div class="activity-notes">
+              <strong><i class="fas fa-sticky-note"></i> Provider Notes:</strong>
+              <p>${item.provider_notes}</p>
+            </div>`
+            : ""
+        }
+      </div>
+      
+      <div class="activity-actions">
+        ${getServiceTakenActionButtons(item)}
+        <small class="text-muted">Created: ${appUtils.formatDate(
+          item.created_at,
+        )}</small>
+      </div>
+    `;
+
+          // Add click handler for details
+          activityItem.addEventListener("click", (e) => {
+            if (!e.target.closest(".btn")) {
+              viewBookingDetails(item.id);
+            }
+          });
+
+          container.appendChild(activityItem);
+        });
+      }
+
+      /**
+       * Get status badge class based on status
+       */
+      function getStatusClass(status) {
+        if (!status) return "badge-secondary";
+
+        const statusUpper = status.toUpperCase();
+
+        if (statusUpper === "COMPLETED") {
+          return "badge-success";
+        } else if (statusUpper === "IN_PROGRESS") {
+          return "badge-warning";
+        } else if (statusUpper === "PENDING") {
+          return "badge-info";
+        } else if (statusUpper === "QUOTE_GIVEN") {
+          return "badge-primary";
+        } else if (statusUpper === "ACCEPTED") {
+          return "badge-primary";
+        } else if (statusUpper === "CANCELLED" || statusUpper === "REJECTED") {
+          return "badge-danger";
+        }
+
+        return "badge-secondary";
+      }
+
+      /**
+       * Get display text for status
+       */
+      function getStatusText(status) {
+        if (!status) return "Unknown";
+
+        const statusMap = {
+          PENDING: "Pending",
+          QUOTE_GIVEN: "Quote Given",
+          ACCEPTED: "Accepted",
+          IN_PROGRESS: "In Progress",
+          COMPLETED: "Completed",
+          CANCELLED: "Cancelled",
+          REJECTED: "Rejected",
+        };
+
+        return (
+          statusMap[status.toUpperCase()] ||
+          status
+            .toLowerCase()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (char) => char.toUpperCase())
+        );
+      }
+
+      /**
+       * Get action buttons for service taken item
+       */
+      function getServiceTakenActionButtons(item) {
+        let buttons = `
+    <button class="btn btn-outline btn-sm" onclick="viewBookingDetails(${item.id}, event)">
+      <i class="fas fa-eye"></i> Details
+    </button>
+  `;
+
+        // Contact provider button
+        if (item.provider_id) {
+          buttons += `
+      <button class="btn btn-outline btn-sm" onclick="contactProvider(${item.provider_id}, event)">
+        <i class="fas fa-comment"></i> Contact
+      </button>
+    `;
+        }
+
+        // Action buttons based on status
+        const statusUpper = item.status ? item.status.toUpperCase() : "";
+
+        if (statusUpper === "QUOTE_GIVEN") {
+          buttons += `
+      <button class="btn btn-success btn-sm" onclick="acceptQuote(${item.id}, event)">
+        <i class="fas fa-check"></i> Accept Quote
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="cancelBooking(${item.id}, event)">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+    `;
+        }
+
+        if (statusUpper === "PENDING") {
+          buttons += `
+      <button class="btn btn-danger btn-sm" onclick="cancelBooking(${item.id}, event)">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+    `;
+        }
+
+        if (statusUpper === "COMPLETED") {
+          buttons += `
+      <button class="btn btn-primary btn-sm" onclick="leaveReview(${item.id}, ${item.provider_id}, event)">
+        <i class="fas fa-star"></i> Review
+      </button>
+    `;
+        }
+
+        return buttons;
+      }
+
+      /**
+       * View booking details
+       */
+      async function viewBookingDetails(bookingId, event) {
+        if (event) event.stopPropagation();
+
+        try {
+          // Fetch booking details
+          const booking = await api.apiRequest(`bookings/${bookingId}/`, "GET");
+
+          // Show booking details in a modal
+          showBookingDetailsModal(booking, "customer");
+        } catch (error) {
+          console.error("Error fetching booking details:", error);
+          appUtils.showNotification("Error loading booking details", "error");
+        }
+      }
+
+      /**
+       * Show booking details modal
+       */
+      function showBookingDetailsModal(booking, userType) {
+        // Create modal HTML
+        const modalHTML = `
+    <div class="modal-overlay active" id="bookingModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Booking Details</h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="booking-details">
+            <h4>${booking.description || "Service Booking"}</h4>
+            
+            <div class="detail-row">
+              <strong>Status:</strong>
+              <span class="badge ${getStatusClass(
+                booking.status,
+              )}">${getStatusText(booking.status)}</span>
+            </div>
+            
+            <div class="detail-row">
+              <strong>Scheduled Date:</strong>
+              <span>${appUtils.formatDate(booking.scheduled_date)}</span>
+            </div>
+            
+            ${
+              booking.quote_price
+                ? `
+            <div class="detail-row">
+              <strong>Quoted Price:</strong>
+              <span>${appUtils.formatCurrency(booking.quote_price)}</span>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.final_price
+                ? `
+            <div class="detail-row">
+              <strong>Final Price:</strong>
+              <span>${appUtils.formatCurrency(booking.final_price)}</span>
+            </div>`
+                : ""
+            }
+            
+            <div class="detail-row">
+              <strong>Address:</strong>
+              <span>${booking.address || "Not specified"}</span>
+            </div>
+            
+            <div class="detail-row">
+              <strong>Client:</strong>
+              <span>${booking.user_name || "N/A"}</span>
+            </div>
+            
+            ${
+              booking.provider_name
+                ? `
+            <div class="detail-row">
+              <strong>Provider:</strong>
+              <span>${booking.provider_name || "N/A"}</span>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.user_notes
+                ? `
+            <div class="detail-row">
+              <strong>Client Notes:</strong>
+              <p>${booking.user_notes}</p>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.provider_notes
+                ? `
+            <div class="detail-row">
+              <strong>Provider Notes:</strong>
+              <p>${booking.provider_notes}</p>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.quoted_at
+                ? `
+            <div class="detail-row">
+              <strong>Quoted At:</strong>
+              <span>${appUtils.formatDate(booking.quoted_at)}</span>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.accepted_at
+                ? `
+            <div class="detail-row">
+              <strong>Accepted At:</strong>
+              <span>${appUtils.formatDate(booking.accepted_at)}</span>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.started_at
+                ? `
+            <div class="detail-row">
+              <strong>Started At:</strong>
+              <span>${appUtils.formatDate(booking.started_at)}</span>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.completed_at
+                ? `
+            <div class="detail-row">
+              <strong>Completed At:</strong>
+              <span>${appUtils.formatDate(booking.completed_at)}</span>
+            </div>`
+                : ""
+            }
+            
+            <div class="detail-row">
+              <strong>Created:</strong>
+              <span>${appUtils.formatDate(booking.created_at)}</span>
+            </div>
+            
+            <div class="detail-row">
+              <strong>Last Updated:</strong>
+              <span>${appUtils.formatDate(booking.updated_at)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+          ${userType === "customer" ? getServiceTakenModalButtons(booking) : getServiceProvidedModalButtons(booking)}
+        </div>
+      </div>
+    </div>
+  `;
+
+        // Add modal to body
+        const modalContainer = document.createElement("div");
+        modalContainer.innerHTML = modalHTML;
+        document.body.appendChild(modalContainer);
+      }
+
+      /**
+       * Get action buttons for service taken modal
+       */
+      function getServiceTakenModalButtons(booking) {
+        let buttons = "";
+        const statusUpper = booking.status ? booking.status.toUpperCase() : "";
+
+        if (statusUpper === "QUOTE_GIVEN") {
+          buttons += `<button class="btn btn-success" onclick="acceptQuote(${booking.id})">Accept Quote</button>`;
+        }
+
+        if (statusUpper === "PENDING" || statusUpper === "QUOTE_GIVEN") {
+          buttons += `<button class="btn btn-danger" onclick="cancelBooking(${booking.id})">Cancel Booking</button>`;
+        }
+
+        if (statusUpper === "COMPLETED" && booking.service_provider) {
+          buttons += `<button class="btn btn-primary" onclick="leaveReview(${booking.id}, ${booking.service_provider})">Leave Review</button>`;
+        }
+
+        return buttons;
+      }
+
+      /**
+       * Close modal
+       */
+      function closeModal() {
+        const modals = document.querySelectorAll(".modal-overlay");
+        modals.forEach((modal) => {
+          modal.remove();
+        });
+      }
+
+      /**
+       * Contact provider
+       */
+      function contactProvider(providerId, event) {
+        if (event) event.stopPropagation();
+        appUtils.showNotification(`Opening chat with provider`, "info");
+      }
+
+      /**
+       * Accept quote
+       */
+      async function acceptQuote(bookingId, event) {
+        if (event) event.stopPropagation();
+
+        try {
+          if (!confirm("Are you sure you want to accept this quote?")) return;
+
+          const updateData = { status: "ACCEPTED" };
+
+          const response = await api.apiRequest(
+            `bookings/${bookingId}/`,
+            "PUT",
+            updateData,
+          );
+
+          appUtils.showNotification(`Quote accepted successfully!`, "success");
+
+          // Refresh data
+          await loadServiceTakenData();
+
+          // Close modal if open
+          closeModal();
+        } catch (error) {
+          console.error("Error accepting quote:", error);
+          appUtils.showNotification(
+            `Failed to accept quote: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      /**
+       * Cancel booking
+       */
+      async function cancelBooking(bookingId, event) {
+        if (event) event.stopPropagation();
+
+        try {
+          if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+          const updateData = { status: "CANCELLED" };
+
+          const response = await api.apiRequest(
+            `bookings/${bookingId}/`,
+            "PUT",
+            updateData,
+          );
+
+          appUtils.showNotification(
+            `Booking cancelled successfully!`,
+            "success",
+          );
+
+          // Refresh data
+          await loadServiceTakenData();
+
+          // Close modal if open
+          closeModal();
+        } catch (error) {
+          console.error("Error cancelling booking:", error);
+          appUtils.showNotification(
+            `Failed to cancel booking: ${error.message}`,
+            "error",
+          );
+        }
+      }
+
+      /**
+       * Leave review
+       */
+      function leaveReview(bookingId, providerId, event) {
+        if (event) event.stopPropagation();
+        window.location.href = `write-review.html?booking=${bookingId}&provider=${providerId}`;
+      }
+
+      /**
+       * Tool button functions
+       */
+      function viewBookingHistory() {
+        // Show all bookings (no filter)
+        document.getElementById("statusFilter").value = "all";
+        document.getElementById("dateFilter").value = "all";
+        filterServiceTaken();
+      }
+
+      function viewMyReviews() {
+        appUtils.showNotification("Opening reviews", "info");
+      }
+
+      function viewUpcomingServices() {
+        // Filter to show upcoming services
+        document.getElementById("statusFilter").value = "all";
+        document.getElementById("dateFilter").value = "this-year";
+        filterServiceTaken();
+      }
+
+      function openBookingSettings() {
+        appUtils.showNotification("Opening booking settings", "info");
+      }
+
+      // Add modal styles if not present
+      if (!document.querySelector("#modal-styles")) {
+        const style = document.createElement("style");
+        style.id = "modal-styles";
+        style.textContent = `
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 1000;
+    }
+    .modal-overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .modal-body {
+      margin-bottom: 1.5rem;
+    }
+    .detail-row {
+      margin-bottom: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .modal-footer {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+  `;
+        document.head.appendChild(style);
+      }
+    </script>
+  </body>
+</html>

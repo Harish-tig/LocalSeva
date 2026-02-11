@@ -97,7 +97,7 @@ function updateProfileDisplay(profile) {
   const location = userData.location || "Kandivali";
   setElementHtml(
     "profileLocation",
-    `<i class="fas fa-map-marker-alt"></i> ${location}`
+    `<i class="fas fa-map-marker-alt"></i> ${location}`,
   );
   setElementValue("location", location);
 
@@ -120,20 +120,33 @@ function updateProfileDisplay(profile) {
 function extractProfileData(profile) {
   if (!profile) return {};
 
+  // Handle avatar URL - ensure it's properly formatted
+  let avatarUrl = profile.avatar;
+
+  // If avatar is null or undefined, set to empty string
+  if (!avatarUrl) {
+    avatarUrl = "";
+  }
+  // If avatar is a relative URL and doesn't start with http
+  else if (typeof avatarUrl === "string" && !avatarUrl.startsWith("http")) {
+    // Log the raw avatar value for debugging
+    console.log("Raw avatar value from API:", avatarUrl);
+  }
+
   return {
     username: profile.username,
     name: profile.name || profile.username,
     email: profile.email,
-    avatar: profile.avatar,
+    avatar: avatarUrl,
     bio: profile.bio || "",
     phone: profile.phone || "",
     location: profile.location || "Kandivali",
     is_service_provider: profile.is_service_provider || false,
     // Provider specific fields (if they exist)
     categories: profile.categories,
-    service_locations: profile.service_locations, // Changed from locations
+    service_locations: profile.service_locations,
     pricing_type: profile.pricing_type,
-    hourly_rate: profile.hourly_rate,
+    base_price: profile.base_price, // Changed from hourly_rate to base_price
     description: profile.description,
     availability: profile.availability,
     experience_years: profile.experience_years,
@@ -161,8 +174,8 @@ function updateProviderCard(profile) {
       typeof providerData.categories === "string"
         ? providerData.categories.split(",").map((cat) => cat.trim())
         : Array.isArray(providerData.categories)
-        ? providerData.categories
-        : [];
+          ? providerData.categories
+          : [];
     if (categories.length > 0) {
       categoriesHtml = categories
         .map((cat) => `<span class="badge badge-secondary">${cat}</span>`)
@@ -172,13 +185,12 @@ function updateProviderCard(profile) {
 
   let serviceLocationsHtml = "Not specified";
   if (providerData.service_locations) {
-    // Changed key
     const service_locations =
       typeof providerData.service_locations === "string"
         ? providerData.service_locations.split(",").map((loc) => loc.trim())
         : Array.isArray(providerData.service_locations)
-        ? providerData.service_locations
-        : [];
+          ? providerData.service_locations
+          : [];
     if (service_locations.length > 0) {
       serviceLocationsHtml = service_locations
         .map((loc) => `<span class="badge badge-secondary">${loc}</span>`)
@@ -187,8 +199,8 @@ function updateProviderCard(profile) {
   }
 
   const pricingType = providerData.pricing_type || "Not specified";
-  const hourlyRate = providerData.hourly_rate
-    ? `₹${providerData.hourly_rate}`
+  const basePrice = providerData.base_price // Changed from hourly_rate to base_price
+    ? `₹${providerData.base_price}`
     : "Not specified";
   const description = providerData.description || "No description provided";
   const availability = providerData.availability || "Not specified";
@@ -202,13 +214,13 @@ function updateProviderCard(profile) {
       <strong>Service Categories:</strong> ${categoriesHtml}
     </div>
     <div class="provider-detail">
-      <strong>Service Locations:</strong> ${serviceLocationsHtml} <!-- Updated label -->
+      <strong>Service Locations:</strong> ${serviceLocationsHtml}
     </div>
     <div class="provider-detail">
       <strong>Pricing Type:</strong> ${pricingType}
     </div>
     <div class="provider-detail">
-      <strong>Hourly Rate:</strong> ${hourlyRate}
+      <strong>Base Price:</strong> ${basePrice}  <!-- Changed label -->
     </div>
     <div class="provider-detail">
       <strong>Availability:</strong> ${availability}
@@ -232,23 +244,66 @@ function updateProfileImage(avatarUrl) {
   if (!profileImageDisplay || !profileIcon) return;
 
   if (avatarUrl) {
+    // Check if it's already a complete URL
+    let imageUrl = avatarUrl;
+
+    // If it's a relative path (starts with /media/), prepend the base URL
+    if (avatarUrl.startsWith("/media/") || avatarUrl.startsWith("media/")) {
+      // Remove any leading slash to make it consistent
+      const cleanPath = avatarUrl.startsWith("/")
+        ? avatarUrl.substring(1)
+        : avatarUrl;
+      imageUrl = `http://127.0.0.1:8000/${cleanPath}`;
+    }
+    // If it's just a filename without path, assume it's in media folder
+    else if (!avatarUrl.includes("://") && !avatarUrl.startsWith("/")) {
+      imageUrl = `http://127.0.0.1:8000/media/${avatarUrl}`;
+    }
+
+    console.log("Setting profile image URL:", imageUrl);
+
     // Add timestamp to prevent caching issues
     const timestamp = new Date().getTime();
-    const imageUrl = avatarUrl.includes("?")
-      ? `${avatarUrl}&t=${timestamp}`
-      : `${avatarUrl}?t=${timestamp}`;
+    const finalUrl = imageUrl.includes("?")
+      ? `${imageUrl}&t=${timestamp}`
+      : `${imageUrl}?t=${timestamp}`;
 
-    profileImageDisplay.src = imageUrl;
+    // Set up error handler BEFORE setting src
+    profileImageDisplay.onerror = function () {
+      console.error("Failed to load profile image:", imageUrl);
+      console.log("Trying fallback image...");
+      profileImageDisplay.style.display = "none";
+      profileIcon.style.display = "block";
+
+      // Try a fallback approach - clear cache and try again
+      if (imageUrl.includes("?t=")) {
+        // Try without timestamp
+        const cleanUrl = imageUrl.split("?")[0];
+        console.log("Trying without timestamp:", cleanUrl);
+        profileImageDisplay.src = cleanUrl;
+        profileImageDisplay.style.display = "block";
+      }
+    };
+
+    profileImageDisplay.onload = function () {
+      console.log("Profile image loaded successfully");
+    };
+
+    // Set the image source
+    profileImageDisplay.src = finalUrl;
     profileImageDisplay.style.display = "block";
     profileIcon.style.display = "none";
 
-    // Handle image loading errors
-    profileImageDisplay.onerror = function () {
-      console.error("Failed to load profile image:", avatarUrl);
-      profileImageDisplay.style.display = "none";
-      profileIcon.style.display = "block";
-    };
+    // Log the actual image element for debugging
+    console.log("Profile image element:", {
+      src: profileImageDisplay.src,
+      currentSrc: profileImageDisplay.currentSrc,
+      complete: profileImageDisplay.complete,
+      naturalWidth: profileImageDisplay.naturalWidth,
+      naturalHeight: profileImageDisplay.naturalHeight,
+    });
   } else {
+    console.log("No avatar URL provided, showing default icon");
     profileImageDisplay.style.display = "none";
     profileIcon.style.display = "block";
   }
@@ -315,7 +370,7 @@ function updateSidebarUserInfo(profile) {
   localStorage.setItem("userName", displayName);
   localStorage.setItem(
     "userIsProvider",
-    userData.is_service_provider.toString()
+    userData.is_service_provider.toString(),
   );
 }
 
@@ -398,7 +453,7 @@ function setupProviderStatus() {
   if (becomeProviderBtn) {
     becomeProviderBtn.addEventListener("click", async function () {
       const confirmBecome = confirm(
-        "Are you sure you want to become a service provider? You will need to provide additional information about your services."
+        "Are you sure you want to become a service provider? You will need to provide additional information about your services.",
       );
 
       if (!confirmBecome) return;
@@ -417,7 +472,7 @@ function setupProviderStatus() {
 
         showNotification(
           "You are now a service provider! Please complete your enrollment details.",
-          "success"
+          "success",
         );
 
         // Update UI to show provider status
@@ -485,15 +540,15 @@ function setupProviderStatus() {
 
       // Collect enrollment data
       const categories = Array.from(
-        document.querySelectorAll('input[name="categories"]:checked')
+        document.querySelectorAll('input[name="categories"]:checked'),
       ).map((cb) => cb.value);
 
       const service_locations = Array.from(
-        document.querySelectorAll('input[name="service_locations"]:checked')
+        document.querySelectorAll('input[name="service_locations"]:checked'),
       ).map((cb) => cb.value);
 
       const pricingType = document.getElementById("pricingType")?.value;
-      const hourlyRate = document.getElementById("hourlyRate")?.value;
+      const basePrice = document.getElementById("hourlyRate")?.value; // Changed variable name
       const serviceDescription =
         document.getElementById("serviceDescription")?.value;
       const availability = document.getElementById("availability")?.value;
@@ -503,7 +558,7 @@ function setupProviderStatus() {
       if (categories.length === 0) {
         showNotification(
           "Please select at least one service category",
-          "error"
+          "error",
         );
         return;
       }
@@ -511,7 +566,7 @@ function setupProviderStatus() {
       if (service_locations.length === 0) {
         showNotification(
           "Please select at least one service location",
-          "error"
+          "error",
         );
         return;
       }
@@ -531,12 +586,12 @@ function setupProviderStatus() {
         return;
       }
 
-      // Prepare enrollment data - arrays become comma-separated strings
+      // Prepare enrollment data - CHANGE HERE: hourly_rate → base_price
       const enrollmentData = {
         categories: categories.join(", "),
         service_locations: service_locations.join(", "),
         pricing_type: pricingType,
-        hourly_rate: hourlyRate ? parseFloat(hourlyRate) : null,
+        base_price: basePrice ? parseFloat(basePrice) : null, // Changed key name
         description: serviceDescription.trim(),
         availability,
         experience_years: experience ? parseFloat(experience) : 0,
@@ -559,7 +614,7 @@ function setupProviderStatus() {
 
         showNotification(
           "Service provider details saved successfully!",
-          "success"
+          "success",
         );
 
         // Update UI with new provider data
@@ -606,7 +661,7 @@ function prefillEnrollmentForm(profile) {
 
   // Prefill categories (handle both string and array formats)
   const categoryCheckboxes = document.querySelectorAll(
-    'input[name="categories"]'
+    'input[name="categories"]',
   );
   categoryCheckboxes.forEach((checkbox) => {
     if (userData.categories) {
@@ -614,8 +669,8 @@ function prefillEnrollmentForm(profile) {
         typeof userData.categories === "string"
           ? userData.categories.split(",").map((cat) => cat.trim())
           : Array.isArray(userData.categories)
-          ? userData.categories
-          : [];
+            ? userData.categories
+            : [];
       checkbox.checked = categories.includes(checkbox.value);
     } else {
       checkbox.checked = false;
@@ -624,17 +679,16 @@ function prefillEnrollmentForm(profile) {
 
   // Prefill service_locations (handle both string and array formats)
   const serviceLocationCheckboxes = document.querySelectorAll(
-    'input[name="service_locations"]'
-  ); // Changed name
+    'input[name="service_locations"]',
+  );
   serviceLocationCheckboxes.forEach((checkbox) => {
     if (userData.service_locations) {
-      // Changed key
       const service_locations =
         typeof userData.service_locations === "string"
           ? userData.service_locations.split(",").map((loc) => loc.trim())
           : Array.isArray(userData.service_locations)
-          ? userData.service_locations
-          : [];
+            ? userData.service_locations
+            : [];
       checkbox.checked = service_locations.includes(checkbox.value);
     } else {
       checkbox.checked = false;
@@ -645,8 +699,9 @@ function prefillEnrollmentForm(profile) {
   if (userData.pricing_type) {
     setElementValue("pricingType", userData.pricing_type);
   }
-  if (userData.hourly_rate) {
-    setElementValue("hourlyRate", userData.hourly_rate);
+  if (userData.base_price) {
+    // Changed from hourly_rate to base_price
+    setElementValue("hourlyRate", userData.base_price); // Keep input ID same for UI compatibility
   }
   if (userData.description) {
     setElementValue("serviceDescription", userData.description);
@@ -682,7 +737,7 @@ function setupAvatarUpload() {
       if (!validTypes.includes(file.type)) {
         showNotification(
           "Please select a valid image file (JPEG, PNG, GIF, WebP)",
-          "error"
+          "error",
         );
         return;
       }

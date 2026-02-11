@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
@@ -19,7 +19,7 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <h2><i class="fas fa-handshake"></i> LocalSeva</h2>
+        <h2>LocalSeva</h2>
         <p>Welcome, <span id="userName">User</span></p>
       </div>
 
@@ -34,19 +34,14 @@
           <h3>My Activity</h3>
           <ul>
             <li>
-              <a href="my-activity.html#serviceTaken"
-                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
-              >
-            </li>
-            <li>
-              <a href="my-activity.html#serviceProvided" class="provider-only"
-                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              <a href="my-activity.html"
+                ><i class="fas fa-hand-holding-heart"></i> My Activity</a
               >
             </li>
           </ul>
         </div>
 
-        <div class="sidebar-section">
+        <!-- <div class="sidebar-section">
           <h3>My Services</h3>
           <ul>
             <li>
@@ -58,7 +53,7 @@
               >
             </li>
           </ul>
-        </div>
+        </div> -->
 
         <div class="sidebar-section">
           <h3>Marketplace</h3>
@@ -269,15 +264,73 @@
               <label for="scheduledDate" class="form-label"
                 >Preferred Date & Time *</label
               >
-              <input
-                type="datetime-local"
-                id="scheduledDate"
-                class="form-control"
-                required
-                min=""
-              />
-              <div class="form-help">
-                Select when you'd like the service to be done
+
+              <div style="margin-bottom: 1rem">
+                <label
+                  for="serviceDate"
+                  style="
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                  >Select Date *</label
+                >
+                <input
+                  type="date"
+                  id="serviceDate"
+                  class="form-control"
+                  required
+                  min=""
+                  style="margin-bottom: 0.5rem"
+                />
+                <div class="form-text">Select the date for the service</div>
+              </div>
+
+              <div style="margin-bottom: 0.5rem">
+                <label
+                  for="serviceTime"
+                  style="
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                  "
+                  >Select Time *</label
+                >
+                <select id="serviceTime" class="form-control" required>
+                  <option value="">Select a time</option>
+                  <!-- Morning -->
+                  <option value="08:00">8:00 AM</option>
+                  <option value="08:30">8:30 AM</option>
+                  <option value="09:00">9:00 AM</option>
+                  <option value="09:30">9:30 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="10:30">10:30 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="11:30">11:30 AM</option>
+                  <!-- Afternoon -->
+                  <option value="12:00">12:00 PM</option>
+                  <option value="12:30">12:30 PM</option>
+                  <option value="13:00">1:00 PM</option>
+                  <option value="13:30">1:30 PM</option>
+                  <option value="14:00">2:00 PM</option>
+                  <option value="14:30">2:30 PM</option>
+                  <option value="15:00">3:00 PM</option>
+                  <option value="15:30">3:30 PM</option>
+                  <option value="16:00">4:00 PM</option>
+                  <option value="16:30">4:30 PM</option>
+                  <!-- Evening -->
+                  <option value="17:00">5:00 PM</option>
+                  <option value="17:30">5:30 PM</option>
+                  <option value="18:00">6:00 PM</option>
+                  <option value="18:30">6:30 PM</option>
+                  <option value="19:00">7:00 PM</option>
+                  <option value="19:30">7:30 PM</option>
+                  <option value="20:00">8:00 PM</option>
+                  <option value="20:30">8:30 PM</option>
+                </select>
+                <div class="form-text">
+                  Select a convenient time (8 AM - 8:30 PM)
+                </div>
               </div>
             </div>
 
@@ -346,231 +399,5 @@
     <script src="js/review.js"></script>
     <!-- Add this line -->
     <script src="js/service-detail.js"></script>
-
-    <style>
-      .service-detail-container {
-        background-color: var(--card-bg);
-        border-radius: var(--border-radius);
-        padding: 2rem;
-        box-shadow: var(--shadow-sm);
-      }
-
-      .detail-header {
-        display: flex;
-        gap: 2rem;
-        margin-bottom: 2rem;
-      }
-
-      .detail-images {
-        flex: 0 0 300px;
-      }
-
-      .detail-images img {
-        width: 100%;
-        border-radius: var(--border-radius);
-        margin-bottom: 1rem;
-      }
-
-      .detail-info {
-        flex: 1;
-      }
-
-      .detail-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .detail-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: var(--text-secondary);
-      }
-
-      .availability-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-      }
-
-      .service-description {
-        margin-bottom: 2rem;
-      }
-
-      .service-description h3 {
-        margin-bottom: 1rem;
-      }
-
-      .detail-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 2rem;
-      }
-
-      .reviews-container {
-        margin-top: 1.5rem;
-      }
-
-      .review-item {
-        padding: 1.5rem 0;
-        border-bottom: 1px solid var(--border-color);
-      }
-
-      .review-item:last-child {
-        border-bottom: none;
-      }
-
-      .review-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-      }
-
-      .reviewer-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .reviewer-info i {
-        font-size: 2.5rem;
-        color: var(--text-secondary);
-      }
-
-      .review-rating {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        margin-top: 0.25rem;
-      }
-
-      .review-rating i {
-        color: var(--warning-color);
-        font-size: 0.875rem;
-      }
-
-      .review-rating span {
-        margin-left: 0.5rem;
-        font-weight: 600;
-      }
-
-      .review-date {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-      }
-
-      .rating-input {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-      }
-
-      .rating-input i {
-        font-size: 1.5rem;
-        color: var(--border-color);
-        cursor: pointer;
-        transition: var(--transition);
-      }
-
-      .rating-input i:hover,
-      .rating-input i.active {
-        color: var(--warning-color);
-      }
-
-      @media (max-width: 768px) {
-        .detail-header {
-          flex-direction: column;
-        }
-
-        .detail-images {
-          flex: 0 0 auto;
-        }
-      }
-
-      /* Review-specific styles */
-      .review-item {
-        animation: fadeIn 0.3s ease-in;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .no-booking-message {
-        margin-bottom: 1.5rem;
-      }
-
-      .alert {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-        padding: 1rem;
-        border-radius: var(--border-radius);
-        margin-bottom: 1rem;
-      }
-
-      .alert i {
-        font-size: 1.25rem;
-        flex-shrink: 0;
-      }
-
-      .alert-info {
-        background-color: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        color: var(--primary);
-      }
-
-      .loading-skeleton {
-        background: linear-gradient(
-          90deg,
-          #f0f0f0 25%,
-          #e0e0e0 50%,
-          #f0f0f0 75%
-        );
-        background-size: 200% 100%;
-        animation: loading 1.5s infinite;
-      }
-
-      @keyframes loading {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
-        }
-      }
-
-      .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: var(--text-secondary);
-      }
-
-      .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        display: block;
-      }
-
-      .empty-state h4 {
-        margin-bottom: 0.5rem;
-        color: var(--text-primary);
-      }
-    </style>
   </body>
 </html>

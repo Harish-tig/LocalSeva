@@ -276,7 +276,7 @@ const ReviewManager = {
   checkUserBookings: async function () {
     console.log(
       "🔍 Checking user bookings for provider:",
-      this.currentProvider?.id
+      this.currentProvider?.id,
     );
 
     if (!this.currentProvider || !this.currentProvider.id) {
@@ -302,7 +302,7 @@ const ReviewManager = {
 
       // Extract booking IDs that already have reviews
       const reviewedBookingIds = existingReviews.map(
-        (review) => review.booking
+        (review) => review.booking,
       );
       console.log("📋 Already reviewed booking IDs:", reviewedBookingIds);
 
@@ -333,7 +333,7 @@ const ReviewManager = {
         const isAlreadyReviewed = reviewedBookingIds.includes(booking.id);
 
         console.log(
-          `Booking #${booking.id}: For provider? ${isForProvider}, Completed? ${isCompleted}, Already reviewed? ${isAlreadyReviewed}`
+          `Booking #${booking.id}: For provider? ${isForProvider}, Completed? ${isCompleted}, Already reviewed? ${isAlreadyReviewed}`,
         );
 
         return isForProvider && isCompleted && !isAlreadyReviewed;
@@ -341,7 +341,7 @@ const ReviewManager = {
 
       console.log(
         "✅ Filtered available bookings for review:",
-        this.userBookings
+        this.userBookings,
       );
 
       // Update review form based on bookings
@@ -498,12 +498,12 @@ const ReviewManager = {
             (booking) => `
           <option value="${booking.id}">
             Booking #${booking.id} - ${new Date(
-              booking.scheduled_date
+              booking.scheduled_date,
             ).toLocaleDateString()} - ${booking.description?.substring(0, 30)}${
               booking.description?.length > 30 ? "..." : ""
             }
           </option>
-        `
+        `,
           )
           .join("")}
       </select>
@@ -515,7 +515,7 @@ const ReviewManager = {
     if (ratingGroup) {
       ratingGroup.parentNode.insertBefore(
         bookingSelect,
-        ratingGroup.nextSibling
+        ratingGroup.nextSibling,
       );
     }
   },
@@ -601,16 +601,15 @@ const ReviewManager = {
 
       if (
         error.message.includes(
-          "UNIQUE constraint failed: local_user_review.booking_id"
+          "UNIQUE constraint failed: local_user_review.booking_id",
         )
       ) {
-        errorMessage =
-          "This booking has already been reviewed. Each booking can only be reviewed once.";
-
-        // Refresh the bookings list to remove the already-reviewed booking
-        setTimeout(() => {
-          this.checkUserBookings();
-        }, 1000);
+        // errorMessage =
+        //   "This booking has already been reviewed. Each booking can only be reviewed once.";
+        // // Refresh the bookings list to remove the already-reviewed booking
+        // setTimeout(() => {
+        //   this.checkUserBookings();
+        // }, 1000);
       } else if (error.message.includes("COMPLETED")) {
         errorMessage += "You can only review completed bookings.";
       } else if (error.message.includes("own bookings")) {
@@ -683,22 +682,22 @@ const ReviewManager = {
     console.log("Review Form:", document.getElementById("reviewForm"));
     console.log(
       "Reviews Container:",
-      document.querySelector(".reviews-container")
+      document.querySelector(".reviews-container"),
     );
 
     // Test API functions
     console.log("API Functions:");
     console.log(
       "- api.getBookings exists:",
-      typeof api.getBookings === "function"
+      typeof api.getBookings === "function",
     );
     console.log(
       "- api.createReview exists:",
-      typeof api.createReview === "function"
+      typeof api.createReview === "function",
     );
     console.log(
       "- api.getProviderReviews exists:",
-      typeof api.getProviderReviews === "function"
+      typeof api.getProviderReviews === "function",
     );
 
     console.log("===========================");
@@ -716,7 +715,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (window.currentProvider) {
     console.log(
       "🎯 Initializing review system for provider:",
-      window.currentProvider
+      window.currentProvider,
     );
     ReviewManager.init(window.currentProvider);
   } else {
@@ -727,7 +726,7 @@ document.addEventListener("DOMContentLoaded", function () {
         clearInterval(checkInterval);
         console.log(
           "🎯 Initializing review system for provider:",
-          window.currentProvider
+          window.currentProvider,
         );
         ReviewManager.init(window.currentProvider);
       }
@@ -814,7 +813,7 @@ window.testReviewCreation = async function () {
   const bookings = await api.getBookings();
   const completedBooking = bookings.find(
     (b) =>
-      b.provider_id == window.currentProvider.id && b.status === "COMPLETED"
+      b.provider_id == window.currentProvider.id && b.status === "COMPLETED",
   );
 
   if (!completedBooking) {

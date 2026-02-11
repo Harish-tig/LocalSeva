@@ -164,7 +164,6 @@ async function loadProductForEdit(productId) {
     document.getElementById("itemPrice").value = product.price || "";
     document.getElementById("itemCity").value = product.city || "";
     document.getElementById("itemAddress").value = product.address || "";
-    document.getElementById("contactPhone").value = product.contact_phone || "";
     document.getElementById("contactWhatsapp").value =
       product.contact_whatsapp || "";
     document.getElementById("contactEmail").checked =
@@ -289,6 +288,16 @@ function validateItemForm() {
     console.log("Address validation failed");
   }
 
+  // Validate WhatsApp number
+  const contactWhatsapp = document.getElementById("contactWhatsapp");
+  const whatsappValue = contactWhatsapp.value.trim();
+  if (!whatsappValue) {
+    isValid = false;
+    contactWhatsapp.classList.add("error");
+    document.getElementById("whatsappError").style.display = "flex";
+    console.log("WhatsApp number validation failed");
+  }
+
   // Check if main image is required (only for new products)
   if (!isEditing && !mainImage.files[0]) {
     isValid = false;
@@ -299,7 +308,7 @@ function validateItemForm() {
   if (!isValid) {
     appUtils.showNotification(
       "Please fill in all required fields correctly",
-      "error"
+      "error",
     );
   } else {
     console.log("Form validation passed");
@@ -325,7 +334,6 @@ function getItemFormData() {
   const price = document.getElementById("itemPrice").value;
   const city = document.getElementById("itemCity").value;
   const address = document.getElementById("itemAddress").value.trim();
-  const contactPhone = document.getElementById("contactPhone").value.trim();
   const contactWhatsapp = document
     .getElementById("contactWhatsapp")
     .value.trim();
@@ -339,7 +347,6 @@ function getItemFormData() {
     price,
     city,
     address,
-    contactPhone,
     contactWhatsapp,
     contactEmail,
   });
@@ -352,16 +359,7 @@ function getItemFormData() {
   formData.append("price", price);
   formData.append("city", city);
   formData.append("address", address);
-
-  // Append contact info (only if provided)
-  if (contactPhone) {
-    formData.append("contact_phone", contactPhone);
-  }
-
-  if (contactWhatsapp) {
-    formData.append("contact_whatsapp", contactWhatsapp);
-  }
-
+  formData.append("contact_whatsapp", contactWhatsapp);
   // Append contact_email as boolean
   formData.append("contact_email", contactEmail);
 

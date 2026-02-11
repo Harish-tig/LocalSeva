@@ -2,6 +2,9 @@
  * My Products page functionality
  */
 
+// Store products data for reference
+let currentProductsData = [];
+
 document.addEventListener("DOMContentLoaded", async function () {
   console.log("My Products page loaded");
 
@@ -16,6 +19,15 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Setup tabs
   setupTabs();
+
+  // Setup theme toggle
+  setupThemeToggle();
+
+  // Setup logout button
+  setupLogoutButton();
+
+  // Setup sidebar
+  setupSidebar();
 });
 
 /**
@@ -25,21 +37,21 @@ async function loadMyProducts() {
   console.log("Loading my products...");
 
   try {
-    // Show loading state
-    const allProductsContainer = document.getElementById("allProducts");
-    if (allProductsContainer) {
-      allProductsContainer.innerHTML = `
-        <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius); grid-column: 1 / -1;"></div>
-      `;
-    }
+    // Show loading state for all containers
+    showLoadingState();
 
-    // Get user's products using the correct API endpoint
+    // Get user's products
     const products = await api.getMyProducts();
+
+    // Store products data for later use
+    currentProductsData = products || [];
 
     console.log("My products received:", products);
 
     if (!products || products.length === 0) {
       console.log("No products found");
+      showEmptyState();
+      return;
     } else {
       console.log(`Found ${products.length} products`);
     }
@@ -51,21 +63,99 @@ async function loadMyProducts() {
     renderProducts(products);
   } catch (error) {
     console.error("Error loading products:", error);
-
-    const allProductsContainer = document.getElementById("allProducts");
-    if (allProductsContainer) {
-      allProductsContainer.innerHTML = `
-        <div class="empty-state" style="grid-column: 1 / -1;">
-          <i class="fas fa-exclamation-circle"></i>
-          <h3>Error loading products</h3>
-          <p>Please try again later.</p>
-          <p style="font-size: 0.875rem; margin-top: 0.5rem;">${
-            error.message || "API error"
-          }</p>
-        </div>
-      `;
-    }
+    showErrorState(error);
   }
+}
+
+/**
+ * Show loading state in all containers
+ */
+function showLoadingState() {
+  const loadingHTML = `
+    <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius);"></div>
+    <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius);"></div>
+    <div class="loading-skeleton" style="height: 300px; border-radius: var(--border-radius);"></div>
+  `;
+
+  const containers = [
+    "allProducts",
+    "activeProductsList",
+    "soldProductsList",
+    "inactiveProductsList",
+  ];
+
+  containers.forEach((containerId) => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = loadingHTML;
+    }
+  });
+}
+
+/**
+ * Show empty state when no products
+ */
+function showEmptyState() {
+  const emptyStateHTML = `
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <i class="fas fa-box-open"></i>
+      <h3>No Products Yet</h3>
+      <p>You haven't added any products to sell.</p>
+      <a href="add-item.html" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Your First Product
+      </a>
+    </div>
+  `;
+
+  const containers = [
+    "allProducts",
+    "activeProductsList",
+    "soldProductsList",
+    "inactiveProductsList",
+  ];
+
+  containers.forEach((containerId) => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = emptyStateHTML;
+    }
+  });
+
+  // Update stats to 0
+  updateStats([]);
+}
+
+/**
+ * Show error state
+ */
+function showErrorState(error) {
+  const errorHTML = `
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <i class="fas fa-exclamation-circle"></i>
+      <h3>Error loading products</h3>
+      <p>Please try again later.</p>
+      <p style="font-size: 0.875rem; margin-top: 0.5rem; color: var(--danger-color);">
+        ${error.message || "API error"}
+      </p>
+      <button onclick="loadMyProducts()" class="btn btn-outline" style="margin-top: 1rem;">
+        <i class="fas fa-redo"></i> Retry
+      </button>
+    </div>
+  `;
+
+  const containers = [
+    "allProducts",
+    "activeProductsList",
+    "soldProductsList",
+    "inactiveProductsList",
+  ];
+
+  containers.forEach((containerId) => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = errorHTML;
+    }
+  });
 }
 
 /**
@@ -79,7 +169,7 @@ function updateStats(products) {
 
   const totalProducts = products.length;
   const activeProducts = products.filter(
-    (p) => p.is_active && !p.is_sold
+    (p) => p.is_active && !p.is_sold,
   ).length;
   const soldProducts = products.filter((p) => p.is_sold).length;
   const totalViews = products.reduce((sum, p) => sum + (p.views || 0), 0);
@@ -112,15 +202,10 @@ function renderProducts(products) {
     products = [];
   }
 
-  const allProducts = document.getElementById("allProducts");
-  const activeProductsList = document.getElementById("activeProductsList");
-  const soldProductsList = document.getElementById("soldProductsList");
-  const inactiveProductsList = document.getElementById("inactiveProductsList");
-
   // Filter products
   const activeProducts = products.filter((p) => p.is_active && !p.is_sold);
   const soldProducts = products.filter((p) => p.is_sold);
-  const inactiveProducts = products.filter((p) => !p.is_active);
+  const inactiveProducts = products.filter((p) => !p.is_active && !p.is_sold);
 
   console.log("Filtered products:", {
     all: products.length,
@@ -129,8 +214,8 @@ function renderProducts(products) {
     inactive: inactiveProducts.length,
   });
 
-  // Helper function to render empty state
-  const renderEmptyState = (message, icon = "fas fa-box-open") => `
+  // Helper function to render empty state for specific tabs
+  const renderTabEmptyState = (message, icon = "fas fa-box-open") => `
     <div class="empty-state" style="grid-column: 1 / -1;">
       <i class="${icon}"></i>
       <h3>${message}</h3>
@@ -141,25 +226,27 @@ function renderProducts(products) {
   `;
 
   // Render all products
-  if (allProducts) {
+  const allProductsContainer = document.getElementById("allProducts");
+  if (allProductsContainer) {
     if (products.length === 0) {
-      allProducts.innerHTML = renderEmptyState(
+      allProductsContainer.innerHTML = renderTabEmptyState(
         "No Products Yet",
-        "fas fa-box-open"
+        "fas fa-box-open",
       );
     } else {
-      allProducts.innerHTML = products
+      allProductsContainer.innerHTML = products
         .map((product) => createProductCard(product))
         .join("");
     }
   }
 
   // Render active products
+  const activeProductsList = document.getElementById("activeProductsList");
   if (activeProductsList) {
     if (activeProducts.length === 0) {
-      activeProductsList.innerHTML = renderEmptyState(
+      activeProductsList.innerHTML = renderTabEmptyState(
         "No Active Products",
-        "fas fa-check-circle"
+        "fas fa-check-circle",
       );
     } else {
       activeProductsList.innerHTML = activeProducts
@@ -169,11 +256,12 @@ function renderProducts(products) {
   }
 
   // Render sold products
+  const soldProductsList = document.getElementById("soldProductsList");
   if (soldProductsList) {
     if (soldProducts.length === 0) {
-      soldProductsList.innerHTML = renderEmptyState(
+      soldProductsList.innerHTML = renderTabEmptyState(
         "No Sold Products",
-        "fas fa-tag"
+        "fas fa-tag",
       );
     } else {
       soldProductsList.innerHTML = soldProducts
@@ -183,11 +271,12 @@ function renderProducts(products) {
   }
 
   // Render inactive products
+  const inactiveProductsList = document.getElementById("inactiveProductsList");
   if (inactiveProductsList) {
     if (inactiveProducts.length === 0) {
-      inactiveProductsList.innerHTML = renderEmptyState(
+      inactiveProductsList.innerHTML = renderTabEmptyState(
         "No Inactive Products",
-        "fas fa-eye-slash"
+        "fas fa-eye-slash",
       );
     } else {
       inactiveProductsList.innerHTML = inactiveProducts
@@ -197,14 +286,16 @@ function renderProducts(products) {
   }
 
   // Add event listeners to action buttons
-  setupProductActions();
+  setTimeout(() => {
+    setupProductActions();
+  }, 100);
 }
 
 /**
  * Create product card HTML
  */
 function createProductCard(product) {
-  console.log("Creating card for product:", product);
+  if (!product) return "";
 
   // Format price - handle different price formats
   let price = "N/A";
@@ -225,15 +316,16 @@ function createProductCard(product) {
 
   // Status badge
   let statusBadge = "";
+  let statusText = "";
   if (product.is_sold) {
-    statusBadge =
-      '<span class="badge badge-success" style="position: absolute; top: 10px; right: 10px; z-index: 1;">Sold</span>';
+    statusBadge = "badge-success";
+    statusText = "Sold";
   } else if (!product.is_active) {
-    statusBadge =
-      '<span class="badge badge-danger" style="position: absolute; top: 10px; right: 10px; z-index: 1;">Inactive</span>';
+    statusBadge = "badge-danger";
+    statusText = "Inactive";
   } else {
-    statusBadge =
-      '<span class="badge badge-primary" style="position: absolute; top: 10px; right: 10px; z-index: 1;">Active</span>';
+    statusBadge = "badge-primary";
+    statusText = "Active";
   }
 
   // Format date
@@ -259,13 +351,12 @@ function createProductCard(product) {
     ? `badge-${product.condition.toLowerCase()}`
     : "badge-secondary";
 
-  // Get image URL - handle both full URLs and relative paths
+  // Get image URL
   let imageUrl = "https://via.placeholder.com/300x200?text=No+Image";
   if (product.main_image) {
     if (product.main_image.startsWith("http")) {
       imageUrl = product.main_image;
     } else if (product.main_image.startsWith("/media/")) {
-      // Assuming your media is served from root
       imageUrl = "http://127.0.0.1:8000" + product.main_image;
     } else {
       imageUrl = product.main_image;
@@ -290,7 +381,7 @@ function createProductCard(product) {
              alt="${product.title || "Product"}" 
              class="card-img"
              onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
-        ${statusBadge}
+        <span class="badge ${statusBadge}" style="position: absolute; top: 10px; right: 10px; z-index: 1;">${statusText}</span>
       </div>
       <div class="card-content">
         <h3 class="card-title">${product.title || "Untitled Product"}</h3>
@@ -389,7 +480,7 @@ function setupProductActions() {
           console.error("Delete error:", error);
           appUtils.showNotification(
             "Failed to delete product: " + error.message,
-            "error"
+            "error",
           );
         }
       }
@@ -405,8 +496,41 @@ function setupProductActions() {
 
       if (confirm(`Mark "${productTitle}" as sold?`)) {
         try {
+          // Find the product data from our stored array
+          const productData = currentProductsData.find(
+            (p) => p.id == productId,
+          );
+
+          if (!productData) {
+            throw new Error("Product data not found");
+          }
+
+          // Create FormData with ALL required fields
           const formData = new FormData();
+
+          // Add all required fields from current product data
+          formData.append("title", productData.title || "");
+          formData.append("description", productData.description || "");
+          formData.append("category", productData.category || "");
+          formData.append("condition", productData.condition || "");
+          formData.append("price", productData.price || "");
+          formData.append("address", productData.address || "");
+          formData.append("city", productData.city || "");
+
+          // Add optional fields if they exist
+          if (productData.contact_phone) {
+            formData.append("contact_phone", productData.contact_phone);
+          }
+          if (productData.contact_whatsapp) {
+            formData.append("contact_whatsapp", productData.contact_whatsapp);
+          }
+          if (productData.contact_email) {
+            formData.append("contact_email", productData.contact_email);
+          }
+
+          // Add the fields we want to update
           formData.append("is_sold", "true");
+          formData.append("is_active", "false");
 
           await api.updateProduct(productId, formData);
           appUtils.showNotification("Product marked as sold", "success");
@@ -416,7 +540,7 @@ function setupProductActions() {
           console.error("Mark sold error:", error);
           appUtils.showNotification(
             "Failed to update product: " + error.message,
-            "error"
+            "error",
           );
         }
       }
@@ -432,8 +556,41 @@ function setupProductActions() {
 
       if (confirm(`Reactivate "${productTitle}"?`)) {
         try {
+          // Find the product data from our stored array
+          const productData = currentProductsData.find(
+            (p) => p.id == productId,
+          );
+
+          if (!productData) {
+            throw new Error("Product data not found");
+          }
+
+          // Create FormData with ALL required fields
           const formData = new FormData();
+
+          // Add all required fields from current product data
+          formData.append("title", productData.title || "");
+          formData.append("description", productData.description || "");
+          formData.append("category", productData.category || "");
+          formData.append("condition", productData.condition || "");
+          formData.append("price", productData.price || "");
+          formData.append("address", productData.address || "");
+          formData.append("city", productData.city || "");
+
+          // Add optional fields if they exist
+          if (productData.contact_phone) {
+            formData.append("contact_phone", productData.contact_phone);
+          }
+          if (productData.contact_whatsapp) {
+            formData.append("contact_whatsapp", productData.contact_whatsapp);
+          }
+          if (productData.contact_email) {
+            formData.append("contact_email", productData.contact_email);
+          }
+
+          // Add the fields we want to update
           formData.append("is_sold", "false");
+          formData.append("is_active", "true");
 
           await api.updateProduct(productId, formData);
           appUtils.showNotification("Product reactivated", "success");
@@ -443,7 +600,7 @@ function setupProductActions() {
           console.error("Reactivate error:", error);
           appUtils.showNotification(
             "Failed to reactivate product: " + error.message,
-            "error"
+            "error",
           );
         }
       }
@@ -459,7 +616,39 @@ function setupProductActions() {
 
       if (confirm(`Activate "${productTitle}"?`)) {
         try {
+          // Find the product data from our stored array
+          const productData = currentProductsData.find(
+            (p) => p.id == productId,
+          );
+
+          if (!productData) {
+            throw new Error("Product data not found");
+          }
+
+          // Create FormData with ALL required fields
           const formData = new FormData();
+
+          // Add all required fields from current product data
+          formData.append("title", productData.title || "");
+          formData.append("description", productData.description || "");
+          formData.append("category", productData.category || "");
+          formData.append("condition", productData.condition || "");
+          formData.append("price", productData.price || "");
+          formData.append("address", productData.address || "");
+          formData.append("city", productData.city || "");
+
+          // Add optional fields if they exist
+          if (productData.contact_phone) {
+            formData.append("contact_phone", productData.contact_phone);
+          }
+          if (productData.contact_whatsapp) {
+            formData.append("contact_whatsapp", productData.contact_whatsapp);
+          }
+          if (productData.contact_email) {
+            formData.append("contact_email", productData.contact_email);
+          }
+
+          // Add the field we want to update
           formData.append("is_active", "true");
 
           await api.updateProduct(productId, formData);
@@ -470,7 +659,7 @@ function setupProductActions() {
           console.error("Activate error:", error);
           appUtils.showNotification(
             "Failed to activate product: " + error.message,
-            "error"
+            "error",
           );
         }
       }
@@ -496,7 +685,86 @@ function setupTabs() {
 
       // Show corresponding content
       const tabId = button.getAttribute("data-tab");
-      document.getElementById(`tab-${tabId}`).classList.add("active");
+      const tabContent = document.getElementById(`tab-${tabId}`);
+      if (tabContent) {
+        tabContent.classList.add("active");
+      }
     });
   });
 }
+
+/**
+ * Setup theme toggle
+ */
+function setupThemeToggle() {
+  const themeToggle = document.getElementById("themeToggle");
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+
+      const icon = themeToggle.querySelector("i");
+      if (icon) {
+        icon.className = newTheme === "dark" ? "fas fa-sun" : "fas fa-moon";
+      }
+    });
+  }
+}
+
+/**
+ * Setup logout button
+ */
+function setupLogoutButton() {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await api.logout();
+        window.location.href = "index.html";
+      } catch (error) {
+        console.error("Logout error:", error);
+        window.location.href = "index.html";
+      }
+    });
+  }
+}
+
+/**
+ * Setup sidebar
+ */
+function setupSidebar() {
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const sidebar = document.getElementById("sidebar");
+  const closeSidebar = document.getElementById("closeSidebar");
+
+  if (mobileMenuBtn && sidebar) {
+    mobileMenuBtn.addEventListener("click", () => {
+      sidebar.classList.add("active");
+    });
+  }
+
+  if (closeSidebar && sidebar) {
+    closeSidebar.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+    });
+  }
+
+  // Close sidebar when clicking outside
+  document.addEventListener("click", (e) => {
+    if (
+      sidebar &&
+      sidebar.classList.contains("active") &&
+      !sidebar.contains(e.target) &&
+      e.target !== mobileMenuBtn
+    ) {
+      sidebar.classList.remove("active");
+    }
+  });
+}
+
+// Make loadMyProducts available globally for retry button
+window.loadMyProducts = loadMyProducts;

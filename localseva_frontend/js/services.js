@@ -108,6 +108,7 @@ async function loadServices() {
           provider.service_locations || provider.location || "Not specified",
         categories: categoriesArray.join(", "),
         categoriesArray: categoriesArray, // Store as array for filtering
+        completed_bookings_count: provider.completed_bookings_count || 0, // ADD THIS LINE
       };
     });
 
@@ -218,9 +219,9 @@ function renderServices(services) {
       service.price &&
       service.price !== "Contact for price"
     ) {
-      priceDisplay = `$${parseFloat(service.price).toFixed(2)}/hr`;
+      priceDisplay = `₹${parseFloat(service.price).toFixed(2)}/hr`;
     } else if (service.price && service.price !== "Contact for price") {
-      priceDisplay = `$${parseFloat(service.price).toFixed(2)}`;
+      priceDisplay = `₹${parseFloat(service.price).toFixed(2)}`;
     }
 
     // Get appropriate icon for category
@@ -244,14 +245,13 @@ function renderServices(services) {
         </div>
         <div class="card-meta">
           <span><i class="${categoryIcon}"></i> ${service.category}</span>
-          <span><i class="fas fa-map-marker-alt"></i> ${
-            service.location || "Local"
-          }</span>
+          <span><i class="fas fa-map-marker-alt"></i> ${service.location || "Local"}</span>
           <span><i class="fas fa-star"></i> ${service.rating.toFixed(1)}</span>
+          <span><i class="fas fa-check-circle"></i> ${service.completed_bookings_count || 0} jobs</span>
         </div>
         <p class="service-description-short">${service.description.substring(
           0,
-          100
+          100,
         )}${service.description.length > 100 ? "..." : ""}</p>
         <div class="card-footer">
           <span class="price">${priceDisplay}</span>

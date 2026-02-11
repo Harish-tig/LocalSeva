@@ -1,191 +1,430 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up - Local Services & Marketplace</title>
-    <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <style>
+      :root {
+        --primary-blue: #7495e8;
+        --light-blue: #a8c1ff;
+        --lighter-blue: #d9e4ff;
+        --dark-blue: #4a6bc2;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5;
+      }
+
+      .auth-container {
+        width: 100%;
+        max-width: 900px;
+        margin: 20px;
+      }
+
+      .auth-card {
+        display: flex;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        min-height: 600px;
+      }
+
+      /* Right Side - Colored Welcome Section */
+      .welcome-section {
+        flex: 1;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--dark-blue) 100%
+        );
+        padding: 60px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        text-align: center;
+        position: relative;
+        order: 2;
+      }
+
+      .welcome-section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+      }
+
+      .welcome-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .welcome-section h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+      }
+
+      .welcome-section p {
+        font-size: 1rem;
+        margin-bottom: 30px;
+        opacity: 0.95;
+      }
+
+      .welcome-section .login-btn {
+        padding: 12px 35px;
+        background: transparent;
+        border: 2px solid white;
+        color: white;
+        border-radius: 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .welcome-section .login-btn:hover {
+        background: white;
+        color: var(--primary-blue);
+      }
+
+      /* Left Side - Signup Form Section */
+      .signup-section {
+        flex: 1;
+        padding: 60px 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        order: 1;
+        overflow-y: auto;
+      }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+
+      .logo-container {
+        margin-bottom: 20px;
+      }
+
+      .auth-logo {
+        max-width: 80px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .auth-header h1 {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .auth-header p {
+        color: #666;
+        font-size: 0.95rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(116, 149, 232, 0.1);
+      }
+
+      .form-text {
+        display: block;
+        margin-top: 5px;
+        color: #888;
+        font-size: 0.8rem;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        margin-top: 4px;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: var(--primary-blue);
+      }
+
+      .checkbox-group label {
+        font-size: 0.85rem;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      .checkbox-group a {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .checkbox-group a:hover {
+        text-decoration: underline;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--dark-blue) 100%
+        );
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(116, 149, 232, 0.4);
+      }
+
+      .btn i {
+        margin-right: 8px;
+      }
+
+      .auth-footer {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .auth-footer p {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 8px 0;
+      }
+
+      .auth-footer a {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .auth-footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Social Login Icons (optional) */
+      .social-login {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+      }
+
+      .social-login p {
+        width: 100%;
+        text-align: center;
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+      }
+
+      .social-icon {
+        width: 40px;
+        height: 40px;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .social-icon:hover {
+        border-color: var(--primary-blue);
+        color: var(--primary-blue);
+        transform: translateY(-2px);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .auth-card {
+          flex-direction: column;
+        }
+
+        .welcome-section {
+          padding: 40px 30px;
+          min-height: 250px;
+          order: 1;
+        }
+
+        .welcome-section h2 {
+          font-size: 2rem;
+        }
+
+        .signup-section {
+          padding: 40px 30px;
+          order: 2;
+        }
+      }
+    </style>
   </head>
   <body class="auth-page">
     <div class="auth-container">
       <div class="auth-card">
-        <div class="auth-header">
-          <h1><i class="fas fa-handshake"></i> LocalConnect</h1>
-          <p>Create your account to get started</p>
+        <!-- Left Side - Signup Form -->
+        <div class="signup-section">
+          <div class="auth-header">
+            <h1>LocalConnect</h1>
+            <p>Create your account to get started</p>
+          </div>
+
+          <form id="signupForm" class="auth-form">
+            <div class="form-group">
+              <label for="username" class="form-label">Username *</label>
+              <input
+                type="text"
+                id="username"
+                class="form-control"
+                placeholder="Choose a username"
+                required
+              />
+              <small class="form-text">This will be used for login</small>
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email Address *</label>
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password" class="form-label">Password *</label>
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="Create a password"
+                required
+                minlength="6"
+              />
+              <small class="form-text">Minimum 6 characters</small>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label"
+                >Confirm Password *</label
+              >
+              <input
+                type="password"
+                id="confirmPassword"
+                class="form-control"
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <div class="checkbox-group">
+                <input type="checkbox" id="terms" required />
+                <label for="terms"
+                  >I agree to the <a href="#">Terms of Service</a> and
+                  <a href="#">Privacy Policy</a></label
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-user-plus"></i> Create Account
+              </button>
+            </div>
+
+            <div class="auth-footer">
+              <p>
+                Already have an account? <a href="index.html">Login here</a>
+              </p>
+            </div>
+          </form>
         </div>
 
-        <form id="signupForm" class="auth-form">
-          <div class="form-group">
-            <label for="username" class="form-label">Username *</label>
-            <input
-              type="text"
-              id="username"
-              class="form-control"
-              placeholder="Choose a username"
-              required
-            />
-            <small class="form-text">This will be used for login</small>
+        <!-- Right Side - Welcome Section -->
+        <div class="welcome-section">
+          <div class="welcome-content">
+            <h2>Welcome Back!</h2>
+            <p>Already have an account?</p>
+            <a href="index.html" class="login-btn">Login</a>
           </div>
-
-          <div class="form-group">
-            <label for="email" class="form-label">Email Address *</label>
-            <input
-              type="email"
-              id="email"
-              class="form-control"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="password" class="form-label">Password *</label>
-            <input
-              type="password"
-              id="password"
-              class="form-control"
-              placeholder="Create a password"
-              required
-              minlength="6"
-            />
-            <small class="form-text">Minimum 6 characters</small>
-          </div>
-
-          <div class="form-group">
-            <label for="confirmPassword" class="form-label"
-              >Confirm Password *</label
-            >
-            <input
-              type="password"
-              id="confirmPassword"
-              class="form-control"
-              placeholder="Confirm your password"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <div class="checkbox-group">
-              <input type="checkbox" id="terms" required />
-              <label for="terms"
-                >I agree to the <a href="#">Terms of Service</a> and
-                <a href="#">Privacy Policy</a></label
-              >
-            </div>
-          </div>
-
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">
-              <i class="fas fa-user-plus"></i> Create Account
-            </button>
-          </div>
-
-          <div class="auth-footer">
-            <p>Already have an account? <a href="index.html">Login here</a></p>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script src="js/auth.js"></script>
-
-    <style>
-      /* Auth Page Specific Styles */
-      .auth-page {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: linear-gradient(
-          135deg,
-          var(--primary-color) 0%,
-          var(--secondary-color) 100%
-        );
-        padding: 1rem;
-      }
-
-      .auth-container {
-        width: 100%;
-        max-width: 400px;
-      }
-
-      .auth-card {
-        background-color: var(--card-bg);
-        border-radius: var(--border-radius);
-        padding: 2.5rem;
-        box-shadow: var(--shadow);
-      }
-
-      .auth-header {
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-
-      .auth-header h1 {
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-      }
-
-      .auth-header p {
-        color: var(--text-secondary);
-      }
-
-      .auth-form {
-        margin-bottom: 1.5rem;
-      }
-
-      .btn-block {
-        width: 100%;
-      }
-
-      .form-text {
-        color: var(--text-secondary);
-        font-size: 0.85rem;
-        margin-top: 0.25rem;
-        display: block;
-      }
-
-      .checkbox-group {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-      }
-
-      .checkbox-group input {
-        margin-top: 0.25rem;
-      }
-
-      .checkbox-group label {
-        font-size: 0.9rem;
-        color: var(--text-secondary);
-      }
-
-      .auth-footer {
-        text-align: center;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--border-color);
-      }
-
-      .auth-footer a {
-        font-weight: 500;
-      }
-
-      /* Responsive */
-      @media (max-width: 576px) {
-        .auth-card {
-          padding: 1.5rem;
-        }
-      }
-    </style>
   </body>
 </html>

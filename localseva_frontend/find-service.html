@@ -1,0 +1,2095 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Service - LocalSeva</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-blue: #7495e8;
+        --light-blue: #a8c1ff;
+        --lighter-blue: #d9e4ff;
+        --dark-blue: #4a6bc2;
+        --text-dark: #333333;
+        --text-light: #666666;
+        --background: #f8faff;
+        --white: #ffffff;
+        --shadow: rgba(116, 149, 232, 0.15);
+        --gray-bg: #f5f7fc;
+        --green: #4caf50;
+        --yellow: #ffc107;
+        --purple: #9c27b0;
+        --teal: #009688;
+        --orange: #ff9800;
+        --pink: #e91e63;
+        --cyan: #00bcd4;
+        --indigo: #3f51b5;
+      }
+
+      /* Dark mode variables */
+      .dark-mode {
+        --primary-blue: #8aabff;
+        --light-blue: #6d8feb;
+        --lighter-blue: #3a4d8a;
+        --dark-blue: #2a3c7a;
+        --text-dark: #f0f0f0;
+        --text-light: #b0b0b0;
+        --background: #121212;
+        --white: #1e1e1e;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --gray-bg: #2d2d2d;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--background);
+        color: var(--text-dark);
+        line-height: 1.4;
+        transition:
+          background-color 0.3s,
+          color 0.3s;
+      }
+
+      .text-container {
+        margin-bottom: 0.5rem;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+      }
+
+      /* Navbar Styles */
+      .navbar {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background-color: var(--white);
+        box-shadow: 0 2px 15px var(--shadow);
+        z-index: 1000;
+        padding: 0 5%;
+        transition:
+          background-color 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        text-decoration: none;
+      }
+
+      .logo svg {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+      }
+
+      .nav-links li {
+        margin: 0 1.5rem;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 500;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+      }
+
+      .nav-links a:hover {
+        color: var(--primary-blue);
+      }
+
+      /* Theme Toggle Button */
+      .theme-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: 2px solid var(--primary-blue);
+        color: var(--primary-blue);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-right: 15px;
+        transition: all 0.3s;
+      }
+
+      .theme-toggle:hover {
+        background-color: var(--primary-blue);
+        color: white;
+        transform: rotate(15deg);
+      }
+
+      .theme-toggle i {
+        font-size: 1.2rem;
+      }
+
+      .login-btn {
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.7rem 1.8rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        text-decoration: none;
+        display: inline-block;
+      }
+
+      .login-btn:hover {
+        background-color: var(--dark-blue);
+      }
+
+      /* Main Find Service Section */
+      .find-service-section {
+        padding: 8rem 5% 5rem;
+        min-height: 100vh;
+        background-color: var(--background);
+      }
+
+      .page-title {
+        font-size: 2.8rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-dark);
+        text-align: center;
+      }
+
+      .page-title span {
+        color: var(--primary-blue);
+      }
+
+      .page-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        margin-bottom: 3rem;
+        text-align: center;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Two Column Layout */
+      .find-service-container {
+        display: flex;
+        gap: 2.5rem;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* Filters Section - 30% */
+      .filters-container {
+        width: 30%;
+        background-color: var(--white);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px var(--shadow);
+        height: fit-content;
+        position: sticky;
+        top: 9rem;
+      }
+
+      .filters-title {
+        font-size: 1.8rem;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--lighter-blue);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .filters-title i {
+        color: var(--primary-blue);
+      }
+
+      .filter-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--lighter-blue);
+      }
+
+      .filter-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .filter-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .filter-label i {
+        color: var(--primary-blue);
+        font-size: 1rem;
+      }
+
+      /* Search Filter */
+      .search-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid var(--lighter-blue);
+        border-radius: 12px;
+        font-size: 1rem;
+        background-color: var(--white);
+        color: var(--text-dark);
+        transition: all 0.3s;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(116, 149, 232, 0.2);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+      }
+
+      /* Location Filter */
+      .location-select {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid var(--lighter-blue);
+        border-radius: 12px;
+        font-size: 1rem;
+        background-color: var(--white);
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: all 0.3s;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 16px;
+      }
+
+      .location-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(116, 149, 232, 0.2);
+      }
+
+      /* Category Filter */
+      .category-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .category-option {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.8rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .category-option:hover {
+        background-color: var(--lighter-blue);
+      }
+
+      .category-option.active {
+        background-color: var(--primary-blue);
+        color: white;
+      }
+
+      .category-option.active i {
+        color: white;
+      }
+
+      .category-option i {
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        width: 24px;
+      }
+
+      .category-option span {
+        font-weight: 500;
+      }
+
+      /* Price Slider Filter */
+      .price-slider-container {
+        padding: 0.5rem 0;
+      }
+
+      .price-slider {
+        width: 100%;
+        height: 8px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: var(--lighter-blue);
+        border-radius: 4px;
+        outline: none;
+        margin: 1rem 0;
+      }
+
+      .price-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .price-slider::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--primary-blue);
+        cursor: pointer;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .price-display {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      /* Filter Buttons */
+      .filter-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .apply-filters-btn {
+        flex: 1;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .apply-filters-btn:hover {
+        background-color: var(--dark-blue);
+      }
+
+      .clear-filters-btn {
+        flex: 1;
+        background-color: transparent;
+        color: var(--text-dark);
+        border: 2px solid var(--lighter-blue);
+        padding: 1rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .clear-filters-btn:hover {
+        background-color: var(--lighter-blue);
+        border-color: var(--primary-blue);
+      }
+
+      /* Providers List Section - 70% */
+      .providers-list-container {
+        width: 70%;
+      }
+
+      .providers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+      }
+
+      /* Provider Card */
+      .provider-card {
+        background-color: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 5px 20px var(--shadow);
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+
+      .provider-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px var(--shadow);
+      }
+
+      .provider-img {
+        height: 200px;
+        width: 100%;
+        background-color: var(--light-blue);
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+
+      .provider-availability {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: var(--green);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .provider-unavailable {
+        background-color: #f44336;
+      }
+
+      .provider-details {
+        padding: 1.5rem;
+      }
+
+      .provider-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .provider-name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .provider-rating {
+        color: var(--yellow);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .provider-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        color: var(--text-light);
+        font-size: 0.9rem;
+      }
+
+      /* Price and services completed section */
+      .provider-price-services {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.8rem 0;
+        border-top: 1px solid var(--lighter-blue);
+        border-bottom: 1px solid var(--lighter-blue);
+      }
+
+      .provider-price {
+        color: var(--primary-blue);
+        font-weight: 600;
+        font-size: 1.3rem;
+      }
+
+      .provider-services-count {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .provider-services-count i {
+        color: var(--green);
+      }
+
+      .provider-categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .category-tag {
+        background-color: var(--lighter-blue);
+        color: var(--primary-blue);
+        padding: 0.3rem 0.7rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .provider-card button {
+        width: 100%;
+        background-color: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.8rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 1rem;
+      }
+
+      .provider-card button:hover {
+        background-color: var(--dark-blue);
+      }
+
+      .no-results {
+        text-align: center;
+        padding: 4rem;
+        color: var(--text-light);
+        font-size: 1.2rem;
+        width: 100%;
+        grid-column: 1 / -1;
+      }
+
+      .no-results i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--text-light);
+      }
+
+      /* Loading Spinner */
+      .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 3rem;
+        grid-column: 1 / -1;
+      }
+
+      .spinner {
+        border: 4px solid var(--lighter-blue);
+        border-top: 4px solid var(--primary-blue);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Results Count */
+      .results-count {
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+      }
+
+      .results-count span {
+        color: var(--primary-blue);
+        font-weight: 600;
+      }
+
+      /* Modal Styles - Same as home page */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        background-color: var(--white);
+        border-radius: 20px;
+        width: 75%;
+        max-width: 900px;
+        min-width: 400px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+        animation: modalFadeIn 0.3s ease;
+        position: relative;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-30px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: var(--primary-blue);
+        border: none;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        z-index: 10;
+        transition: all 0.3s;
+      }
+
+      .close-modal:hover {
+        background-color: var(--dark-blue);
+        transform: rotate(90deg);
+      }
+
+      .modal-body {
+        padding: 2.5rem;
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .modal-provider-header {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid var(--lighter-blue);
+      }
+
+      .modal-provider-avatar {
+        flex-shrink: 0;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: var(--light-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.2rem;
+        font-weight: bold;
+        background-size: cover;
+        background-position: center;
+        margin-right: 2rem;
+        border: 5px solid var(--lighter-blue);
+      }
+
+      .modal-provider-main-info {
+        flex: 1;
+      }
+
+      .modal-provider-name {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+        font-weight: 600;
+      }
+
+      .modal-provider-rating {
+        color: var(--yellow);
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.1rem;
+      }
+
+      .modal-provider-location {
+        color: var(--text-light);
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+      }
+
+      .modal-provider-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+      }
+
+      .modal-stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.8rem 1.5rem;
+        background: var(--lighter-blue);
+        border-radius: 10px;
+        min-width: 120px;
+      }
+
+      .modal-stat-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-bottom: 0.3rem;
+      }
+
+      .modal-stat-value {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .modal-provider-details {
+        margin-bottom: 2rem;
+      }
+
+      .modal-provider-bio {
+        color: var(--text-dark);
+        line-height: 1.7;
+        margin-bottom: 2rem;
+        font-size: 1.05rem;
+        padding: 1.5rem;
+        background: var(--lighter-blue);
+        border-radius: 15px;
+      }
+
+      .modal-details-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      .detail-item {
+        background: linear-gradient(
+          135deg,
+          var(--lighter-blue) 0%,
+          #ffffff 100%
+        );
+        padding: 1.2rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--primary-blue);
+      }
+
+      .detail-label {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      .modal-categories {
+        margin-bottom: 2rem;
+      }
+
+      .modal-categories h4 {
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .modal-footer {
+        padding: 1.5rem 2.5rem;
+        border-top: 2px solid var(--lighter-blue);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--lighter-blue);
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+      }
+
+      .modal-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+      }
+
+      .modal-price-type {
+        font-size: 1rem;
+        color: var(--text-light);
+        margin-left: 5px;
+      }
+
+      .modal-book-btn {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue) 0%,
+          var(--dark-blue) 100%
+        );
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        box-shadow: 0 5px 15px rgba(116, 149, 232, 0.4);
+      }
+
+      .modal-book-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(116, 149, 232, 0.6);
+      }
+
+      .modal-close-btn {
+        background-color: transparent;
+        color: var(--text-dark);
+        border: 2px solid var(--light-blue);
+        padding: 0.9rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .modal-close-btn:hover {
+        background-color: var(--lighter-blue);
+        border-color: var(--primary-blue);
+      }
+
+      /* Footer */
+      .footer {
+        background-color: var(--dark-blue);
+        color: white;
+        padding: 2rem 5%;
+        text-align: center;
+        margin-top: 4rem;
+      }
+
+      .footer-logo {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .footer-links li {
+        margin: 0 1rem;
+      }
+
+      .footer-links a {
+        color: white;
+        text-decoration: none;
+        transition: opacity 0.3s;
+      }
+
+      .footer-links a:hover {
+        opacity: 0.8;
+      }
+
+      .copyright {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1200px) {
+        .find-service-container {
+          flex-direction: column;
+        }
+
+        .filters-container {
+          width: 100%;
+          position: static;
+          margin-bottom: 2rem;
+        }
+
+        .providers-list-container {
+          width: 100%;
+        }
+
+        .providers-grid {
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        .modal-content {
+          width: 80%;
+        }
+
+        .modal-details-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 992px) {
+        .nav-links {
+          display: none;
+        }
+
+        .page-title {
+          font-size: 2.2rem;
+        }
+
+        .modal-content {
+          width: 85%;
+        }
+
+        .modal-provider-header {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
+        .modal-provider-avatar {
+          margin-right: 0;
+          margin-bottom: 1.5rem;
+        }
+
+        .modal-provider-stats {
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .find-service-section {
+          padding: 7rem 5% 3rem;
+        }
+
+        .page-title {
+          font-size: 1.8rem;
+        }
+
+        .page-subtitle {
+          font-size: 1rem;
+        }
+
+        .providers-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .filter-buttons {
+          flex-direction: column;
+        }
+
+        .modal-content {
+          width: 90%;
+          min-width: 300px;
+        }
+
+        .modal-details-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-footer {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .modal-footer button,
+        .modal-footer a {
+          width: 100%;
+          text-align: center;
+        }
+
+        .footer-links {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .footer-links li {
+          margin: 0;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .page-title {
+          font-size: 1.6rem;
+        }
+
+        .filters-container {
+          padding: 1.5rem;
+        }
+
+        .filters-title {
+          font-size: 1.5rem;
+        }
+
+        .modal-content {
+          width: 95%;
+          padding: 0;
+        }
+
+        .modal-body {
+          padding: 1.5rem;
+        }
+
+        .modal-provider-name {
+          font-size: 1.4rem;
+        }
+
+        .modal-provider-stats {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .modal-stat-item {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="home.html" class="logo"> LocalSeva </a>
+        <ul class="nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li><a href="find-service.html" class="active">Find Service</a></li>
+          <li><a href="marketplace.html">Marketplace</a></li>
+        </ul>
+        <div style="display: flex; align-items: center">
+          <button
+            class="theme-toggle"
+            id="themeToggle"
+            title="Toggle Dark Mode"
+          >
+            <i class="fas fa-moon"></i>
+          </button>
+          <a href="login.html" class="login-btn">Login</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Find Service Section -->
+    <section class="find-service-section">
+      <h1 class="page-title">Find the Perfect <span>Service Provider</span></h1>
+      <p class="page-subtitle">
+        Browse through our verified local service providers. Filter by location,
+        category, or price to find exactly what you need.
+      </p>
+
+      <div class="find-service-container">
+        <!-- Filters Section - 30% -->
+        <div class="filters-container">
+          <h2 class="filters-title"><i class="fas fa-filter"></i> Filters</h2>
+
+          <!-- Search Filter -->
+          <div class="filter-section">
+            <div class="search-container">
+              <i class="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                class="search-input"
+                id="searchFilter"
+                placeholder="Search services or providers..."
+              />
+            </div>
+          </div>
+
+          <!-- Location Filter -->
+          <div class="filter-section">
+            <div class="filter-label">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Location</span>
+            </div>
+            <select class="location-select" id="locationFilter">
+              <option value="">All Locations</option>
+              <option value="Downtown">Downtown</option>
+              <option value="City Center">City Center</option>
+              <option value="Suburbs">Suburbs</option>
+              <option value="Residential Area">Residential Area</option>
+              <option value="Commercial Area">Commercial Area</option>
+            </select>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="filter-section">
+            <div class="filter-label">
+              <i class="fas fa-list-alt"></i>
+              <span>Service Category</span>
+            </div>
+            <div class="category-options">
+              <div class="category-option" data-category="">
+                <i class="fas fa-th-large"></i>
+                <span>All Categories</span>
+              </div>
+              <div class="category-option" data-category="PLUMBING">
+                <i class="fas fa-faucet"></i>
+                <span>Plumbing</span>
+              </div>
+              <div class="category-option" data-category="CLEANING">
+                <i class="fas fa-broom"></i>
+                <span>Cleaning</span>
+              </div>
+              <div class="category-option" data-category="ELECTRICAL">
+                <i class="fas fa-bolt"></i>
+                <span>Electrical</span>
+              </div>
+              <div class="category-option" data-category="TUTORING">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Tutoring</span>
+              </div>
+              <div class="category-option" data-category="CARPENTRY">
+                <i class="fas fa-hammer"></i>
+                <span>Carpentry</span>
+              </div>
+              <div class="category-option" data-category="FITNESS">
+                <i class="fas fa-dumbbell"></i>
+                <span>Fitness</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Filter -->
+          <div class="filter-section">
+            <div class="filter-label">
+              <i class="fas fa-tag"></i>
+              <span>Price Range</span>
+            </div>
+            <div class="price-slider-container">
+              <div class="price-display">
+                <span id="minPrice">₹0</span>
+                <span id="maxPrice">₹5000</span>
+              </div>
+              <input
+                type="range"
+                class="price-slider"
+                id="priceFilter"
+                min="0"
+                max="5000"
+                step="100"
+                value="5000"
+              />
+            </div>
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="filter-buttons">
+            <button class="apply-filters-btn" id="applyFilters">
+              Apply Filters
+            </button>
+            <button class="clear-filters-btn" id="clearFilters">
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        <!-- Providers List Section - 70% -->
+        <div class="providers-list-container">
+          <div class="results-count">
+            Showing <span id="resultsCount">0</span> service providers
+          </div>
+
+          <div class="providers-grid" id="providersContainer">
+            <div class="loading-spinner" id="loadingSpinner">
+              <div class="spinner"></div>
+              <p>Loading service providers...</p>
+            </div>
+            <!-- Provider cards will be loaded here by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-logo">LocalSeva</div>
+      <ul class="footer-links">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="find-service.html">Find Service</a></li>
+        <li><a href="marketplace.html">Marketplace</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+      <div class="copyright">
+        © 2023 LocalSeva. All rights reserved. Bridging the gap in local
+        services & commerce.
+      </div>
+    </footer>
+
+    <!-- Modal Popup for Service Provider Details -->
+    <div class="modal-overlay" id="providerModal">
+      <div class="modal-content">
+        <button class="close-modal" id="closeModal">&times;</button>
+        <div class="modal-body" id="modalBody">
+          <!-- Modal content will be loaded here -->
+        </div>
+        <div class="modal-footer">
+          <div class="modal-price-container">
+            <span class="modal-price" id="modalPrice">₹500</span>
+            <span class="modal-price-type" id="modalPriceType">/service</span>
+          </div>
+          <div>
+            <button class="modal-close-btn" id="modalCloseBtn">Close</button>
+            <a href="login.html" class="modal-book-btn" id="modalBookBtn"
+              >Book Service</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // API Configuration
+      const API_BASE_URL = "http://127.0.0.1:8000/api/user/providers/";
+
+      // DOM Elements
+      const providersContainer = document.getElementById("providersContainer");
+      const loadingSpinner = document.getElementById("loadingSpinner");
+      const resultsCount = document.getElementById("resultsCount");
+      const themeToggle = document.getElementById("themeToggle");
+
+      // Filter Elements
+      const searchFilter = document.getElementById("searchFilter");
+      const locationFilter = document.getElementById("locationFilter");
+      const categoryOptions = document.querySelectorAll(".category-option");
+      const priceFilter = document.getElementById("priceFilter");
+      const minPriceDisplay = document.getElementById("minPrice");
+      const maxPriceDisplay = document.getElementById("maxPrice");
+      const applyFiltersBtn = document.getElementById("applyFilters");
+      const clearFiltersBtn = document.getElementById("clearFilters");
+
+      // Modal Elements
+      const providerModal = document.getElementById("providerModal");
+      const closeModalBtn = document.getElementById("closeModal");
+      const modalCloseBtn = document.getElementById("modalCloseBtn");
+      const modalBody = document.getElementById("modalBody");
+      const modalBookBtn = document.getElementById("modalBookBtn");
+      const modalPrice = document.getElementById("modalPrice");
+      const modalPriceType = document.getElementById("modalPriceType");
+
+      // Global state
+      let allProviders = [];
+      let filteredProviders = [];
+      let currentFilters = {
+        search: "",
+        location: "",
+        category: "",
+        maxPrice: 5000,
+      };
+      let selectedProvider = null;
+
+      // Theme state
+      let isDarkMode = false;
+
+      // Function to fetch service providers from API
+      async function fetchServiceProviders(params = {}) {
+        try {
+          loadingSpinner.style.display = "block";
+
+          // Build query string
+          const queryParams = new URLSearchParams();
+          for (const [key, value] of Object.entries(params)) {
+            if (value !== undefined && value !== "") {
+              queryParams.append(key, value);
+            }
+          }
+
+          // Add ordering by rating by default
+          if (!params.ordering) {
+            queryParams.append("ordering", "-rating");
+          }
+
+          const apiUrl = `${API_BASE_URL}?${queryParams.toString()}`;
+          console.log("Fetching from:", apiUrl);
+
+          const response = await fetch(apiUrl, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const providers = await response.json();
+
+          // Log the API response to console for debugging
+          console.log("API Response:", providers);
+          console.log(
+            "First provider details:",
+            providers[0] ? providers[0] : "No providers found",
+          );
+
+          if (providers[0]) {
+            console.log("First provider price fields:", {
+              base_price: providers[0].base_price,
+              pricing_type: providers[0].pricing_type,
+              services_completed: providers[0].services_completed,
+            });
+          }
+
+          loadingSpinner.style.display = "none";
+          return providers;
+        } catch (error) {
+          console.error("Error fetching service providers:", error);
+          loadingSpinner.style.display = "none";
+
+          // Fallback to mock data if API fails
+          return getMockProviders();
+        }
+      }
+
+      // Function to create provider card HTML
+      function createProviderCard(provider) {
+        // Generate initials for avatar if no image
+        const initials = provider.username
+          ? provider.username
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+              .substring(0, 2)
+          : "LS";
+
+        // Generate star rating HTML
+        const rating = provider.rating || 0;
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let starsHTML = "";
+
+        for (let i = 1; i <= 5; i++) {
+          if (i <= fullStars) {
+            starsHTML += '<i class="fas fa-star"></i>';
+          } else if (i === fullStars + 1 && hasHalfStar) {
+            starsHTML += '<i class="fas fa-star-half-alt"></i>';
+          } else {
+            starsHTML += '<i class="far fa-star"></i>';
+          }
+        }
+
+        // Format categories
+        let categoriesHTML = "";
+        if (provider.categories) {
+          if (Array.isArray(provider.categories)) {
+            categoriesHTML = provider.categories
+              .slice(0, 3)
+              .map((cat) => `<span class="category-tag">${cat}</span>`)
+              .join("");
+          } else if (typeof provider.categories === "string") {
+            try {
+              const categoriesArray = JSON.parse(provider.categories);
+              if (Array.isArray(categoriesArray)) {
+                categoriesHTML = categoriesArray
+                  .slice(0, 3)
+                  .map((cat) => `<span class="category-tag">${cat}</span>`)
+                  .join("");
+              } else {
+                categoriesHTML = `<span class="category-tag">${provider.categories}</span>`;
+              }
+            } catch {
+              categoriesHTML = `<span class="category-tag">${provider.categories}</span>`;
+            }
+          }
+        }
+
+        // Format price - Dynamic from API
+        const price = provider.base_price || "50";
+        const pricingType = provider.pricing_type || "FLEXIBLE";
+        const priceText =
+          pricingType === "FIXED" ? `₹${price}` : `₹${price}/hr`;
+
+        // Services completed count - Dynamic from API or default
+        const servicesCompleted = provider.services_completed || "0";
+
+        return `
+                <div class="provider-card" data-id="${provider.id}">
+                    <div class="provider-img" style="${
+                      provider.avatar
+                        ? `background-image: url('${provider.avatar}')`
+                        : "background-color: var(--light-blue)"
+                    }">
+                        ${
+                          !provider.avatar
+                            ? `<span style="color: white; font-size: 3rem; font-weight: bold;">${initials}</span>`
+                            : ""
+                        }
+                        <div class="provider-availability ${
+                          provider.is_available ? "" : "provider-unavailable"
+                        }">
+                            ${provider.is_available ? "Available Now" : "Busy"}
+                        </div>
+                    </div>
+                    <div class="provider-details">
+                        <div class="provider-header">
+                            <div class="provider-name">${
+                              provider.username || "Service Provider"
+                            }</div>
+                            <div class="provider-rating">
+                                ${starsHTML} <span>${rating.toFixed(1)}</span>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-light); margin-bottom: 1rem; font-size: 0.95rem; height: 60px; overflow: hidden;">
+                            ${
+                              provider.description ||
+                              provider.bio ||
+                              "Professional service provider"
+                            }
+                        </p>
+                        ${
+                          categoriesHTML
+                            ? `<div class="provider-categories">${categoriesHTML}</div>`
+                            : ""
+                        }
+                        <div class="provider-meta">
+                            <div><i class="fas fa-map-marker-alt"></i> ${
+                              provider.location || "Local Area"
+                            }</div>
+                            <div><i class="fas fa-briefcase"></i> ${
+                              provider.experience_years || "1"
+                            }+ yrs</div>
+                        </div>
+                        <div class="provider-price-services">
+                            <div class="provider-price">${priceText}</div>
+                            <div class="provider-services-count">
+                                <i class="fas fa-check-circle"></i> ${servicesCompleted} services
+                            </div>
+                        </div>
+                        <button onclick="showProviderModal(${
+                          provider.id
+                        })">Book Now</button>
+                    </div>
+                </div>
+            `;
+      }
+
+      // Function to load providers into the UI
+      async function loadProviders() {
+        const params = { ...currentFilters };
+
+        // Convert max price to base_price filter if needed
+        if (currentFilters.maxPrice < 5000) {
+          // We'll filter on client side for price since API might not support price range
+        }
+
+        const providers = await fetchServiceProviders(params);
+        allProviders = providers;
+
+        // Apply filters on client side
+        applyFilters();
+
+        // Update results count
+        updateResultsCount();
+      }
+
+      // Function to apply filters
+      function applyFilters() {
+        filteredProviders = [...allProviders];
+
+        // Apply search filter
+        if (currentFilters.search) {
+          const searchTerm = currentFilters.search.toLowerCase();
+          filteredProviders = filteredProviders.filter(
+            (provider) =>
+              provider.username?.toLowerCase().includes(searchTerm) ||
+              provider.description?.toLowerCase().includes(searchTerm) ||
+              provider.bio?.toLowerCase().includes(searchTerm) ||
+              (provider.categories &&
+                JSON.stringify(provider.categories)
+                  .toLowerCase()
+                  .includes(searchTerm)),
+          );
+        }
+
+        // Apply location filter
+        if (currentFilters.location) {
+          filteredProviders = filteredProviders.filter(
+            (provider) =>
+              provider.location?.toLowerCase() ===
+              currentFilters.location.toLowerCase(),
+          );
+        }
+
+        // Apply category filter
+        if (currentFilters.category) {
+          filteredProviders = filteredProviders.filter((provider) => {
+            if (!provider.categories) return false;
+
+            if (Array.isArray(provider.categories)) {
+              return provider.categories
+                .map((cat) => cat.toUpperCase())
+                .includes(currentFilters.category.toUpperCase());
+            } else if (typeof provider.categories === "string") {
+              try {
+                const categoriesArray = JSON.parse(provider.categories);
+                if (Array.isArray(categoriesArray)) {
+                  return categoriesArray
+                    .map((cat) => cat.toUpperCase())
+                    .includes(currentFilters.category.toUpperCase());
+                } else {
+                  return (
+                    provider.categories.toUpperCase() ===
+                    currentFilters.category.toUpperCase()
+                  );
+                }
+              } catch {
+                return (
+                  provider.categories.toUpperCase() ===
+                  currentFilters.category.toUpperCase()
+                );
+              }
+            }
+            return false;
+          });
+        }
+
+        // Apply price filter
+        if (currentFilters.maxPrice < 5000) {
+          filteredProviders = filteredProviders.filter((provider) => {
+            const price = parseFloat(provider.base_price) || 0;
+            return price <= currentFilters.maxPrice;
+          });
+        }
+
+        // Clear existing content
+        providersContainer.innerHTML = "";
+
+        if (!filteredProviders || filteredProviders.length === 0) {
+          providersContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <h3>No service providers found</h3>
+                        <p>Try adjusting your filters or search criteria</p>
+                    </div>
+                `;
+        } else {
+          // Add provider cards
+          filteredProviders.forEach((provider) => {
+            providersContainer.innerHTML += createProviderCard(provider);
+          });
+        }
+
+        // Update results count
+        updateResultsCount();
+      }
+
+      // Function to update results count
+      function updateResultsCount() {
+        const count = filteredProviders ? filteredProviders.length : 0;
+        resultsCount.textContent = count;
+      }
+
+      // Function to show provider modal
+      function showProviderModal(providerId) {
+        // Find the provider by ID
+        selectedProvider = filteredProviders.find((p) => p.id === providerId);
+
+        if (!selectedProvider) {
+          alert("Provider not found");
+          return;
+        }
+
+        // Generate initials for avatar
+        const initials = selectedProvider.username
+          ? selectedProvider.username
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .toUpperCase()
+              .substring(0, 2)
+          : "LS";
+
+        // Generate star rating HTML
+        const rating = selectedProvider.rating || 0;
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let starsHTML = "";
+
+        for (let i = 1; i <= 5; i++) {
+          if (i <= fullStars) {
+            starsHTML += '<i class="fas fa-star"></i>';
+          } else if (i === fullStars + 1 && hasHalfStar) {
+            starsHTML += '<i class="fas fa-star-half-alt"></i>';
+          } else {
+            starsHTML += '<i class="far fa-star"></i>';
+          }
+        }
+
+        // Format categories
+        let categoriesHTML = "";
+        if (selectedProvider.categories) {
+          if (Array.isArray(selectedProvider.categories)) {
+            categoriesHTML = selectedProvider.categories
+              .map((cat) => `<span class="category-tag">${cat}</span>`)
+              .join("");
+          } else if (typeof selectedProvider.categories === "string") {
+            try {
+              const categoriesArray = JSON.parse(selectedProvider.categories);
+              if (Array.isArray(categoriesArray)) {
+                categoriesHTML = categoriesArray
+                  .map((cat) => `<span class="category-tag">${cat}</span>`)
+                  .join("");
+              } else {
+                categoriesHTML = `<span class="category-tag">${selectedProvider.categories}</span>`;
+              }
+            } catch {
+              categoriesHTML = `<span class="category-tag">${selectedProvider.categories}</span>`;
+            }
+          }
+        }
+
+        // Format price - Dynamic from API
+        const price = selectedProvider.base_price || "50";
+        const pricingType = selectedProvider.pricing_type || "FLEXIBLE";
+        const priceText =
+          pricingType === "FIXED" ? `₹${price}` : `₹${price}/hr`;
+
+        // Services completed count - Dynamic from API
+        const servicesCompleted = selectedProvider.services_completed || "0";
+        const experienceYears = selectedProvider.experience_years || "1";
+
+        // Build modal content
+        modalBody.innerHTML = `
+                <div class="modal-provider-header">
+                    <div class="modal-provider-avatar" style="${
+                      selectedProvider.avatar
+                        ? `background-image: url('${selectedProvider.avatar}')`
+                        : "background-color: var(--light-blue)"
+                    }">
+                        ${!selectedProvider.avatar ? initials : ""}
+                    </div>
+                    <div class="modal-provider-main-info">
+                        <h2 class="modal-provider-name">${
+                          selectedProvider.username || "Service Provider"
+                        }</h2>
+                        <div class="modal-provider-rating">
+                            ${starsHTML} <span>${rating.toFixed(
+                              1,
+                            )} (${selectedProvider.total_reviews || "0"} reviews)</span>
+                        </div>
+                        <div class="modal-provider-location">
+                            <i class="fas fa-map-marker-alt"></i> ${
+                              selectedProvider.location || "Local Area"
+                            }
+                        </div>
+                        <div class="modal-provider-stats">
+                            <div class="modal-stat-item">
+                                <div class="modal-stat-label">Experience</div>
+                                <div class="modal-stat-value">${experienceYears}+ years</div>
+                            </div>
+                            <div class="modal-stat-item">
+                                <div class="modal-stat-label">Services Completed</div>
+                                <div class="modal-stat-value">${servicesCompleted}</div>
+                            </div>
+                            <div class="modal-stat-item">
+                                <div class="modal-stat-label">Service Radius</div>
+                                <div class="modal-stat-value">3-5 kms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-provider-details">
+                    <p class="modal-provider-bio">${
+                      selectedProvider.description ||
+                      selectedProvider.bio ||
+                      "Professional service provider with extensive experience in delivering quality services. Committed to customer satisfaction and timely completion of all projects."
+                    }</p>
+                    
+                    <div class="modal-details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Availability</div>
+                            <div class="detail-value">${
+                              selectedProvider.availability ||
+                              "Mon-Sat: 9AM-7PM"
+                            }</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Service Radius</div>
+                            <div class="detail-value">3-5 kms</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value" style="color: ${
+                              selectedProvider.is_available
+                                ? "var(--green)"
+                                : "#f44336"
+                            }">
+                                ${
+                                  selectedProvider.is_available
+                                    ? "Available Now"
+                                    : "Currently Busy"
+                                }
+                            </div>
+                        </div>
+                        ${
+                          selectedProvider.phone
+                            ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Contact</div>
+                            <div class="detail-value">${selectedProvider.phone}</div>
+                        </div>
+                        `
+                            : ""
+                        }
+                        ${
+                          selectedProvider.email
+                            ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">${selectedProvider.email}</div>
+                        </div>
+                        `
+                            : ""
+                        }
+                        <div class="detail-item">
+                            <div class="detail-label">Pricing Type</div>
+                            <div class="detail-value">${
+                              pricingType === "FIXED"
+                                ? "Fixed Price"
+                                : "Hourly Rate"
+                            }</div>
+                        </div>
+                    </div>
+                    
+                    ${
+                      categoriesHTML
+                        ? `
+                    <div class="modal-categories">
+                        <h4>Service Categories</h4>
+                        <div class="provider-categories">
+                            ${categoriesHTML}
+                        </div>
+                    </div>
+                    `
+                        : ""
+                    }
+                    
+                    ${
+                      selectedProvider.service_locations
+                        ? `
+                    <div class="detail-item" style="grid-column: 1 / -1; margin-top: 1rem;">
+                        <div class="detail-label">Service Locations</div>
+                        <div class="detail-value">${
+                          Array.isArray(selectedProvider.service_locations)
+                            ? selectedProvider.service_locations.join(", ")
+                            : selectedProvider.service_locations
+                        }</div>
+                    </div>
+                    `
+                        : ""
+                    }
+                </div>
+            `;
+
+        // Update modal price
+        modalPrice.textContent = `₹${price}`;
+        modalPriceType.textContent = pricingType === "FIXED" ? "" : "/hr";
+
+        // Show the modal
+        providerModal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+
+      // Function to close modal
+      function closeModal() {
+        providerModal.style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+
+      // Function to update price display
+      function updatePriceDisplay() {
+        const maxPrice = priceFilter.value;
+        maxPriceDisplay.textContent = `₹${maxPrice}`;
+        currentFilters.maxPrice = parseInt(maxPrice);
+      }
+
+      // Function to handle category selection
+      function handleCategorySelection(selectedCategory) {
+        // Remove active class from all category options
+        categoryOptions.forEach((option) => {
+          option.classList.remove("active");
+        });
+
+        // Add active class to selected category
+        selectedCategory.classList.add("active");
+
+        // Update current filters
+        currentFilters.category = selectedCategory.dataset.category || "";
+      }
+
+      // Function to clear all filters
+      function clearAllFilters() {
+        // Reset search
+        searchFilter.value = "";
+        currentFilters.search = "";
+
+        // Reset location
+        locationFilter.value = "";
+        currentFilters.location = "";
+
+        // Reset category
+        categoryOptions.forEach((option) => {
+          option.classList.remove("active");
+          if (option.dataset.category === "") {
+            option.classList.add("active");
+          }
+        });
+        currentFilters.category = "";
+
+        // Reset price
+        priceFilter.value = 5000;
+        currentFilters.maxPrice = 5000;
+        updatePriceDisplay();
+
+        // Apply filters
+        applyFilters();
+      }
+
+      // Theme toggle functions
+      function toggleTheme() {
+        isDarkMode = !isDarkMode;
+
+        if (isDarkMode) {
+          document.body.classList.add("dark-mode");
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.setAttribute("title", "Switch to Light Mode");
+          localStorage.setItem("theme", "dark");
+        } else {
+          document.body.classList.remove("dark-mode");
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.setAttribute("title", "Switch to Dark Mode");
+          localStorage.setItem("theme", "light");
+        }
+      }
+
+      function loadTheme() {
+        const savedTheme = localStorage.getItem("theme");
+
+        if (savedTheme === "dark") {
+          isDarkMode = true;
+          document.body.classList.add("dark-mode");
+          themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          themeToggle.setAttribute("title", "Switch to Light Mode");
+        } else {
+          isDarkMode = false;
+          document.body.classList.remove("dark-mode");
+          themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          themeToggle.setAttribute("title", "Switch to Dark Mode");
+        }
+      }
+
+      // Mock data for demo (in case API is not available)
+      function getMockProviders() {
+        return [
+          {
+            id: 1,
+            username: "Flash Electrician",
+            avatar: "",
+            role: "SERVICE",
+            bio: "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
+            location: "Downtown, City Center",
+            experience_years: 8,
+            pricing_type: "FIXED",
+            base_price: "500",
+            is_available: true,
+            rating: 4.8,
+            total_reviews: 250,
+            services_completed: "150",
+            categories: ["ELECTRICAL", "HOME_REPAIR"],
+            description:
+              "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
+            availability: "Mon-Sat: 9AM-7PM",
+            service_locations: ["Downtown", "City Center", "Suburbs"],
+            phone: "+91 9876543210",
+            email: "flash@example.com",
+          },
+          {
+            id: 2,
+            username: "Plumber Joe",
+            avatar: "",
+            role: "SERVICE",
+            bio: "Professional plumber with 10 years experience in residential and commercial plumbing.",
+            location: "New York, NY",
+            experience_years: 10,
+            pricing_type: "FIXED",
+            base_price: "400",
+            is_available: true,
+            rating: 4.5,
+            total_reviews: 120,
+            services_completed: "200",
+            categories: ["PLUMBING", "HOME_MAINTENANCE"],
+            description:
+              "Professional plumber with 10 years experience in residential and commercial plumbing.",
+            availability: "24/7 Emergency Service",
+            service_locations: ["Manhattan", "Brooklyn", "Queens"],
+            phone: "+91 9876543211",
+            email: "joe@example.com",
+          },
+          {
+            id: 3,
+            username: "Maria's Cleaning",
+            avatar: "",
+            role: "SERVICE",
+            bio: "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
+            location: "Suburbia",
+            experience_years: 5,
+            pricing_type: "FLEXIBLE",
+            base_price: "300",
+            is_available: true,
+            rating: 4.9,
+            total_reviews: 89,
+            services_completed: "120",
+            categories: ["CLEANING", "HOME_SERVICES"],
+            description:
+              "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
+            availability: "Mon-Fri: 8AM-6PM",
+            service_locations: ["All areas"],
+            phone: "+91 9876543212",
+            email: "maria@example.com",
+          },
+        ];
+      }
+
+      // Initialize page when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load theme preference
+        loadTheme();
+
+        // Load all providers initially
+        loadProviders();
+
+        // Setup price slider
+        updatePriceDisplay();
+        priceFilter.addEventListener("input", updatePriceDisplay);
+
+        // Setup category selection
+        categoryOptions.forEach((option) => {
+          option.addEventListener("click", () =>
+            handleCategorySelection(option),
+          );
+        });
+
+        // Setup search filter
+        searchFilter.addEventListener("input", (e) => {
+          currentFilters.search = e.target.value;
+        });
+
+        // Setup location filter
+        locationFilter.addEventListener("change", (e) => {
+          currentFilters.location = e.target.value;
+        });
+
+        // Setup apply filters button
+        applyFiltersBtn.addEventListener("click", applyFilters);
+
+        // Setup clear filters button
+        clearFiltersBtn.addEventListener("click", clearAllFilters);
+
+        // Setup theme toggle
+        themeToggle.addEventListener("click", toggleTheme);
+
+        // Setup modal event listeners
+        closeModalBtn.addEventListener("click", closeModal);
+        modalCloseBtn.addEventListener("click", closeModal);
+
+        // Close modal when clicking outside
+        providerModal.addEventListener("click", function (e) {
+          if (e.target === providerModal) {
+            closeModal();
+          }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && providerModal.style.display === "flex") {
+            closeModal();
+          }
+        });
+
+        // Allow Enter key to apply filters in search
+        searchFilter.addEventListener("keyup", function (e) {
+          if (e.key === "Enter") {
+            applyFilters();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

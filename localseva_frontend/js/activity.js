@@ -121,7 +121,7 @@ async function loadTabData(tabId) {
       case "serviceProvided":
         const isProvider = localStorage.getItem("userIsProvider") === "true";
         console.log(
-          `Checking if provider for serviceProvided tab: ${isProvider}`
+          `Checking if provider for serviceProvided tab: ${isProvider}`,
         );
         if (!isProvider) {
           container.innerHTML = `
@@ -219,6 +219,7 @@ async function fetchActivityData() {
           completed_at: booking.completed_at,
           user_id: booking.user,
           provider_id: booking.service_provider,
+          price_distribution_note: booking.price_distribution_note || "",
         };
         serviceTaken.push(activityItem);
       });
@@ -251,6 +252,7 @@ async function fetchActivityData() {
           completed_at: booking.completed_at,
           user_id: booking.user,
           provider_id: booking.service_provider,
+          price_distribution_note: booking.price_distribution_note || "",
         };
         serviceProvided.push(activityItem);
       });
@@ -273,7 +275,7 @@ async function fetchActivityData() {
     console.error("Error fetching activity data:", error);
     appUtils.showNotification(
       "Error loading activity data: " + error.message,
-      "error"
+      "error",
     );
     throw error;
   } finally {
@@ -302,8 +304,11 @@ function applyFilters(tabId, items) {
         (item.address || "").toLowerCase().includes(searchTerm) ||
         (item.user_notes || "").toLowerCase().includes(searchTerm) ||
         (item.provider_notes || "").toLowerCase().includes(searchTerm) ||
+        (item.price_distribution_note || "")
+          .toLowerCase()
+          .includes(searchTerm) ||
         (item.client || "").toLowerCase().includes(searchTerm) ||
-        (item.provider || "").toLowerCase().includes(searchTerm)
+        (item.provider || "").toLowerCase().includes(searchTerm),
     );
   }
 
@@ -352,7 +357,7 @@ function applyFilters(tabId, items) {
           return itemDate >= lastMonth;
         case "last-3-months":
           const last3Months = new Date(
-            now.getTime() - 90 * 24 * 60 * 60 * 1000
+            now.getTime() - 90 * 24 * 60 * 60 * 1000,
           );
           return itemDate >= last3Months;
         case "this-year":
@@ -403,7 +408,7 @@ function renderActivityItems(tabId, items, container) {
           ${
             item.final_price && item.final_price !== item.quoted_price
               ? `<small class="text-muted">(Quoted: ${appUtils.formatCurrency(
-                  item.quoted_price
+                  item.quoted_price,
                 )})</small>`
               : ""
           }
@@ -414,12 +419,12 @@ function renderActivityItems(tabId, items, container) {
         <div class="activity-meta">
           <span><i class="fas fa-user"></i> ${getOtherParty(tabId, item)}</span>
           <span><i class="fas fa-calendar"></i> ${appUtils.formatDate(
-            item.date
+            item.date,
           )}</span>
           ${
             item.completed_at
               ? `<span><i class="fas fa-check-circle"></i> Completed: ${appUtils.formatDate(
-                  item.completed_at
+                  item.completed_at,
                 )}</span>`
               : ""
           }
@@ -460,12 +465,22 @@ function renderActivityItems(tabId, items, container) {
           </div>`
             : ""
         }
+        
+        ${
+          item.price_distribution_note
+            ? `
+          <div class="activity-notes" style="background-color: #f8f9fa; padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem;">
+            <strong><i class="fas fa-money-bill-wave"></i> Price Distribution:</strong>
+            <p style="margin-bottom: 0;">${item.price_distribution_note}</p>
+          </div>`
+            : ""
+        }
       </div>
       
       <div class="activity-actions">
         ${getActionButtons(tabId, item)}
         <small class="text-muted">Created: ${appUtils.formatDate(
-          item.created_at
+          item.created_at,
         )}</small>
       </div>
     `;
@@ -595,7 +610,7 @@ function getActionButtons(tabId, item) {
   // Action buttons for provider
   if (tabId === "serviceProvided") {
     if (item.status === "PENDING") {
-      buttons += `<button class="btn btn-primary btn-sm" onclick="giveQuote(${item.id})">
+      buttons += `<button class="btn btn-primary btn-sm" onclick="showGiveQuoteModal(${item.id})">
         <i class="fas fa-dollar-sign"></i> Give Quote
       </button>`;
       buttons += `<button class="btn btn-danger btn-sm" onclick="updateBookingStatus(${item.id}, 'REJECTED', '${tabId}')">
@@ -606,7 +621,7 @@ function getActionButtons(tabId, item) {
         <i class="fas fa-play"></i> Start Service
       </button>`;
     } else if (item.status === "IN_PROGRESS") {
-      buttons += `<button class="btn btn-success btn-sm" onclick="completeService(${item.id}, '${tabId}')">
+      buttons += `<button class="btn btn-success btn-sm" onclick="showCompleteServiceModal(${item.id}, '${tabId}')">
         <i class="fas fa-check"></i> Complete
       </button>`;
     }
@@ -617,6 +632,9 @@ function getActionButtons(tabId, item) {
     if (item.status === "QUOTE_GIVEN") {
       buttons += `<button class="btn btn-success btn-sm" onclick="updateBookingStatus(${item.id}, 'ACCEPTED', '${tabId}')">
         <i class="fas fa-check"></i> Accept Quote
+      </button>`;
+      buttons += `<button class="btn btn-danger btn-sm" onclick="updateBookingStatus(${item.id}, 'REJECTED', '${tabId}')">
+        <i class="fas fa-times"></i> Reject Quote
       </button>`;
     }
     if (item.status === "PENDING") {
@@ -711,12 +729,246 @@ async function viewBookingDetails(bookingId, tabType) {
 }
 
 /**
+ * Ensure modal styles are added to the document
+ */
+function ensureModalStyles() {
+  if (!document.querySelector("#modal-styles")) {
+    const style = document.createElement("style");
+    style.id = "modal-styles";
+    style.textContent = `
+      .modal-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0,0,0,0.7) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 9999 !important;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      
+      .modal-overlay.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+      }
+      
+      .modal-content {
+        background: var(--card-bg, #ffffff) !important;
+        border-radius: 12px !important;
+        padding: 2rem !important;
+        width: 90% !important;
+        max-width: 500px !important;
+        max-height: 85vh !important;
+        overflow-y: auto !important;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+        position: relative !important;
+        z-index: 10000 !important;
+      }
+      
+      .modal-overlay.active .modal-content {
+        transform: translateY(0) !important;
+      }
+      
+      .modal-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 1.5rem !important;
+        padding-bottom: 1rem !important;
+        border-bottom: 1px solid var(--border-color, #e1e1e1) !important;
+      }
+      
+      .modal-header h3 {
+        margin: 0 !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        color: var(--text-primary, #333333) !important;
+      }
+      
+      .modal-close {
+        background: none !important;
+        border: none !important;
+        font-size: 1.75rem !important;
+        cursor: pointer !important;
+        color: var(--text-secondary, #666666) !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease !important;
+      }
+      
+      .modal-close:hover {
+        background: var(--bg-hover, #f5f5f5) !important;
+        color: var(--text-primary, #333333) !important;
+      }
+      
+      .modal-body {
+        margin-bottom: 1.5rem !important;
+      }
+      
+      .modal-footer {
+        display: flex !important;
+        gap: 0.75rem !important;
+        justify-content: flex-end !important;
+        padding-top: 1.5rem !important;
+        border-top: 1px solid var(--border-color, #e1e1e1) !important;
+      }
+      
+      /* Form styles for quote modal */
+      .form-group {
+        margin-bottom: 1.5rem !important;
+      }
+      
+      .form-label {
+        display: block !important;
+        margin-bottom: 0.5rem !important;
+        font-weight: 500 !important;
+        color: var(--text-primary, #333333) !important;
+      }
+      
+      .form-control {
+        width: 100% !important;
+        padding: 0.75rem !important;
+        border: 1px solid var(--border-color, #e1e1e1) !important;
+        border-radius: 8px !important;
+        background: var(--input-bg, #ffffff) !important;
+        color: var(--text-primary, #333333) !important;
+        font-size: 1rem !important;
+        transition: border-color 0.2s ease !important;
+      }
+      
+      .form-control:focus {
+        outline: none !important;
+        border-color: var(--primary-color, #007bff) !important;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
+      }
+      
+      textarea.form-control {
+        min-height: 100px !important;
+        resize: vertical !important;
+        font-family: inherit !important;
+      }
+      
+      /* Detail rows in booking modal */
+      .detail-row {
+        margin-bottom: 1rem !important;
+        padding-bottom: 1rem !important;
+        border-bottom: 1px solid var(--border-light, #f0f0f0) !important;
+      }
+      
+      .detail-row:last-child {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+        border-bottom: none !important;
+      }
+      
+      .detail-row strong {
+        display: block !important;
+        margin-bottom: 0.25rem !important;
+        color: var(--text-secondary, #666666) !important;
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+      }
+      
+      .detail-row span, .detail-row p {
+        color: var(--text-primary, #333333) !important;
+        font-size: 1rem !important;
+      }
+      
+      .detail-row p {
+        margin: 0.5rem 0 0 0 !important;
+        line-height: 1.5 !important;
+      }
+      
+      /* Button styles */
+      .btn {
+        padding: 0.625rem 1.25rem !important;
+        border-radius: 8px !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        border: 1px solid transparent !important;
+      }
+      
+      .btn-primary {
+        background: var(--primary-color, #007bff) !important;
+        color: white !important;
+        border-color: var(--primary-color, #007bff) !important;
+      }
+      
+      .btn-primary:hover {
+        background: var(--primary-dark, #0056b3) !important;
+        border-color: var(--primary-dark, #0056b3) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2) !important;
+      }
+      
+      .btn-secondary {
+        background: var(--secondary-bg, #6c757d) !important;
+        color: white !important;
+        border-color: var(--secondary-bg, #6c757d) !important;
+      }
+      
+      .btn-secondary:hover {
+        background: var(--secondary-dark, #545b62) !important;
+        border-color: var(--secondary-dark, #545b62) !important;
+      }
+      
+      .btn-danger {
+        background: var(--danger-color, #dc3545) !important;
+        color: white !important;
+        border-color: var(--danger-color, #dc3545) !important;
+      }
+      
+      .btn-danger:hover {
+        background: var(--danger-dark, #bd2130) !important;
+        border-color: var(--danger-dark, #bd2130) !important;
+      }
+      
+      .btn-success {
+        background: var(--success-color, #28a745) !important;
+        color: white !important;
+        border-color: var(--success-color, #28a745) !important;
+      }
+      
+      .btn-success:hover {
+        background: var(--success-dark, #1e7e34) !important;
+        border-color: var(--success-dark, #1e7e34) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+/**
  * Show booking details modal
  */
 function showBookingDetailsModal(booking, tabType) {
+  // Ensure styles are loaded
+  ensureModalStyles();
+
+  // Close any existing modal first
+  closeModal();
+  closeGiveQuoteModal();
+  closeCompleteServiceModal();
+
   // Create modal HTML
   const modalHTML = `
-    <div class="modal-overlay active" id="bookingModal">
+    <div class="modal-overlay" id="bookingModal">
       <div class="modal-content">
         <div class="modal-header">
           <h3>Booking Details</h3>
@@ -724,13 +976,13 @@ function showBookingDetailsModal(booking, tabType) {
         </div>
         <div class="modal-body">
           <div class="booking-details">
-            <h4>${booking.description}</h4>
+            <h4 style="margin: 0 0 1.5rem 0; font-size: 1.25rem;">${booking.description}</h4>
             
             <div class="detail-row">
               <strong>Status:</strong>
-              <span class="badge ${getStatusClass(
-                booking.status
-              )}">${getStatusText(booking.status)}</span>
+              <span class="badge ${getStatusClass(booking.status)}" style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500;">
+                ${getStatusText(booking.status)}
+              </span>
             </div>
             
             <div class="detail-row">
@@ -784,6 +1036,16 @@ function showBookingDetailsModal(booking, tabType) {
             <div class="detail-row">
               <strong>Provider Notes:</strong>
               <p>${booking.provider_notes}</p>
+            </div>`
+                : ""
+            }
+            
+            ${
+              booking.price_distribution_note
+                ? `
+            <div class="detail-row">
+              <strong>Price Distribution Notes:</strong>
+              <p>${booking.price_distribution_note}</p>
             </div>`
                 : ""
             }
@@ -852,66 +1114,13 @@ function showBookingDetailsModal(booking, tabType) {
   modalContainer.innerHTML = modalHTML;
   document.body.appendChild(modalContainer);
 
-  // Add modal styles if not present
-  if (!document.querySelector("#modal-styles")) {
-    const style = document.createElement("style");
-    style.id = "modal-styles";
-    style.textContent = `
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.5);
-        display: none;
-        z-index: 1000;
-      }
-      .modal-overlay.active {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .modal-content {
-        background: var(--card-bg);
-        border-radius: var(--border-radius);
-        padding: 1.5rem;
-        max-width: 500px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        box-shadow: var(--shadow-lg);
-      }
-      .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-      .modal-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--text-secondary);
-      }
-      .modal-body {
-        margin-bottom: 1.5rem;
-      }
-      .detail-row {
-        margin-bottom: 0.75rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-      }
-      .modal-footer {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: flex-end;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+  // Add active class with delay for animation
+  setTimeout(() => {
+    const modal = document.getElementById("bookingModal");
+    if (modal) {
+      modal.classList.add("active");
+    }
+  }, 10);
 }
 
 /**
@@ -922,16 +1131,17 @@ function getModalActionButtons(booking, tabType) {
 
   if (tabType === "serviceProvided") {
     if (booking.status === "PENDING") {
-      buttons += `<button class="btn btn-primary" onclick="giveQuote(${booking.id})">Give Quote</button>`;
+      buttons += `<button class="btn btn-primary" onclick="showGiveQuoteModal(${booking.id})">Give Quote</button>`;
       buttons += `<button class="btn btn-danger" onclick="updateBookingStatus(${booking.id}, 'REJECTED', '${tabType}')">Reject</button>`;
     } else if (booking.status === "ACCEPTED") {
       buttons += `<button class="btn btn-primary" onclick="updateBookingStatus(${booking.id}, 'IN_PROGRESS', '${tabType}')">Start Service</button>`;
     } else if (booking.status === "IN_PROGRESS") {
-      buttons += `<button class="btn btn-success" onclick="completeService(${booking.id}, '${tabType}')">Complete Service</button>`;
+      buttons += `<button class="btn btn-success" onclick="showCompleteServiceModal(${booking.id}, '${tabType}')">Complete Service</button>`;
     }
   } else if (tabType === "serviceTaken") {
     if (booking.status === "QUOTE_GIVEN") {
       buttons += `<button class="btn btn-success" onclick="updateBookingStatus(${booking.id}, 'ACCEPTED', '${tabType}')">Accept Quote</button>`;
+      buttons += `<button class="btn btn-danger" onclick="updateBookingStatus(${booking.id}, 'REJECTED', '${tabType}')">Reject Quote</button>`;
     }
     if (booking.status === "PENDING") {
       buttons += `<button class="btn btn-danger" onclick="updateBookingStatus(${booking.id}, 'CANCELLED', '${tabType}')">Cancel Booking</button>`;
@@ -942,13 +1152,366 @@ function getModalActionButtons(booking, tabType) {
 }
 
 /**
- * Close modal
+ * Show modal for giving a quote
+ */
+function showGiveQuoteModal(bookingId) {
+  // Ensure styles are loaded
+  ensureModalStyles();
+
+  // Close any existing modal first
+  closeModal();
+  closeGiveQuoteModal();
+  closeCompleteServiceModal();
+
+  // Create modal HTML
+  const modalHTML = `
+    <div class="modal-overlay" id="giveQuoteModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Give Quote</h3>
+          <button class="modal-close" onclick="closeGiveQuoteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="giveQuoteForm" onsubmit="event.preventDefault(); submitQuote(${bookingId})">
+            <div class="form-group">
+              <label for="quotePrice" class="form-label">Quote Price (₹)</label>
+              <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                class="form-control" 
+                id="quotePrice" 
+                required 
+                placeholder="Enter price"
+                style="font-size: 1.1rem; font-weight: 500;"
+              >
+            </div>
+            <div class="form-group">
+              <label for="providerNotes" class="form-label">Provider Notes (Optional)</label>
+              <textarea 
+                class="form-control" 
+                id="providerNotes" 
+                rows="4" 
+                placeholder="Add any notes for the client, such as:
+• What's included in the service
+• Any special requirements
+• Estimated timeline
+• Additional costs if any"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeGiveQuoteModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitQuote(${bookingId})">Submit Quote</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add modal to body
+  const modalContainer = document.createElement("div");
+  modalContainer.innerHTML = modalHTML;
+  document.body.appendChild(modalContainer);
+
+  // Add active class with delay for animation
+  setTimeout(() => {
+    const modal = document.getElementById("giveQuoteModal");
+    if (modal) {
+      modal.classList.add("active");
+    }
+  }, 10);
+
+  // Focus on the price input
+  setTimeout(() => {
+    const priceInput = document.getElementById("quotePrice");
+    if (priceInput) {
+      priceInput.focus();
+      // Auto-select the text
+      priceInput.select();
+    }
+  }, 50);
+}
+
+/**
+ * Show modal for completing a service
+ */
+function showCompleteServiceModal(bookingId, tabType) {
+  // Ensure styles are loaded
+  ensureModalStyles();
+
+  // Close any existing modal first
+  closeModal();
+  closeGiveQuoteModal();
+  closeCompleteServiceModal();
+
+  // Create modal HTML
+  const modalHTML = `
+    <div class="modal-overlay" id="completeServiceModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Complete Service</h3>
+          <button class="modal-close" onclick="closeCompleteServiceModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="completeServiceForm" onsubmit="event.preventDefault(); submitCompleteService(${bookingId}, '${tabType}')">
+            <div class="form-group">
+              <label for="finalPrice" class="form-label">
+                Final Price (₹)
+                <small class="text-muted" style="font-weight: normal;">Leave blank to use quoted price</small>
+              </label>
+              <input 
+                type="number" 
+                step="0.01" 
+                min="0" 
+                class="form-control" 
+                id="finalPrice" 
+                placeholder="Enter final price (optional)"
+                style="font-size: 1.1rem;"
+              >
+            </div>
+            <div class="form-group">
+              <label for="priceDistributionNote" class="form-label">
+                Price Distribution Notes (Optional)
+                <small class="text-muted" style="font-weight: normal;">e.g., money distribution, additional work details, etc.</small>
+              </label>
+              <textarea 
+                class="form-control" 
+                id="priceDistributionNote" 
+                rows="4" 
+                placeholder="Example:
+• 80% to provider, 20% to platform
+• Additional materials cost: ₹500
+• Service completed as discussed
+• Any special instructions followed"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeCompleteServiceModal()">Cancel</button>
+          <button class="btn btn-success" onclick="submitCompleteService(${bookingId}, '${tabType}')">
+            <i class="fas fa-check"></i> Mark as Completed
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add modal to body
+  const modalContainer = document.createElement("div");
+  modalContainer.innerHTML = modalHTML;
+  document.body.appendChild(modalContainer);
+
+  // Add active class with delay for animation
+  setTimeout(() => {
+    const modal = document.getElementById("completeServiceModal");
+    if (modal) {
+      modal.classList.add("active");
+    }
+  }, 10);
+
+  // Focus on the price input
+  setTimeout(() => {
+    const priceInput = document.getElementById("finalPrice");
+    if (priceInput) {
+      priceInput.focus();
+    }
+  }, 50);
+}
+
+/**
+ * Close booking details modal with animation
  */
 function closeModal() {
   const modal = document.getElementById("bookingModal");
   if (modal) {
-    modal.remove();
+    modal.classList.remove("active");
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
   }
+}
+
+/**
+ * Close the give quote modal with animation
+ */
+function closeGiveQuoteModal() {
+  const modal = document.getElementById("giveQuoteModal");
+  if (modal) {
+    modal.classList.remove("active");
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
+  }
+}
+
+/**
+ * Close the complete service modal with animation
+ */
+function closeCompleteServiceModal() {
+  const modal = document.getElementById("completeServiceModal");
+  if (modal) {
+    modal.classList.remove("active");
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
+  }
+}
+
+/**
+ * Submit the quote to the backend
+ */
+async function submitQuote(bookingId) {
+  const quotePrice = document.getElementById("quotePrice")?.value;
+  const providerNotes = document.getElementById("providerNotes")?.value;
+
+  if (!quotePrice || quotePrice.trim() === "" || parseFloat(quotePrice) <= 0) {
+    appUtils.showNotification("Please enter a valid quote price.", "error");
+    const priceInput = document.getElementById("quotePrice");
+    if (priceInput) {
+      priceInput.focus();
+      priceInput.select();
+    }
+    return;
+  }
+
+  try {
+    const updateData = {
+      quote_price: parseFloat(quotePrice),
+      provider_notes: providerNotes || "",
+    };
+
+    // Show loading
+    const submitBtn = document.querySelector("#giveQuoteModal .btn-primary");
+    if (submitBtn) {
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+      submitBtn.disabled = true;
+    }
+
+    const response = await api.apiRequest(
+      `bookings/${bookingId}/`,
+      "PUT",
+      updateData,
+    );
+
+    appUtils.showNotification("Quote given successfully!", "success");
+
+    // Refresh data
+    isDataLoaded = false;
+
+    // Close modal
+    closeGiveQuoteModal();
+
+    // Reload current tab
+    const activeTab = document.querySelector(".tab-content.active");
+    if (activeTab) {
+      const tabId = activeTab.id;
+      await loadTabData(tabId);
+    }
+  } catch (error) {
+    console.error("Error giving quote:", error);
+    appUtils.showNotification(
+      `Failed to give quote: ${error.message}`,
+      "error",
+    );
+
+    // Reset button
+    const submitBtn = document.querySelector("#giveQuoteModal .btn-primary");
+    if (submitBtn) {
+      submitBtn.innerHTML = "Submit Quote";
+      submitBtn.disabled = false;
+    }
+  }
+}
+
+/**
+ * Submit completed service to backend
+ */
+async function submitCompleteService(bookingId, tabType) {
+  const finalPriceInput = document.getElementById("finalPrice");
+  const priceDistributionNoteInput = document.getElementById(
+    "priceDistributionNote",
+  );
+
+  const finalPrice = finalPriceInput?.value;
+  const priceDistributionNote = priceDistributionNoteInput?.value || "";
+
+  // Prepare update data
+  const updateData = {
+    status: "COMPLETED",
+  };
+
+  // Add final price if provided
+  if (finalPrice && finalPrice.trim() !== "" && parseFloat(finalPrice) > 0) {
+    updateData.final_price = parseFloat(finalPrice);
+  }
+
+  // Add price distribution note if provided
+  if (priceDistributionNote.trim() !== "") {
+    updateData.price_distribution_note = priceDistributionNote;
+  }
+
+  try {
+    // Show loading
+    const submitBtn = document.querySelector(
+      "#completeServiceModal .btn-success",
+    );
+    if (submitBtn) {
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> Completing...';
+      submitBtn.disabled = true;
+    }
+
+    const response = await api.apiRequest(
+      `bookings/${bookingId}/`,
+      "PUT",
+      updateData,
+    );
+
+    appUtils.showNotification("Service marked as completed!", "success");
+
+    // Refresh data
+    isDataLoaded = false;
+
+    // Close modal
+    closeCompleteServiceModal();
+
+    // Reload current tab
+    const activeTab = document.querySelector(".tab-content.active");
+    if (activeTab) {
+      const tabId = activeTab.id;
+      await loadTabData(tabId);
+    }
+
+    // Also close booking details modal if it's open
+    closeModal();
+  } catch (error) {
+    console.error("Error completing service:", error);
+    appUtils.showNotification(
+      `Failed to complete service: ${error.message}`,
+      "error",
+    );
+
+    // Reset button
+    const submitBtn = document.querySelector(
+      "#completeServiceModal .btn-success",
+    );
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fas fa-check"></i> Mark as Completed';
+      submitBtn.disabled = false;
+    }
+  }
+}
+
+/**
+ * Give quote for a booking
+ */
+async function giveQuote(bookingId) {
+  showGiveQuoteModal(bookingId);
 }
 
 /**
@@ -963,12 +1526,25 @@ function contactUser(userId) {
  * Update booking status
  */
 async function updateBookingStatus(bookingId, status, tabType) {
+  // Handle COMPLETED status separately with modal
+  if (status === "COMPLETED" && tabType === "serviceProvided") {
+    showCompleteServiceModal(bookingId, tabType);
+    return;
+  }
+
   try {
     let confirmMsg = "";
 
     switch (status) {
       case "REJECTED":
-        confirmMsg = "Are you sure you want to reject this booking?";
+        // Check if it's the provider rejecting a booking or the client rejecting a quote
+        if (tabType === "serviceProvided") {
+          confirmMsg = "Are you sure you want to reject this booking?";
+        } else if (tabType === "serviceTaken") {
+          confirmMsg = "Are you sure you want to reject this quote?";
+        } else {
+          confirmMsg = `Are you sure you want to change status to ${status}?`;
+        }
         break;
       case "CANCELLED":
         confirmMsg = "Are you sure you want to cancel this booking?";
@@ -987,31 +1563,15 @@ async function updateBookingStatus(bookingId, status, tabType) {
 
     const updateData = { status: status };
 
-    // If provider is completing service, they can also update final price
-    if (status === "COMPLETED" && tabType === "serviceProvided") {
-      const finalPrice = prompt(
-        "Enter final price (leave blank to use quoted price):",
-        ""
-      );
-      if (finalPrice !== null) {
-        if (finalPrice.trim() !== "") {
-          updateData.final_price = parseFloat(finalPrice);
-        }
-        updateData.status = "COMPLETED";
-      } else {
-        return; // User cancelled
-      }
-    }
-
     const response = await api.apiRequest(
       `bookings/${bookingId}/`,
       "PUT",
-      updateData
+      updateData,
     );
 
     appUtils.showNotification(
       `Booking ${status.toLowerCase()} successfully!`,
-      "success"
+      "success",
     );
 
     // Refresh data
@@ -1030,96 +1590,16 @@ async function updateBookingStatus(bookingId, status, tabType) {
     console.error("Error updating booking status:", error);
     appUtils.showNotification(
       `Failed to update booking: ${error.message}`,
-      "error"
+      "error",
     );
   }
 }
 
 /**
- * Give quote for a booking
- */
-async function giveQuote(bookingId) {
-  try {
-    const quotePrice = prompt("Enter quote price:", "");
-    if (quotePrice === null) return; // User cancelled
-
-    const providerNotes = prompt("Enter provider notes (optional):", "");
-
-    const updateData = {
-      quote_price: parseFloat(quotePrice),
-      provider_notes: providerNotes || "",
-    };
-
-    const response = await api.apiRequest(
-      `bookings/${bookingId}/`,
-      "PUT",
-      updateData
-    );
-
-    appUtils.showNotification("Quote given successfully!", "success");
-
-    // Refresh data
-    isDataLoaded = false;
-
-    // Reload current tab
-    const activeTab = document.querySelector(".tab-content.active");
-    if (activeTab) {
-      const tabId = activeTab.id;
-      await loadTabData(tabId);
-    }
-
-    closeModal();
-  } catch (error) {
-    console.error("Error giving quote:", error);
-    appUtils.showNotification(
-      `Failed to give quote: ${error.message}`,
-      "error"
-    );
-  }
-}
-
-/**
- * Complete service (provider action)
+ * Complete service (provider action) - Now uses modal
  */
 async function completeService(bookingId, tabType) {
-  try {
-    const finalPrice = prompt(
-      "Enter final price (leave blank to use quoted price):",
-      ""
-    );
-    if (finalPrice === null) return; // User cancelled
-
-    const updateData = { status: "COMPLETED" };
-    if (finalPrice.trim() !== "") {
-      updateData.final_price = parseFloat(finalPrice);
-    }
-
-    const response = await api.apiRequest(
-      `bookings/${bookingId}/`,
-      "PUT",
-      updateData
-    );
-
-    appUtils.showNotification("Service marked as completed!", "success");
-
-    // Refresh data
-    isDataLoaded = false;
-
-    // Reload current tab
-    const activeTab = document.querySelector(".tab-content.active");
-    if (activeTab) {
-      const tabId = activeTab.id;
-      await loadTabData(tabId);
-    }
-
-    closeModal();
-  } catch (error) {
-    console.error("Error completing service:", error);
-    appUtils.showNotification(
-      `Failed to complete service: ${error.message}`,
-      "error"
-    );
-  }
+  showCompleteServiceModal(bookingId, tabType);
 }
 
 /**
@@ -1139,7 +1619,48 @@ async function becomeProvider() {
   } catch (error) {
     appUtils.showNotification(
       `Failed to become provider: ${error.message}`,
-      "error"
+      "error",
     );
   }
 }
+
+/**
+ * Close modals with Escape key
+ */
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    closeModal();
+    closeGiveQuoteModal();
+    closeCompleteServiceModal();
+  }
+});
+
+/**
+ * Close any open modal when clicking outside
+ */
+document.addEventListener("click", function (event) {
+  const bookingModal = document.getElementById("bookingModal");
+  const giveQuoteModal = document.getElementById("giveQuoteModal");
+  const completeServiceModal = document.getElementById("completeServiceModal");
+
+  if (bookingModal && bookingModal.classList.contains("active")) {
+    if (event.target === bookingModal) {
+      closeModal();
+    }
+  }
+
+  if (giveQuoteModal && giveQuoteModal.classList.contains("active")) {
+    if (event.target === giveQuoteModal) {
+      closeGiveQuoteModal();
+    }
+  }
+
+  if (
+    completeServiceModal &&
+    completeServiceModal.classList.contains("active")
+  ) {
+    if (event.target === completeServiceModal) {
+      closeCompleteServiceModal();
+    }
+  }
+});

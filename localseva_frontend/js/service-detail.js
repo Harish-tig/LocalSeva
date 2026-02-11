@@ -123,9 +123,9 @@ function renderServiceDetails(provider) {
   // Format price
   let priceDisplay = "Contact for price";
   if (provider.pricing_type === "HOURLY" && provider.hourly_rate) {
-    priceDisplay = `$${parseFloat(provider.hourly_rate).toFixed(2)}/hour`;
+    priceDisplay = `₹${parseFloat(provider.hourly_rate).toFixed(2)}/hour`;
   } else if (provider.base_price) {
-    priceDisplay = `$${parseFloat(provider.base_price).toFixed(2)}`;
+    priceDisplay = `₹${parseFloat(provider.base_price).toFixed(2)}`;
   }
   console.log("💰 Price display:", priceDisplay);
 
@@ -178,9 +178,7 @@ function renderServiceDetails(provider) {
           </div>
           <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
             <i class="fas fa-star" style="color: #fbbf24;"></i>
-            <span>${provider.rating ? provider.rating.toFixed(1) : "0.0"} (${
-    provider.total_reviews || 0
-  } reviews)</span>
+            <span>${provider.rating ? provider.rating.toFixed(1) : "0.0"} (${provider.total_reviews || 0} reviews)</span>
           </div>
           <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
             <i class="fas fa-briefcase" style="color: var(--primary);"></i>
@@ -190,15 +188,11 @@ function renderServiceDetails(provider) {
             <i class="fas fa-money-bill-wave" style="color: #10b981;"></i>
             <span>${priceDisplay}</span>
           </div>
-        </div>
-        
-        <div class="service-description" style="margin-bottom: 2rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-          <h3 style="margin-top: 0; margin-bottom: 1rem; color: #374151;">About ${
-            provider.username || "Provider"
-          }</h3>
-          <p style="margin: 0; color: #6b7280; line-height: 1.6;">${
-            provider.bio || provider.description || "No description available."
-          }</p>
+          
+          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-check-circle" style="color: #10b981;"></i>
+            <span>${provider.completed_bookings_count || 0} completed jobs</span>
+          </div>
         </div>
         
         <div class="service-description" style="margin-bottom: 2rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -236,17 +230,17 @@ function renderServiceDetails(provider) {
       if (provider.phone) {
         appUtils.showNotification(
           `Contact provider at: ${provider.phone}`,
-          "info"
+          "info",
         );
       } else if (provider.email) {
         appUtils.showNotification(
           `Contact provider at: ${provider.email}`,
-          "info"
+          "info",
         );
       } else {
         appUtils.showNotification(
           "No contact information available",
-          "warning"
+          "warning",
         );
       }
     });
@@ -312,15 +306,15 @@ window.testServiceDetail = {
     console.log("🔍 Checking DOM elements:");
     console.log(
       "- Service detail container:",
-      document.getElementById("serviceDetail")
+      document.getElementById("serviceDetail"),
     );
     console.log(
       "- Request button:",
-      document.getElementById("requestServiceBtn")
+      document.getElementById("requestServiceBtn"),
     );
     console.log(
       "- Contact button:",
-      document.getElementById("contactProviderBtn")
+      document.getElementById("contactProviderBtn"),
     );
     console.log("- Current provider:", window.currentProvider);
     console.log("- ServiceRequestManager:", typeof ServiceRequestManager);

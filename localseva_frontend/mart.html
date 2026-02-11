@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
@@ -9,83 +9,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-    <style>
-      .category-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 1.5rem;
-        margin: 2rem 0;
-      }
-
-      .category-card {
-        background: var(--card-bg);
-        border-radius: var(--border-radius);
-        padding: 1.5rem 1rem;
-        text-align: center;
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: 1px solid var(--border-color);
-      }
-
-      .category-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow);
-        border-color: var(--primary-color);
-      }
-
-      .category-card i {
-        font-size: 2rem;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-      }
-
-      .category-card h3 {
-        margin: 0.5rem 0;
-        font-size: 1rem;
-      }
-
-      .category-card p {
-        color: var(--text-muted);
-        font-size: 0.875rem;
-        margin: 0;
-      }
-
-      .featured-section,
-      .recent-section {
-        margin-top: 3rem;
-      }
-
-      .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-      }
-
-      .category-intro {
-        color: var(--text-muted);
-        margin-bottom: 1rem;
-      }
-
-      @media (max-width: 768px) {
-        .category-cards {
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1rem;
-        }
-
-        .cards-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .category-card {
-          padding: 1rem 0.5rem;
-        }
-
-        .category-card i {
-          font-size: 1.5rem;
-        }
-      }
-    </style>
   </head>
   <body>
     <!-- Mobile Menu Button -->
@@ -96,7 +19,7 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <h2><i class="fas fa-handshake"></i> LocalSeva</h2>
+        <h2>LocalSeva</h2>
         <p>Welcome, <span id="userName">User</span></p>
       </div>
 
@@ -111,19 +34,14 @@
           <h3>My Activity</h3>
           <ul>
             <li>
-              <a href="my-activity.html#serviceTaken"
-                ><i class="fas fa-hand-holding-heart"></i> Service Taken</a
-              >
-            </li>
-            <li>
-              <a href="my-activity.html#serviceProvided" class="provider-only"
-                ><i class="fas fa-hand-holding"></i> Service Provided</a
+              <a href="my-activity.html"
+                ><i class="fas fa-hand-holding-heart"></i> My Activity</a
               >
             </li>
           </ul>
         </div>
 
-        <div class="sidebar-section">
+        <!-- <div class="sidebar-section">
           <h3>My Services</h3>
           <ul>
             <li>
@@ -135,7 +53,7 @@
               >
             </li>
           </ul>
-        </div>
+        </div> -->
 
         <div class="sidebar-section">
           <h3>Marketplace</h3>
