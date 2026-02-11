@@ -7,10 +7,12 @@ from .views import (
     ReportCreateView, UserReportsListView,
     ProductListView, ProductCreateView, ProductDetailView,
     ProductCommentCreateView, ProductCommentListView, ProductCommentDeleteView,
-    UserProductsListView, UserProductCommentsListView
+    UserProductsListView, UserProductCommentsListView, home
 )
 
 urlpatterns = [
+    #landing
+    path("", home, name="home"),
     # Authentication
     path('register/', RegisterView.as_view(), name="register"),
     path('login/', LoginView.as_view(), name="login"),

@@ -20,6 +20,10 @@ from .models import Profile, Booking, Review, Report, Product, ProductComment
 
 User = get_user_model()
 
+from django.shortcuts import render
+
+def home(request):
+    return render(request, "home.html")
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
