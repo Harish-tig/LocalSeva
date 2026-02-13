@@ -26,7 +26,7 @@ class Profile(models.Model):
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name="profile")
 
     # Basic info for all users
-    avatar = models.ImageField(upload_to="static/profiles/", blank=True, null=True)
+    avatar = models.ImageField(upload_to="profiles/", blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="USER")
     bio = models.TextField(max_length=500, blank=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
@@ -147,7 +147,7 @@ class Report(models.Model):
                                 help_text="Related booking if applicable")
     report_type = models.CharField(max_length=50, choices=REPORT_TYPE_CHOICES)
     description = models.TextField()
-    evidence_image = models.ImageField(upload_to="static/reports/", blank=True, null=True)
+    evidence_image = models.ImageField(upload_to="reports/", blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     admin_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -190,9 +190,9 @@ class Product(models.Model):
     city = models.CharField(max_length=100)
 
     # Images
-    main_image = models.ImageField(upload_to="static/products/", blank=True, null=True)
-    image_2 = models.ImageField(upload_to="static/products/", blank=True, null=True)
-    image_3 = models.ImageField(upload_to="static/products/", blank=True, null=True)
+    main_image = models.ImageField(upload_to="products/", blank=True, null=True)
+    image_2 = models.ImageField(upload_to="products/", blank=True, null=True)
+    image_3 = models.ImageField(upload_to="products/", blank=True, null=True)
 
     # Contact preferences
     contact_phone = models.CharField(max_length=15, blank=True)
