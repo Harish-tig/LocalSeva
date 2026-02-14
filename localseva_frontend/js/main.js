@@ -549,10 +549,21 @@ function debounce(func, wait) {
  */
 function checkAuth() {
   const token = localStorage.getItem("accessToken");
+  const currentPage = window.location.pathname.split('/').pop() || 'home.html'; // default to home if empty
+  const publicPages = ['index.html', 'signup.html', 'home.html'];
+
+  // If on a public page, allow access regardless of token
+  if (publicPages.includes(currentPage)) {
+    return true;
+  }
+
+  // If not on a public page and no token, redirect to home
   if (!token) {
-    window.location.href = "index.html";
+    window.location.href = "home.html";
     return false;
   }
+
+  // Token exists, allow access
   return true;
 }
 
