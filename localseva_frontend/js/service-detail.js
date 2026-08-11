@@ -1,325 +1,282 @@
 /**
- * Service Detail page functionality
+ * Service Detail Page - LocalSeva
+ * Handles provider profile loading, booking, and reviews
  */
 
-document.addEventListener("DOMContentLoaded", async function () {
-  console.log("🏁 Service Detail page loading...");
+let currentProviderId = null;
+let currentProvider = null;
 
-  // Check authentication
-  if (!api.isAuthenticated()) {
-    console.log("❌ User not authenticated, redirecting to login");
+document.addEventListener("DOMContentLoaded", function () {
+  // Check auth
+  if (typeof api !== 'undefined' && !api.isAuthenticated()) {
     window.location.href = "index.html";
     return;
   }
 
-  // Get service ID from URL
+  // Get provider ID from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const serviceId = urlParams.get("id");
+  currentProviderId = urlParams.get("id");
 
-  if (!serviceId) {
-    console.log("❌ No service ID found in URL, redirecting to services");
+  if (!currentProviderId) {
+    showToast("Invalid provider ID", "error");
     window.location.href = "services.html";
     return;
   }
 
-  console.log("🔍 Loading service details for ID:", serviceId);
+  // Setup modal close buttons
+  document.querySelectorAll('.modal-close-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('.modal-overlay').classList.remove('active');
+    });
+  });
 
-  // Load service details
-  await loadServiceDetails(serviceId);
-});
-
-/**
- * Load service details from API
- */
-async function loadServiceDetails(serviceId) {
-  const container = document.getElementById("serviceDetail");
-  if (!container) {
-    console.error("❌ Service detail container not found");
-    return;
+  // Setup min date for booking
+  const dateInput = document.getElementById("scheduled_date");
+  if (dateInput) {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    dateInput.min = now.toISOString().slice(0, 16);
   }
 
-  // Show loading state
-  container.innerHTML = `
-    <div class="loading-skeleton" style="height: 400px; border-radius: var(--border-radius);"></div>
-  `;
+  // Bind forms
+  const bookingForm = document.getElementById("bookingForm");
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", handleBookingSubmit);
+  }
 
+  const reviewForm = document.getElementById("reviewForm");
+  if (reviewForm) {
+    reviewForm.addEventListener("submit", handleReviewSubmit);
+  }
+
+  // Load Data
+  loadProviderDetails();
+});
+
+async function loadProviderDetails() {
   try {
-    console.log("📡 Fetching providers from API...");
+    const provider = await api.getProviderById(currentProviderId);
+    currentProvider = provider;
+    
+    // Update UI
+    document.getElementById("loadingState").style.display = "none";
+    document.getElementById("providerContent").style.display = "block";
+    
+    document.getElementById("providerName").textContent = provider.username;
+    document.getElementById("providerStatus").textContent = provider.is_available ? "Available" : "Busy";
+    document.getElementById("providerStatus").className = provider.is_available ? "badge badge-success" : "badge badge-warning";
+    
+    document.getElementById("providerRating").textContent = `${parseFloat(provider.rating || 0).toFixed(1)} (${provider.total_reviews || 0} reviews)`;
+    document.getElementById("providerExperience").textContent = `${provider.experience_years || 0} years exp.`;
+    document.getElementById("providerCompleted").textContent = `${provider.completed_bookings_count || 0} jobs done`;
+    document.getElementById("providerLocation").textContent = provider.location || "Location not specified";
+    
+    document.getElementById("providerBio").textContent = provider.bio || "No description provided.";
+    
+    // Pricing
+    let priceDisplay = "Contact for price";
+    if (provider.pricing_type === "HOURLY" && provider.base_price) {
+      priceDisplay = `${formatCurrency(provider.base_price)}/hr`;
+    } else if (provider.base_price) {
+      priceDisplay = formatCurrency(provider.base_price);
+    }
+    document.getElementById("providerPrice").textContent = priceDisplay;
+    document.getElementById("providerPricingType").textContent = provider.pricing_type || "N/A";
+    
+    // Categories and Areas
+    const categories = Array.isArray(provider.categories) ? provider.categories.join(", ") : "General";
+    document.getElementById("providerCategories").textContent = categories;
+    
+    const areas = Array.isArray(provider.service_locations) ? provider.service_locations.join(", ") : "All Areas";
+    document.getElementById("providerServiceAreas").textContent = areas;
 
-    // Get all providers and find the one with matching ID
-    const providers = await api.getProviders();
-    console.log("✅ Providers fetched:", providers);
-
-    const provider = providers.find((p) => p.id == serviceId);
-    console.log("🔍 Found provider:", provider);
-
-    if (!provider) {
-      throw new Error("Service not found");
+    // Populate Booking Modal Category Select
+    const categorySelect = document.getElementById("service_category");
+    if (categorySelect && Array.isArray(provider.categories)) {
+      categorySelect.innerHTML = '<option value="">Select a category</option>';
+      provider.categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+      });
     }
 
-    // Store provider globally for use in request service AND review system
-    window.currentProvider = provider;
-    console.log("💾 Provider stored globally:", window.currentProvider);
-
-    // Render service details
-    renderServiceDetails(provider);
-
-    // Initialize service request functionality
-    if (typeof ServiceRequestManager !== "undefined") {
-      ServiceRequestManager.init(provider);
-    } else {
-      console.error("❌ ServiceRequestManager not loaded!");
+    // Bind Action Buttons
+    const bookBtn = document.getElementById("bookServiceBtn");
+    if (bookBtn) {
+      bookBtn.addEventListener("click", () => {
+        if (!provider.is_available) {
+          showToast("This provider is currently not available.", "warning");
+          return;
+        }
+        openModal("bookingModal");
+      });
     }
 
-    // Initialize review system
-    if (typeof ReviewManager !== "undefined") {
-      ReviewManager.init(provider);
-    } else {
-      console.error("❌ ReviewManager not loaded!");
+    const contactBtn = document.getElementById("contactProviderBtn");
+    if (contactBtn) {
+      contactBtn.addEventListener("click", () => {
+        showToast("Contact feature coming soon!", "info");
+      });
     }
+
+    // Load Reviews
+    loadProviderReviews();
+    
+    // Load User Bookings for Reviews
+    loadUserBookingsForReview();
+
   } catch (error) {
-    console.error("❌ Error loading service details:", error);
-    container.innerHTML = `
+    console.error("Error loading provider:", error);
+    showToast("Error loading provider details: " + error.message, "error");
+    document.getElementById("loadingState").innerHTML = `
       <div class="empty-state">
-        <i class="fas fa-exclamation-circle"></i>
-        <h3>Error loading service details</h3>
-        <p>${error.message || "Please try again later."}</p>
-        <a href="services.html" class="btn btn-outline">Back to Services</a>
+        <i class="fas fa-exclamation-circle text-danger"></i>
+        <h3>Provider Not Found</h3>
+        <p>The service provider you are looking for does not exist or an error occurred.</p>
+        <a href="services.html" class="btn btn-primary mt-4">Back to Services</a>
       </div>
     `;
   }
 }
 
-/**
- * Render service details
- */
-function renderServiceDetails(provider) {
-  console.log("🎨 Rendering service details for:", provider.username);
-
-  const container = document.getElementById("serviceDetail");
-  if (!container) {
-    console.error("❌ Container not found");
-    return;
+async function handleBookingSubmit(e) {
+  e.preventDefault();
+  
+  const submitBtn = document.getElementById("submitBookingBtn");
+  const originalText = submitBtn.textContent;
+  
+  try {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
+    
+    const bookingData = {
+      provider_id: currentProviderId,
+      service_category: document.getElementById("service_category").value,
+      scheduled_date: new Date(document.getElementById("scheduled_date").value).toISOString(),
+      address: document.getElementById("address").value,
+      description: document.getElementById("description").value
+    };
+    
+    await api.createBooking(bookingData);
+    
+    showToast("Service booked successfully! Check your dashboard for updates.", "success");
+    closeModal("bookingModal");
+    document.getElementById("bookingForm").reset();
+    
+    // Redirect to dashboard after a delay
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 2000);
+    
+  } catch (error) {
+    console.error("Booking error:", error);
+    showToast(error.message || "Failed to book service.", "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
+}
 
-  // Format categories - handle different data types
-  let categories = [];
-  let categoriesText = "General";
-
-  if (provider.categories) {
-    console.log("📋 Original categories:", provider.categories);
-
-    if (typeof provider.categories === "string") {
-      categories = provider.categories.split(",").map((cat) => cat.trim());
-    } else if (Array.isArray(provider.categories)) {
-      categories = provider.categories;
-    } else {
-      categories = [String(provider.categories)];
+async function loadProviderReviews() {
+  const reviewsContainer = document.getElementById("reviewsList");
+  const reviewCountHeader = document.getElementById("reviewCountHeader");
+  
+  try {
+    const reviews = await api.getProviderReviews(currentProviderId);
+    
+    reviewCountHeader.textContent = reviews.length;
+    
+    if (reviews.length === 0) {
+      reviewsContainer.innerHTML = '<div class="text-muted text-center py-4">No reviews yet. Be the first to review!</div>';
+      return;
     }
-    categoriesText = categories.join(", ");
-    console.log("📝 Processed categories:", categories);
-  }
-
-  // Format price
-  let priceDisplay = "Contact for price";
-  if (provider.pricing_type === "HOURLY" && provider.hourly_rate) {
-    priceDisplay = `₹${parseFloat(provider.hourly_rate).toFixed(2)}/hour`;
-  } else if (provider.base_price) {
-    priceDisplay = `₹${parseFloat(provider.base_price).toFixed(2)}`;
-  }
-  console.log("💰 Price display:", priceDisplay);
-
-  // Format availability
-  const availabilityText = provider.is_available
-    ? "Available"
-    : "Currently Busy";
-  const availabilityClass = provider.is_available
-    ? "badge-success"
-    : "badge-warning";
-  const availabilityIcon = provider.is_available
-    ? "fa-check-circle"
-    : "fa-clock";
-
-  console.log("📅 Availability:", availabilityText);
-
-  // Get avatar or use category-based image
-  let avatarUrl = provider.avatar;
-  if (!avatarUrl) {
-    // If no avatar from API, use a default based on category
-    avatarUrl = getDefaultImageUrl(categories[0] || "General");
-  }
-  console.log("🖼️ Avatar URL:", avatarUrl);
-
-  container.innerHTML = `
-    <div class="detail-header">
-      <div class="detail-images">
-        <img src="${avatarUrl}" 
-             alt="${provider.username}"
-             onerror="this.src='https://via.placeholder.com/300x200?text=Service'"
-             style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px;">
-      </div>
-      <div class="detail-info">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-          <h1>${provider.username || provider.name || "Provider"}</h1>
-          <span class="badge ${availabilityClass}" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-            <i class="fas ${availabilityIcon}"></i>
-            ${availabilityText}
-          </span>
+    
+    reviewsContainer.innerHTML = '';
+    reviews.forEach(review => {
+      const stars = Array(5).fill(0).map((_, i) => 
+        `<i class="fas fa-star ${i < review.rating ? 'text-warning' : 'text-gray-300'}"></i>`
+      ).join('');
+      
+      reviewsContainer.innerHTML += `
+        <div class="review-item">
+          <div class="review-header">
+            <span class="review-author">${review.user_name}</span>
+            <span class="review-date">${formatDate(review.created_at)}</span>
+          </div>
+          <div class="review-rating mb-2">
+            ${stars}
+          </div>
+          <p class="text-sm text-secondary m-0">${review.comment}</p>
         </div>
-        
-        <div class="detail-meta" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-tag" style="color: var(--primary);"></i>
-            <span>${categoriesText}</span>
-          </div>
-          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
-            <span>${provider.location || "Location not specified"}</span>
-          </div>
-          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-star" style="color: #fbbf24;"></i>
-            <span>${provider.rating ? provider.rating.toFixed(1) : "0.0"} (${provider.total_reviews || 0} reviews)</span>
-          </div>
-          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-briefcase" style="color: var(--primary);"></i>
-            <span>${provider.experience_years || 0} years experience</span>
-          </div>
-          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-money-bill-wave" style="color: #10b981;"></i>
-            <span>${priceDisplay}</span>
-          </div>
-          
-          <div class="detail-meta-item" style="display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-check-circle" style="color: #10b981;"></i>
-            <span>${provider.completed_bookings_count || 0} completed jobs</span>
-          </div>
-        </div>
-        
-        <div class="service-description" style="margin-bottom: 2rem; padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-          <h3 style="margin-top: 0; margin-bottom: 1rem; color: #374151;">Service Details</h3>
-          <div style="display: grid; gap: 0.5rem;">
-            <p style="margin: 0; color: #6b7280;"><strong>Service Areas:</strong> ${
-              provider.service_locations || provider.location || "Not specified"
-            }</p>
-            <p style="margin: 0; color: #6b7280;"><strong>Availability:</strong> ${
-              provider.availability || "Flexible"
-            }</p>
-            <p style="margin: 0; color: #6b7280;"><strong>Pricing:</strong> ${priceDisplay}</p>
-          </div>
-        </div>
-        
-        <div class="detail-actions" style="display: flex; gap: 1rem; margin-top: 2rem;">
-          <button class="btn btn-primary" id="requestServiceBtn" style="flex: 1; padding: 1rem; font-size: 1rem;">
-            <i class="fas fa-calendar-check"></i> Request Service
-          </button>
-          <button class="btn btn-outline" id="contactProviderBtn" style="flex: 1; padding: 1rem; font-size: 1rem;">
-            <i class="fas fa-envelope"></i> Contact Provider
-          </button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  console.log("✅ Service details rendered successfully");
-
-  // Add event listeners for action buttons
-  document
-    .getElementById("contactProviderBtn")
-    ?.addEventListener("click", () => {
-      console.log("📞 Contact button clicked");
-      if (provider.phone) {
-        appUtils.showNotification(
-          `Contact provider at: ${provider.phone}`,
-          "info",
-        );
-      } else if (provider.email) {
-        appUtils.showNotification(
-          `Contact provider at: ${provider.email}`,
-          "info",
-        );
-      } else {
-        appUtils.showNotification(
-          "No contact information available",
-          "warning",
-        );
-      }
+      `;
     });
+    
+  } catch (error) {
+    console.error("Error loading reviews:", error);
+    reviewsContainer.innerHTML = '<div class="text-danger text-center py-4">Failed to load reviews.</div>';
+  }
 }
 
-/**
- * Get default image URL based on category
- * This is a helper function that's only used if the API doesn't provide an avatar
- */
-function getDefaultImageUrl(categories) {
-  if (!categories) {
-    console.log("📸 No category provided, using default image");
-    return "https://via.placeholder.com/300x200?text=Service";
-  }
-
-  console.log("📸 Getting image for category:", categories);
-
-  const category = categories.toLowerCase();
-  if (category.includes("cleaning")) {
-    return "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=300&fit=crop";
-  } else if (category.includes("plumbing")) {
-    return "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&h=300&fit=crop";
-  } else if (category.includes("repair")) {
-    return "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=300&fit=crop";
-  } else if (category.includes("carpenter") || category.includes("wood")) {
-    return "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=400&h=300&fit=crop";
-  } else if (
-    category.includes("electrical") ||
-    category.includes("electrician")
-  ) {
-    return "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop";
-  } else if (category.includes("ceramic") || category.includes("tile")) {
-    return "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400&h=300&fit=crop";
-  } else if (category.includes("fitness")) {
-    return "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop";
-  } else if (category.includes("delivery") || category.includes("moving")) {
-    return "https://images.unsplash.com/photo-1556742111-a301b5f64d6d?w=400&h=300&fit=crop";
-  } else if (category.includes("education") || category.includes("tutor")) {
-    return "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop";
-  }
-
-  console.log("📸 Using generic service image");
-  return "https://via.placeholder.com/300x200?text=Service";
-}
-
-// Add console test functions
-window.testServiceDetail = {
-  getProviderInfo: function () {
-    return window.currentProvider;
-  },
-
-  testRequestService: function () {
-    const requestBtn = document.getElementById("requestServiceBtn");
-    if (requestBtn) {
-      console.log("🔘 Clicking request service button...");
-      requestBtn.click();
-    } else {
-      console.error("❌ Request button not found");
+async function loadUserBookingsForReview() {
+  try {
+    // Requires an endpoint that fetches completed bookings for this specific user + provider
+    // In current api.js, we have getUserBookingsForProvider
+    const bookings = await api.getUserBookingsForProvider(currentProviderId);
+    
+    const writeReviewBtn = document.getElementById("writeReviewBtn");
+    const bookingSelect = document.getElementById("review_booking");
+    
+    if (bookings && bookings.length > 0) {
+      writeReviewBtn.style.display = "inline-flex";
+      writeReviewBtn.addEventListener("click", () => openModal("reviewModal"));
+      
+      bookingSelect.innerHTML = '<option value="">Select a completed booking</option>';
+      bookings.forEach(booking => {
+        bookingSelect.innerHTML += `
+          <option value="${booking.id}">
+            ${booking.service_category} - ${formatDate(booking.completed_at)}
+          </option>
+        `;
+      });
     }
-  },
+  } catch (error) {
+    console.log("Could not load user bookings for review or no completed bookings found.");
+  }
+}
 
-  checkElements: function () {
-    console.log("🔍 Checking DOM elements:");
-    console.log(
-      "- Service detail container:",
-      document.getElementById("serviceDetail"),
-    );
-    console.log(
-      "- Request button:",
-      document.getElementById("requestServiceBtn"),
-    );
-    console.log(
-      "- Contact button:",
-      document.getElementById("contactProviderBtn"),
-    );
-    console.log("- Current provider:", window.currentProvider);
-    console.log("- ServiceRequestManager:", typeof ServiceRequestManager);
-    console.log("- ReviewManager:", typeof ReviewManager);
-  },
-};
-
-console.log("✅ service-detail.js loaded successfully");
+async function handleReviewSubmit(e) {
+  e.preventDefault();
+  
+  const submitBtn = document.getElementById("submitReviewBtn");
+  const originalText = submitBtn.textContent;
+  
+  try {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    
+    const reviewData = {
+      booking: document.getElementById("review_booking").value,
+      provider: currentProviderId,
+      rating: parseInt(document.getElementById("review_rating").value),
+      comment: document.getElementById("review_comment").value
+    };
+    
+    await api.createReview(reviewData);
+    
+    showToast("Review submitted successfully!", "success");
+    closeModal("reviewModal");
+    document.getElementById("reviewForm").reset();
+    
+    // Reload reviews
+    loadProviderReviews();
+    
+  } catch (error) {
+    console.error("Review error:", error);
+    showToast(error.message || "Failed to submit review.", "error");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+}

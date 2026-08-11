@@ -15,6 +15,8 @@ Authorization: Bearer <your_access_token>
 1. [Authentication](#1-authentication)
    - [Register User](#11-register-user)
    - [Login](#12-login)
+   - [Forgot Password](#13-forgot-password)
+   - [Reset Password](#14-reset-password)
    
 2. [Profile Management](#2-profile-management)
    - [Get/Update Profile](#21-getupdate-profile)
@@ -69,6 +71,9 @@ Authorization: Bearer <your_access_token>
 - `password` (string, min 8 chars)
 - `password2` (string, must match password)
 
+**Rate Limiting:**
+- Maximum 3 requests per minute per user/IP.
+
 **Success Response (201 Created):**
 ```json
 {
@@ -106,6 +111,9 @@ Authorization: Bearer <your_access_token>
 - `username` (string)
 - `password` (string)
 
+**Rate Limiting:**
+- Maximum 3 requests per minute per user/IP.
+
 **Success Response (200 OK):**
 ```json
 {
@@ -122,6 +130,76 @@ Authorization: Bearer <your_access_token>
 ```json
 {
   "error": "Invalid credentials"
+}
+```
+
+---
+
+### 1.3 Forgot Password
+**POST** `/forgotpassword/`
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com"
+}
+```
+
+**Required Fields:**
+- `email` (string)
+
+**Rate Limiting:**
+- Maximum 3 requests per minute per user/IP.
+
+**Success Response (200 OK):**
+```json
+{
+  "message": "otp sent successfully"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "error": "User with this email does not exist."
+}
+```
+
+---
+
+### 1.4 Reset Password
+**POST** `/reset/`
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "otp": "123456",
+  "new_password": "NewSecurePassword123",
+  "confirm_new_password": "NewSecurePassword123"
+}
+```
+
+**Required Fields:**
+- `email` (string)
+- `otp` (string, 6 digits)
+- `new_password` (string, min 8 chars)
+- `confirm_new_password` (string, must match new_password)
+
+**Rate Limiting:**
+- Maximum 3 requests per minute per user/IP.
+
+**Success Response (200 OK):**
+```json
+{
+  "message": "Password reset successful"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "error": "Invalid or expired OTP."
 }
 ```
 
@@ -240,6 +318,9 @@ Authorization: Bearer <your_access_token>
 - `search` (string, optional) - Search in username, bio, location, description
 - `ordering` (string, optional) - Order by: rating, experience_years, base_price (prepend - for descending)
 
+**Caching:**
+- Responses are cached for 5 minutes in Redis (falls back to database on cache miss). Cache is unique per query string.
+
 **Success Response (200 OK):**
 ```json
 [
@@ -329,14 +410,12 @@ Authorization: Bearer <your_access_token>
   "description": "Leaking pipe in kitchen sink",
   "address": "123 Main St, New York, NY",
   "scheduled_date": "2023-10-15T10:00:00Z",
-  "quote_price": null,
   "final_price": null,
   "status": "PENDING",
   "provider_notes": "",
   "user_notes": "",
   "created_at": "2023-10-10T09:00:00Z",
   "updated_at": "2023-10-10T09:00:00Z",
-  "quoted_at": null,
   "accepted_at": null,
   "started_at": null,
   "completed_at": null
@@ -367,14 +446,13 @@ Authorization: Bearer <your_access_token>
     "description": "Leaking pipe in kitchen sink",
     "address": "123 Main St, New York, NY",
     "scheduled_date": "2023-10-15T10:00:00Z",
-    "quote_price": "500.00",
+    "scheduled_date": "2023-10-15T10:00:00Z",
     "final_price": null,
-    "status": "QUOTE_GIVEN",
-    "provider_notes": "Will bring replacement parts",
+    "status": "PENDING",
+    "provider_notes": "",
     "user_notes": "Please call before coming",
     "created_at": "2023-10-10T09:00:00Z",
     "updated_at": "2023-10-11T14:30:00Z",
-    "quoted_at": "2023-10-11T14:30:00Z",
     "accepted_at": null,
     "started_at": null,
     "completed_at": null
@@ -393,25 +471,24 @@ Authorization: Bearer <your_access_token>
 #### PUT - Update Booking
 
 **Who can update what:**
-- **Service Provider can:** Give quote, update status, add provider notes
-- **Customer can:** Accept quote, update user notes
+- **Service Provider can:** Accept booking (ACCEPTED status), update status (IN_PROGRESS, COMPLETED, REJECTED), add provider notes, set final_price
+- **Customer can:** Update user notes, cancel booking (via cancel endpoint)
 
-**Service Provider giving quote:**
+**Customer / Provider adding notes:**
 ```json
 {
-  "quote_price": "500.00",
-  "provider_notes": "Will bring replacement parts"
+  "user_notes": "Please come to the back door",
+  "provider_notes": "I will arrive around 10:15 AM"
 }
 ```
-*Changes status to "QUOTE_GIVEN"*
 
-**Customer accepting quote:**
+**Service Provider accepting booking:**
 ```json
 {
   "status": "ACCEPTED"
 }
 ```
-*Only works if status is "QUOTE_GIVEN"*
+*Only works if status is "PENDING"*
 
 **Service Provider starting service:**
 ```json
@@ -427,15 +504,13 @@ Authorization: Bearer <your_access_token>
   "status": "COMPLETED"
 }
 ```
-### NOTE: -> WHEN PROVIDER SETTING STATAUS FROM IN PROGRESS TO COMPLETED. HE CAN UPDATE FINAL PRICE
+### NOTE: -> WHEN PROVIDER SETTING STATUS FROM IN PROGRESS TO COMPLETED, HE CAN UPDATE FINAL PRICE
 ```json
 {
   "final_price": 500,
   "status" : "COMPLETED"
 }
 ```
-**This will set the final price. if final_price is not provided the backend will automatically register quoted price as final price**
-
 *Only works if status is "IN_PROGRESS"*
 
 **Service Provider rejecting booking:**
@@ -452,6 +527,24 @@ Authorization: Bearer <your_access_token>
 ```json
 {
   "error": "You don't have permission to update this booking"
+}
+```
+
+---
+
+### 4.4 Cancel Booking
+**POST** `/bookings/{pk}/cancel/`
+
+**Request Body:** None
+
+**Who can cancel:**
+- **Customer**: Only the customer who created the booking, and only if the status is `PENDING` or `ACCEPTED`.
+- **Service Provider**: Cannot cancel via this endpoint.
+
+**Success Response (200 OK):**
+```json
+{
+  "message": "Booking cancelled successfully"
 }
 ```
 
@@ -590,6 +683,9 @@ Authorization: Bearer <your_access_token>
 - `max_price` (float, optional) - Maximum price
 - `search` (string, optional) - Search in title, description, seller username
 - `ordering` (string, optional) - Order by: price, created_at, views
+
+**Caching:**
+- Responses are cached for 5 minutes in Redis (falls back to database on cache miss). Cache is unique per query string.
 
 **Categories:** "FURNITURE", "ELECTRONICS", "VEHICLES", "REAL_ESTATE", "HOME_APPLIANCES", "CLOTHING", "BOOKS", "SPORTS", "OTHER"
 

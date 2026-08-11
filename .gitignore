@@ -25,3 +25,6 @@ staticfiles/
 
 #data dumps
 data.json
+
+
+**/local_user/management/**

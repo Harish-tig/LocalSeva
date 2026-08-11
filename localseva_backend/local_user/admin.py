@@ -75,7 +75,7 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     """Booking admin"""
-    list_display = ('id', 'user', 'get_provider', 'status', 'service_category', 'quote_price', 'scheduled_date')
+    list_display = ('id', 'user', 'get_provider', 'status', 'service_category', 'agreed_price', 'scheduled_date')
     list_filter = ('status', 'scheduled_date', 'service_category')
     search_fields = ('user__username', 'service_provider__user__username', 'description', 'address')
     list_editable = ('status',)
@@ -129,5 +129,4 @@ class ProductCommentAdmin(admin.ModelAdmin):
 # ============= ADMIN SITE CONFIGURATION =============
 admin.site.site_header = "Service Booking Platform Admin"
 admin.site.site_title = "Service Booking Admin"
-admin.site.index_title = "Dashboard"
 admin.site.index_title = "Dashboard"

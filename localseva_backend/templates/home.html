@@ -379,8 +379,26 @@
         }
 
         .endpoint-desc {
-            color: var(--tertiary);
-            font-size: 0.8125rem;
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .badge-warning {
+            color: #b45309;
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
         }
 
         .expand-icon {
@@ -728,6 +746,10 @@
                         <span class="meta-value">RESTful Design</span>
                     </div>
                     <div class="meta-item">
+                        <span class="meta-label">Caching</span>
+                        <span class="meta-value">Redis</span>
+                    </div>
+                    <div class="meta-item">
                         <span class="meta-label">Database</span>
                         <span class="meta-value">PostgreSQL / SQLite</span>
                     </div>
@@ -740,7 +762,7 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-number">25+</div>
+                    <div class="stat-number">28+</div>
                     <div class="stat-label">Endpoints</div>
                 </div>
                 <div class="stat-item">
@@ -790,14 +812,16 @@
                     <p>
                         Secure JWT-based authentication with role-based access control. Separate
                         permissions for customers, service providers, and marketplace sellers
-                        ensure data security and proper access levels.
+                        ensure data security. Critical endpoints are protected with strict 3/minute rate limiting.
                     </p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-number">04</div>
                     <h4>Reviews & Safety</h4>
                     <p>
-                        Comprehensive review system with star ratings and written feedback.
+                        Comprehensive review system with star ratings and written feedback. Highly requested endpoints like Product and Provider lists are accelerated via Redis caching with automatic DB fallbacks.
+                    </p>
+                    <p>
                         User reporting mechanism for fraud, poor service, or safety concerns
                         maintains platform integrity and user trust.
                     </p>
@@ -823,7 +847,7 @@
                         <div class="endpoint-item">
                             <span class="method-badge post">POST</span>
                             <span class="endpoint-path">/api/user/register/</span>
-                            <span class="endpoint-desc">Register new user account</span>
+                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Register new user account <span class="badge badge-warning">Rate Limited: 3/min</span></span>
                             <span class="expand-icon">+</span>
                         </div>
                         <div class="endpoint-details">
@@ -885,7 +909,7 @@
                         <div class="endpoint-item">
                             <span class="method-badge post">POST</span>
                             <span class="endpoint-path">/api/user/login/</span>
-                            <span class="endpoint-desc">Authenticate and receive JWT tokens</span>
+                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Authenticate and receive JWT tokens <span class="badge badge-warning">Rate Limited: 3/min</span></span>
                             <span class="expand-icon">+</span>
                         </div>
                         <div class="endpoint-details">
@@ -924,6 +948,103 @@
   "user_id": 1,
   "username": "john_doe",
   "is_service_provider": false
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Forgot Password Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/forgotpassword/</span>
+                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Request password reset OTP via email <span class="badge badge-warning">Rate Limited: 3/min</span></span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">email</span>
+                                            <span class="field-type">string</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Request Example</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "email": "user@example.com"
+}</pre>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "message": "otp sent successfully"
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Password Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/reset/</span>
+                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Reset password using OTP <span class="badge badge-warning">Rate Limited: 3/min</span></span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">email</span>
+                                            <span class="field-type">string</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                        <div class="field-item">
+                                            <span class="field-name">otp</span>
+                                            <span class="field-type">string (6 digits)</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                        <div class="field-item">
+                                            <span class="field-name">new_password</span>
+                                            <span class="field-type">string</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                        <div class="field-item">
+                                            <span class="field-name">confirm_new_password</span>
+                                            <span class="field-type">string</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Request Example</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "email": "user@example.com",
+  "otp": "123456",
+  "new_password": "NewSecurePassword123",
+  "confirm_new_password": "NewSecurePassword123"
+}</pre>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "message": "Password reset successful"
 }</pre>
                                     </div>
                                 </div>
@@ -1265,8 +1386,7 @@
     "user_name": "john_doe",
     "provider_name": "plumber_joe",
     "description": "Leaking pipe in kitchen sink",
-    "status": "QUOTE_GIVEN",
-    "quote_price": "500.00",
+    "status": "PENDING",
     "scheduled_date": "2023-10-15T10:00:00Z"
   }
 ]</pre>
@@ -1287,35 +1407,41 @@
                         <div class="endpoint-details">
                             <div class="endpoint-details-content">
                                 <div class="detail-section">
-                                    <h5>Provider: Give Quote</h5>
-                                    <div class="code-block">
-                                        <pre>{
-  "quote_price": "500.00",
-  "provider_notes": "Will bring replacement parts"
-}</pre>
-                                    </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Customer: Accept Quote</h5>
-                                    <div class="code-block">
-                                        <pre>{
-  "status": "ACCEPTED"
-}</pre>
-                                    </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Provider: Complete Service</h5>
-                                    <div class="code-block">
-                                        <pre>{
-  "status": "COMPLETED",
-  "final_price": 500
-}</pre>
-                                    </div>
-                                </div>
                                 <div class="detail-section">
                                     <h5>Status Flow</h5>
                                     <div class="code-block">
-                                        <pre>PENDING → QUOTE_GIVEN → ACCEPTED → IN_PROGRESS → COMPLETED</pre>
+                                        <pre>PENDING → ACCEPTED → IN_PROGRESS → COMPLETED</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cancel Booking Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/bookings/{id}/cancel/</span>
+                            <span class="endpoint-desc">Cancel an active booking (Customer only, status must be PENDING or ACCEPTED)</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">None</span>
+                                            <span class="field-type">No request body required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "message": "Booking cancelled successfully"
+}</pre>
                                     </div>
                                 </div>
                             </div>

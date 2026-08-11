@@ -1,13 +1,14 @@
+from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 from .views import (
     RegisterView, LoginView, ProfileUpdateView,
     BecomeServiceProviderView, ServiceProviderListView,
-    BookingCreateView, BookingListView, BookingDetailView,
+    BookingCreateView, BookingListView, BookingDetailView, BookingCancelView,
     ReviewCreateView, ProviderReviewsListView,
     ReportCreateView, UserReportsListView,
     ProductListView, ProductCreateView, ProductDetailView,
     ProductCommentCreateView, ProductCommentListView, ProductCommentDeleteView,
-    UserProductsListView, UserProductCommentsListView, home
+    UserProductsListView, UserProductCommentsListView, home, ResetpasswordView, ForgotPasswordView
 )
 
 urlpatterns = [
@@ -16,6 +17,8 @@ urlpatterns = [
     # Authentication
     path('register/', RegisterView.as_view(), name="register"),
     path('login/', LoginView.as_view(), name="login"),
+    path('forgotpassword/',ForgotPasswordView.as_view(),name="forgotpassword"),
+    path('reset/',ResetpasswordView.as_view(),name='resetpassword'),
 
     # Profile Management
     path('profile/', ProfileUpdateView.as_view(), name="profile"),
@@ -29,6 +32,7 @@ urlpatterns = [
     path('bookings/', BookingListView.as_view(), name="bookings"),
     path('bookings/create/', BookingCreateView.as_view(), name="create-booking"),
     path('bookings/<int:pk>/', BookingDetailView.as_view(), name="booking-detail"),
+    path('bookings/<int:pk>/cancel/', BookingCancelView.as_view(), name="cancel-booking"),
 
     # Reviews
     path('reviews/create/', ReviewCreateView.as_view(), name="create-review"),

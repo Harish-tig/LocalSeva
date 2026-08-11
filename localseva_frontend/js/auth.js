@@ -16,6 +16,12 @@ document.addEventListener("DOMContentLoaded", function () {
     initSignupForm();
   }
 
+  // Initialize forgot password modal (on login page)
+  const fpModal = document.getElementById("forgotPasswordModal");
+  if (fpModal) {
+    initForgotPasswordModal();
+  }
+
   // Auto-fill demo accounts if URL has demo parameter
   const urlParams = new URLSearchParams(window.location.search);
   const demo = urlParams.get("demo");
@@ -46,7 +52,7 @@ function initLoginForm() {
 
     // Basic validation
     if (!username || !password) {
-      appUtils.showNotification("Please fill in all fields", "error");
+      showToast("Please fill in all fields", "error");
       return;
     }
 
@@ -60,7 +66,7 @@ function initLoginForm() {
       // Call API login
       const result = await api.login(username, password);
 
-      appUtils.showNotification("Login successful! Redirecting...", "success");
+      showToast("Login successful! Redirecting...", "success");
 
       // Redirect to services page after delay
       setTimeout(() => {
@@ -68,7 +74,7 @@ function initLoginForm() {
       }, 1500);
     } catch (error) {
       console.error("Login error:", error);
-      appUtils.showNotification(
+      showToast(
         error.message || "Login failed. Please check your credentials.",
         "error"
       );
@@ -96,17 +102,17 @@ function initSignupForm() {
 
     // Validation
     if (!username || !email || !password || !confirmPassword) {
-      appUtils.showNotification("Please fill in all required fields", "error");
+      showToast("Please fill in all required fields", "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      appUtils.showNotification("Passwords do not match", "error");
+      showToast("Passwords do not match", "error");
       return;
     }
 
     if (password.length < 6) {
-      appUtils.showNotification(
+      showToast(
         "Password must be at least 6 characters",
         "error"
       );
@@ -114,7 +120,7 @@ function initSignupForm() {
     }
 
     if (!terms) {
-      appUtils.showNotification(
+      showToast(
         "Please accept the terms and conditions",
         "error"
       );
@@ -131,7 +137,7 @@ function initSignupForm() {
       // Call API signup with only required fields
       const result = await api.signup(username, email, password);
 
-      appUtils.showNotification("Account created successfully!", "success");
+      showToast("Account created successfully!", "success");
 
       // Redirect to services page after delay
       setTimeout(() => {
@@ -153,10 +159,193 @@ function initSignupForm() {
           "Password requirements not met. Please use a stronger password.";
       }
 
-      appUtils.showNotification(errorMessage, "error");
+      showToast(errorMessage, "error");
 
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
+    }
+  });
+}
+
+/**
+ * Initialize forgot password modal
+ * Two-step flow: Step 1 = enter email (request OTP), Step 2 = enter OTP + new password
+ */
+function initForgotPasswordModal() {
+  const modal = document.getElementById("forgotPasswordModal");
+  const closeBtn = document.getElementById("fpCloseBtn");
+  const step1 = document.getElementById("fpStep1");
+  const step2 = document.getElementById("fpStep2");
+  const emailForm = document.getElementById("fpEmailForm");
+  const resetForm = document.getElementById("fpResetForm");
+  const backBtn = document.getElementById("fpBackToStep1");
+  const modalTitle = document.getElementById("fpModalTitle");
+  const modalSubtitle = document.getElementById("fpModalSubtitle");
+
+  // Track the email used in Step 1 so Step 2 can reuse it
+  let forgotEmail = "";
+
+  // --- Helper: show message in a step ---
+  function showMsg(stepId, message, type) {
+    const msgEl = document.getElementById(stepId);
+    if (!msgEl) return;
+    msgEl.textContent = message;
+    msgEl.className = "fp-msg " + type; // 'success' or 'error'
+  }
+
+  function clearMsg(stepId) {
+    const msgEl = document.getElementById(stepId);
+    if (!msgEl) return;
+    msgEl.textContent = "";
+    msgEl.className = "fp-msg";
+  }
+
+  // --- Helper: reset modal to initial state ---
+  function resetModal() {
+    step1.classList.add("active");
+    step2.classList.remove("active");
+    modalTitle.textContent = "Reset Password";
+    modalSubtitle.textContent = "Enter your email to receive a reset OTP";
+    clearMsg("fpStep1Msg");
+    clearMsg("fpStep2Msg");
+    emailForm.reset();
+    resetForm.reset();
+    forgotEmail = "";
+    // Re-enable buttons
+    const emailBtn = document.getElementById("fpEmailBtn");
+    const resetBtn = document.getElementById("fpResetBtn");
+    if (emailBtn) {
+      emailBtn.disabled = false;
+      emailBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    }
+    if (resetBtn) {
+      resetBtn.disabled = false;
+      resetBtn.innerHTML = '<i class="fas fa-lock"></i> Reset Password';
+    }
+  }
+
+  // --- Close modal ---
+  function closeModal() {
+    modal.classList.remove("active");
+    resetModal();
+  }
+
+  closeBtn.addEventListener("click", closeModal);
+
+  // Close on overlay click
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.classList.contains("active")) {
+      closeModal();
+    }
+  });
+
+  // --- Step 1: Email submission ---
+  emailForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    clearMsg("fpStep1Msg");
+
+    const email = document.getElementById("fpEmail").value.trim();
+    if (!email) {
+      showMsg("fpStep1Msg", "Please enter your email address.", "error");
+      return;
+    }
+
+    const btn = document.getElementById("fpEmailBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    try {
+      await api.forgotPassword(email);
+      forgotEmail = email;
+
+      showMsg("fpStep1Msg", "OTP sent to your email! Check your inbox.", "success");
+
+      // Move to Step 2 after a short delay
+      setTimeout(() => {
+        step1.classList.remove("active");
+        step2.classList.add("active");
+        modalTitle.textContent = "Enter OTP";
+        modalSubtitle.textContent = "Enter the code sent to " + email;
+        clearMsg("fpStep2Msg");
+      }, 1200);
+    } catch (error) {
+      showMsg("fpStep1Msg", error.message || "Failed to send OTP.", "error");
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
+    }
+  });
+
+  // --- Step 2: OTP + Password reset ---
+  resetForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    clearMsg("fpStep2Msg");
+
+    const otp = document.getElementById("fpOtp").value.trim();
+    const newPassword = document.getElementById("fpNewPassword").value;
+    const confirmPassword = document.getElementById("fpConfirmPassword").value;
+
+    // Validation
+    if (!otp) {
+      showMsg("fpStep2Msg", "Please enter the OTP.", "error");
+      return;
+    }
+
+    if (!newPassword || !confirmPassword) {
+      showMsg("fpStep2Msg", "Please fill in both password fields.", "error");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      showMsg("fpStep2Msg", "Password must be at least 8 characters.", "error");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showMsg("fpStep2Msg", "Passwords do not match.", "error");
+      return;
+    }
+
+    const btn = document.getElementById("fpResetBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+
+    try {
+      await api.resetPassword(forgotEmail, otp, newPassword, confirmPassword);
+
+      showMsg("fpStep2Msg", "Password reset successful! You can now log in.", "success");
+
+      // Close modal and show login notification after a delay
+      setTimeout(() => {
+        closeModal();
+        if (typeof showToast !== "undefined") {
+          showToast("Password reset successful! Please log in with your new password.", "success");
+        }
+      }, 2000);
+    } catch (error) {
+      showMsg("fpStep2Msg", error.message || "Password reset failed.", "error");
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Reset Password';
+    }
+  });
+
+  // --- Back to Step 1 ---
+  backBtn.addEventListener("click", function () {
+    step2.classList.remove("active");
+    step1.classList.add("active");
+    modalTitle.textContent = "Reset Password";
+    modalSubtitle.textContent = "Enter your email to receive a reset OTP";
+    clearMsg("fpStep2Msg");
+
+    // Re-enable the email button
+    const emailBtn = document.getElementById("fpEmailBtn");
+    if (emailBtn) {
+      emailBtn.disabled = false;
+      emailBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send OTP';
     }
   });
 }

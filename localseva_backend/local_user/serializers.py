@@ -1,9 +1,12 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Profile, Booking, Review, Report, Product, ProductComment
+from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
-
+from django.core.cache import cache
+import secrets,string
+from .utils import reset_password_mail
+import hashlib
 User = get_user_model()
 
 
@@ -40,6 +43,50 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def create(self,validated_data):
+        user = UserModel.objects.filter(email=validated_data.get('email')).first()
+        if not user:
+            raise serializers.ValidationError("user not found or invalid email")
+        else:
+            otp = ''.join(secrets.choice(string.digits) for _ in range(6))
+            secure_otp = hashlib.sha3_256(otp.encode(),usedforsecurity = True).digest()
+            cache.set(validated_data.get('email'), secure_otp, timeout=600)
+            reset_password_mail(mail_to=user.email,otp=otp)
+            del otp
+            return validated_data
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    otp = serializers.CharField(max_length=6,required=True)
+    new_password = serializers.CharField(required=True,write_only=True)
+    confirm_new_password = serializers.CharField(required=True,write_only=True)
+
+    #check is the user sending otp
+    def validate(self, data):
+        if 'otp' not in data or 'email' not in data:
+            raise serializers.ValidationError("otp or email not found")
+        else:
+            check_secure_otp = hashlib.sha3_256(data.get('otp').encode(),usedforsecurity = True).digest()
+
+            if check_secure_otp != cache.get(data.get('email')):
+                raise serializers.ValidationError("otp did not match! Wrong Otp")
+            if data['new_password'] != data['confirm_new_password']:
+                raise serializers.ValidationError({"password": "Password fields didn't match."})
+
+        return data
+
+
+    def update(self, instance, validated_data):
+        instance.set_password(raw_password=validated_data['new_password'])
+        cache.delete(validated_data['email'])
+        instance.save()
+        return instance
 
 #changes here
 class ProfileSerializer(serializers.ModelSerializer):
@@ -112,14 +159,14 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = [
             'id', 'user', 'user_name', 'provider_id', 'provider_name',
-            'service_category', 'description', 'address', 'scheduled_date','price_distribution_note',
-            'quote_price', 'final_price', 'status', 'provider_notes', 'user_notes',
-            'created_at', 'updated_at', 'quoted_at', 'accepted_at', 'started_at',
+            'service_category', 'description', 'address', 'scheduled_date',
+            'agreed_price', 'final_price', 'status', 'provider_notes', 'user_notes',
+            'created_at', 'updated_at', 'accepted_at', 'started_at',
             'completed_at'
         ]
         read_only_fields = [
             'user', 'user_name', 'provider_name', 'created_at', 'updated_at',
-            'quoted_at', 'accepted_at', 'started_at', 'completed_at'
+            'accepted_at', 'started_at', 'completed_at', 'agreed_price'
         ]
 
     def validate(self, data):
@@ -168,13 +215,12 @@ class BookingSerializer(serializers.ModelSerializer):
 
 #changes here
 class BookingUpdateSerializer(serializers.ModelSerializer):
-    """Separate serializer for updating bookings (provider gives quote, user accepts, etc.)"""
+    """Separate serializer for updating bookings"""
 
     class Meta:
         model = Booking
-        fields = ['quote_price', 'provider_notes', 'status', "final_price","price_distribution_note"]
+        fields = ['provider_notes', 'status', 'final_price']
         extra_kwargs = {
-            'quote_price': {'required': False},
             'provider_notes': {'required': False},
         }
 
@@ -185,21 +231,14 @@ class BookingUpdateSerializer(serializers.ModelSerializer):
         if not request:
             return data
 
-        # Provider can only give quote or update status
+        # Provider can only update status
         if request.user.profile == instance.service_provider:
-            if 'quote_price' in data:
-                if data['quote_price'] and data['quote_price'] <= 0:
-                    raise serializers.ValidationError(
-                        {"quote_price": "Quote price must be positive"}
-                    )
-                data['status'] = 'QUOTE_GIVEN'
-
-            if 'status' in data and data['status'] in ['REJECTED', 'IN_PROGRESS', 'COMPLETED']:
+            if 'status' in data and data['status'] in ['ACCEPTED', 'REJECTED', 'IN_PROGRESS', 'COMPLETED']:
                 # Validate state transitions
-                if instance.status == 'PENDING' and data['status'] == 'REJECTED':
+                if instance.status == 'PENDING' and data['status'] in ['ACCEPTED', 'REJECTED']:
                     pass  # Valid
                 elif instance.status == 'ACCEPTED' and data['status'] == 'IN_PROGRESS':
-                    pass  # valid coz user has accepted and provider is working on it.
+                    pass  # Valid
                 elif instance.status == 'IN_PROGRESS' and data['status'] == 'COMPLETED':
                     pass  # Valid
                 else:
@@ -207,18 +246,13 @@ class BookingUpdateSerializer(serializers.ModelSerializer):
                         {"status": f"Cannot change status from {instance.status} to {data['status']}"}
                     )
 
-        # User can accept or reject quote
+        # User can cancel
         if request.user == instance.user:
-            if 'status' in data and data['status'] in ['ACCEPTED', 'REJECTED']:
-                if instance.status != 'QUOTE_GIVEN':
+            if 'status' in data and data['status'] == 'CANCELLED':
+                if instance.status not in ['PENDING', 'ACCEPTED']:
                     raise serializers.ValidationError(
-                        {"status": "Can only accept or reject a booking that has a quote"}
+                        {"status": "Can only cancel a pending or accepted booking"}
                     )
-                if data['status'] == 'ACCEPTED' and not instance.quote_price:
-                    raise serializers.ValidationError(
-                        {"status": "Cannot accept booking without a quote price"}
-                    )
-                # For REJECTED, no additional validation needed
 
         return data
 
@@ -227,21 +261,16 @@ class BookingUpdateSerializer(serializers.ModelSerializer):
 
         # Update timestamps based on status changes
         if 'status' in validated_data:
-            if validated_data['status'] == 'QUOTE_GIVEN' and not instance.quoted_at:
-                instance.quoted_at = timezone.now()
-            elif validated_data['status'] == 'ACCEPTED' and not instance.accepted_at:
+            if validated_data['status'] == 'ACCEPTED' and not instance.accepted_at:
                 instance.accepted_at = timezone.now()
             elif validated_data['status'] == 'IN_PROGRESS' and not instance.started_at:
                 instance.started_at = timezone.now()
             elif validated_data['status'] == 'COMPLETED' and not instance.completed_at:
                 instance.completed_at = timezone.now()
                 if 'final_price' in validated_data:
-                    print(validated_data['final_price'])
                     instance.final_price = validated_data['final_price']
                 else:
-                    instance.final_price = instance.quote_price #Default final price same as quote
-                if validated_data['price_distribution_note']:
-                    instance.price_distribution_note = validated_data['price_distribution_note']
+                    instance.final_price = instance.agreed_price #Default final price same as agreed
 
 
         return super().update(instance, validated_data)
@@ -337,7 +366,7 @@ class ProductSerializer(serializers.ModelSerializer):
     seller_avatar = serializers.ImageField(source='seller.profile.avatar', read_only=True)
     seller_rating = serializers.FloatField(source='seller.profile.marketplace_rating', read_only=True)
     comment_count = serializers.SerializerMethodField()
-    email = serializers.EmailField(source='product.seller.email', read_only=True)
+    email = serializers.EmailField(source='seller.email', read_only=True)
 
     class Meta:
         model = Product

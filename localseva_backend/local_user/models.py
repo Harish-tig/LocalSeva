@@ -12,7 +12,7 @@ class UserModel(AbstractUser):
         return self.username
 
 #changes here
-class Profile(models.Model):
+class Profile(models.Model):    
     ROLE_CHOICES = [
         ("USER", "User"),
         ("SERVICE", "Service Provider"),
@@ -71,12 +71,11 @@ class Profile(models.Model):
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),  # User created booking, waiting for provider response
-        ('QUOTE_GIVEN', 'Quote Given'),  # Provider has given a quote with base_price
-        ('ACCEPTED', 'Accepted'),  # User accepted the quote
-        ('REJECTED', 'Rejected'),  # Provider rejected or user cancelled before quote
+        ('ACCEPTED', 'Accepted'),  # Provider accepted the booking
+        ('REJECTED', 'Rejected'),  # Provider rejected or user cancelled
         ('IN_PROGRESS', 'In Progress'),  # Service has started
         ('COMPLETED', 'Completed'),  # Service completed, waiting for payment/review
-        ('CANCELLED', 'Cancelled'),  # Cancelled after quote acceptance
+        ('CANCELLED', 'Cancelled'),  # Cancelled after acceptance
     ]
 
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name="bookings_made")
@@ -88,15 +87,16 @@ class Booking(models.Model):
     scheduled_date = models.DateTimeField()
 
     # Price tracking
+    agreed_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+                                      help_text="Price agreed upon at booking")
     quote_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
-                                      help_text="Price quoted by provider")
+                                      help_text="Legacy field - unused")
     final_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
                                       help_text="Final price paid by user")
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     provider_notes = models.TextField(blank=True)
     user_notes = models.TextField(blank=True)
-    price_distribution_note = models.TextField(blank=True)
 
     # Timestamps for different stages
     created_at = models.DateTimeField(auto_now_add=True)

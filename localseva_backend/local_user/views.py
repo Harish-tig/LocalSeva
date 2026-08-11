@@ -1,24 +1,25 @@
-from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import ScopedRateThrottle
+from django.core.cache import cache
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from django.db import models
-from django.utils import timezone
+
 
 from .serializers import (
     RegisterSerializer, LoginSerializer, ProfileSerializer,
     ServiceProviderSerializer, BookingSerializer, BookingUpdateSerializer,
-    ReviewSerializer, ReportSerializer, ProductSerializer, ProductCommentSerializer
+    ReviewSerializer, ReportSerializer, ProductSerializer, ProductCommentSerializer, ResetPasswordSerializer, ForgotPasswordSerializer
 )
-from .models import Profile, Booking, Review, Report, Product, ProductComment
+from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel
 
-User = get_user_model()
+# User = get_user_model()
 
 from django.shortcuts import render
 
@@ -27,6 +28,8 @@ def home(request):
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'register'
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -46,6 +49,8 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -68,6 +73,49 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
+
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data = request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(
+                data={
+                    "message":"otp sent successfully"
+                }
+            )
+        return Response(
+            data={
+                "message":"something went wrong!"
+            }
+        )
+
+
+
+class ResetpasswordView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
+
+    def post(self, request):
+        user = UserModel.objects.filter(email=request.data.get('email')).first()
+        serializer = ResetPasswordSerializer(instance=user,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(
+                {"message": "Password reset successful"},
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data={
+                "message": "something went wrong!"
+            }
+        )
 
 class ProfileUpdateView(APIView):
     """
@@ -106,6 +154,12 @@ class ProfileUpdateView(APIView):
                 request.user.is_service_provider = (data['role'] == 'SERVICE')
                 request.user.save()
 
+            # Invalidate providers cache so updated data shows immediately
+            try:
+                cache.delete("all_service_providers_list")
+            except Exception:
+                pass
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -126,8 +180,17 @@ class BecomeServiceProviderView(APIView):
                 "next_step": "Update your profile to add service provider details"
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # Set both the user flag AND the profile role so provider appears in listings
+        profile.role = "SERVICE"
+        profile.save()
         request.user.is_service_provider = True
         request.user.save()
+
+        # Invalidate the providers cache so new provider shows up immediately
+        try:
+            cache.delete("all_service_providers_list")
+        except Exception:
+            pass
 
         return Response({
             "message": "You are now marked as a service provider!",
@@ -162,28 +225,95 @@ class ServiceProviderListView(ListAPIView):
         if provider_id:
             queryset = queryset.filter(id=provider_id)
 
-        # Filter by location if provided
-        location = self.request.query_params.get('location', None)
-        if location:
-            queryset = queryset.filter(location__icontains=location)
-
-        # Filter by min experience if provided
-        min_experience = self.request.query_params.get('min_experience', None)
-        if min_experience:
-            queryset = queryset.filter(experience_years__gte=int(min_experience))
-
-        # Filter by max price if provided
-        max_price = self.request.query_params.get('max_price', None)
-        if max_price:
-            queryset = queryset.filter(base_price__lte=float(max_price))
-
-        # Filter by category if provided (checking JSON array)
-        category = self.request.query_params.get('category', None)
-        if category:
-            # This is a basic filter for JSON array - might need adjustment based on exact JSON structure
-            queryset = queryset.filter(categories__contains=[category])
-
         return queryset
+
+    def filter_cached_data(self, data, params):
+        """Apply query param filters directly on cached JSON data — no DB hit"""
+        result = list(data)
+
+        # Filter by location (partial match)
+        location = params.get('location')
+        if location:
+            loc = location.lower()
+            result = [d for d in result if loc in (d.get('location') or '').lower()]
+
+        # Filter by minimum experience years
+        min_experience = params.get('min_experience')
+        if min_experience:
+            try:
+                min_exp = int(min_experience)
+                result = [d for d in result if (d.get('experience_years') or 0) >= min_exp]
+            except (ValueError, TypeError):
+                pass
+
+        # Filter by max base price
+        max_price = params.get('max_price')
+        if max_price:
+            try:
+                max_p = float(max_price)
+                result = [d for d in result if d.get('base_price') is not None and float(d['base_price']) <= max_p]
+            except (ValueError, TypeError):
+                pass
+
+        # Filter by category (checks inside the categories JSON array)
+        category = params.get('category')
+        if category:
+            result = [d for d in result if category in (d.get('categories') or [])]
+
+        # Filter by pricing_type (FIXED / FLEXIBLE)
+        pricing_type = params.get('pricing_type')
+        if pricing_type:
+            result = [d for d in result if d.get('pricing_type') == pricing_type]
+
+        # Filter by availability
+        is_available = params.get('is_available')
+        if is_available is not None:
+            val = is_available.lower() in ('true', '1', 'yes')
+            result = [d for d in result if bool(d.get('is_available')) == val]
+
+        # Apply ordering (default: -rating)
+        ordering = params.get('ordering', '-rating')
+        reverse = ordering.startswith('-')
+        order_field = ordering.lstrip('-')
+        if order_field in ('rating', 'experience_years', 'base_price'):
+            result.sort(
+                key=lambda d: float(d.get(order_field) or 0),
+                reverse=reverse
+            )
+
+        return result
+
+    def list(self, request, *args, **kwargs):
+        # id lookups go straight to DB, no caching
+        if request.query_params.get('id'):
+            return super().list(request, *args, **kwargs)
+
+        cache_key = "all_service_providers_list"
+        try:
+            cached_data = cache.get(cache_key)
+        except Exception:
+            cached_data = None
+
+        if cached_data is None:
+            queryset = Profile.objects.filter(role='SERVICE')
+            serializer = self.get_serializer(queryset, many=True)
+            cached_data = serializer.data
+            try:
+                cache.set(cache_key, cached_data, 60)
+            except Exception:
+                pass
+
+        # No filters — return everything (sorted by rating by default)
+        query_params = request.query_params
+        has_filters = any(
+            query_params.get(k) for k in ('location', 'min_experience', 'max_price', 'category', 'pricing_type', 'is_available', 'ordering')
+        )
+        if not has_filters:
+            return Response(cached_data)
+
+        # Filters present — apply them on the cached data instead of hitting DB
+        filtered_data = self.filter_cached_data(cached_data, query_params)
+        return Response(filtered_data)
 
 
 class BookingCreateView(CreateAPIView):
@@ -191,7 +321,9 @@ class BookingCreateView(CreateAPIView):
     serializer_class = BookingSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        provider = serializer.validated_data.get('service_provider')
+        agreed_price = provider.base_price if provider else None
+        serializer.save(user=self.request.user, agreed_price=agreed_price)
 
 
 class BookingListView(ListAPIView):
@@ -210,6 +342,22 @@ class BookingListView(ListAPIView):
         else:
             # Return bookings where user is the customer
             return Booking.objects.filter(user=user)
+
+class BookingCancelView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            booking = Booking.objects.get(pk=pk, user=request.user)
+        except Booking.DoesNotExist:
+            return Response({"error": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if booking.status not in ['PENDING', 'ACCEPTED']:
+            return Response({"error": "Cannot cancel booking in current status"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        booking.status = 'CANCELLED'
+        booking.save()
+        return Response({"message": "Booking cancelled successfully"})
 
 
 
@@ -258,12 +406,6 @@ class BookingDetailView(RetrieveAPIView, UpdateAPIView):
 
         if serializer.is_valid():
             serializer.save()
-
-            # If provider is giving quote, set quoted_at timestamp
-            if 'quote_price' in request.data and booking.quoted_at is None:
-                booking.quoted_at = timezone.now()
-                booking.save()
-
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -315,24 +457,101 @@ class UserReportsListView(ListAPIView):
 class ProductListView(ListAPIView):
     permission_classes = [permissions.AllowAny]
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'condition', 'city', 'is_sold']
-    search_fields = ['title', 'description', 'seller__username']
-    ordering_fields = ['price', 'created_at', 'views']
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True)
+        # Only used as fallback if cache misses completely
+        return Product.objects.filter(is_active=True)
+
+    def filter_cached_data(self, data, params):
+        """Apply query param filters directly on cached products — no DB hit"""
+        result = list(data)
+
+        # Filter by category
+        category = params.get('category')
+        if category:
+            result = [d for d in result if d.get('category') == category]
+
+        # Filter by condition
+        condition = params.get('condition')
+        if condition:
+            result = [d for d in result if d.get('condition') == condition]
+
+        # Filter by city (partial match)
+        city = params.get('city')
+        if city:
+            result = [d for d in result if city.lower() in (d.get('city') or '').lower()]
+
+        # Filter sold/unsold
+        is_sold = params.get('is_sold')
+        if is_sold is not None:
+            val = is_sold.lower() in ('true', '1', 'yes')
+            result = [d for d in result if bool(d.get('is_sold')) == val]
 
         # Filter by price range
-        min_price = self.request.query_params.get('min_price')
-        max_price = self.request.query_params.get('max_price')
-
+        min_price = params.get('min_price')
         if min_price:
-            queryset = queryset.filter(price__gte=float(min_price))
-        if max_price:
-            queryset = queryset.filter(price__lte=float(max_price))
+            try:
+                result = [d for d in result if float(d.get('price') or 0) >= float(min_price)]
+            except (ValueError, TypeError):
+                pass
 
-        return queryset
+        max_price = params.get('max_price')
+        if max_price:
+            try:
+                result = [d for d in result if float(d.get('price') or 0) <= float(max_price)]
+            except (ValueError, TypeError):
+                pass
+
+        # Search across title, description, seller name
+        search = params.get('search')
+        if search:
+            s = search.lower()
+            result = [
+                d for d in result
+                if s in (d.get('title') or '').lower()
+                or s in (d.get('description') or '').lower()
+                or s in (d.get('seller_name') or '').lower()
+            ]
+
+        # Apply ordering
+        ordering = params.get('ordering', '-created_at')
+        reverse = ordering.startswith('-')
+        order_field = ordering.lstrip('-')
+        if order_field in ('price', 'views', 'created_at'):
+            result.sort(
+                key=lambda d: d.get(order_field) or 0,
+                reverse=reverse
+            )
+
+        return result
+
+    def list(self, request, *args, **kwargs):
+        cache_key = "all_products_list"
+        try:
+            cached_data = cache.get(cache_key)
+        except Exception:
+            cached_data = None
+
+        if cached_data is None:
+            queryset = Product.objects.filter(is_active=True)
+            serializer = self.get_serializer(queryset, many=True)
+            cached_data = serializer.data
+            try:
+                cache.set(cache_key, cached_data, 60 * 5)
+            except Exception:
+                pass
+
+        # No filters — return full cached list
+        query_params = request.query_params
+        has_filters = any(
+            query_params.get(k) for k in ('category', 'condition', 'city', 'is_sold', 'min_price', 'max_price', 'search', 'ordering')
+        )
+        if not has_filters:
+            return Response(cached_data)
+
+        # Apply filters on cached data — no DB hit
+        filtered_data = self.filter_cached_data(cached_data, query_params)
+        return Response(filtered_data)
 
 
 #changes here
@@ -351,7 +570,7 @@ class ProductCreateView(CreateAPIView):
 
 
 class ProductDetailView(RetrieveAPIView, UpdateAPIView, DestroyAPIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = ProductSerializer
 
     def get_queryset(self):
@@ -359,9 +578,10 @@ class ProductDetailView(RetrieveAPIView, UpdateAPIView, DestroyAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        # Increment view count
-        instance.views += 1
-        instance.save()
+        # Increment view count only if not owner
+        if not request.user.is_authenticated or request.user != instance.seller:
+            instance.views += 1
+            instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 

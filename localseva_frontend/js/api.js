@@ -1,7 +1,8 @@
 /**
  * API Configuration for Django DRF with JWT Authentication
  */
-const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
+const API_BASE_URL = "http://127.0.0.1:8000/api/user/";
+//const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
 
 // JWT Token management
 let accessToken = localStorage.getItem("accessToken");
@@ -235,16 +236,10 @@ async function signup(username, email, password) {
   }
 }
 
-async function logout() {
-  try {
-    if (refreshToken) {
-      await apiRequest("logout/", "POST", { refresh_token: refreshToken });
-    }
-  } catch (error) {
-    console.log("Logout API call failed");
-  } finally {
-    clearTokens();
-  }
+function logout() {
+  // No server-side logout endpoint — just clear tokens locally.
+  // JWT access tokens expire naturally (60 min); refresh tokens in 1 day.
+  clearTokens();
 }
 
 // ===== PROFILE FUNCTIONS =====
@@ -468,8 +463,9 @@ async function getProviders(filters = {}) {
 
 async function getProviderById(id) {
   try {
-    // Assuming endpoint is /api/user/providers/{id}/
-    const provider = await apiRequest(`providers/${id}/`);
+    const providers = await getProviders();
+    const provider = providers.find(p => p.id == id);
+    if (!provider) throw new Error("Provider not found");
     console.log("Fetched provider by ID:", provider);
     return provider;
   } catch (error) {
@@ -507,7 +503,7 @@ async function createBooking(bookingData) {
   console.log("=== CREATE BOOKING API CALL ===");
   console.log("Input data (raw):", bookingData);
 
-  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
+  // Using global API_BASE_URL
   const endpoint = `${API_BASE_URL}bookings/create/`;
 
   console.log("API Endpoint:", endpoint);
@@ -802,11 +798,11 @@ if (typeof window.api === "object") {
 /**
  * Get bookings for the current user
  */
-async function getBookings() {
-  console.log("📋 Getting user bookings...");
+async function getBookings(type = 'user') {
+  console.log(`📋 Getting ${type} bookings...`);
 
-  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
-  const endpoint = `${API_BASE_URL}bookings/`;
+  // Using global API_BASE_URL
+  const endpoint = `${API_BASE_URL}bookings/?type=${type}`;
 
   console.log("API Endpoint:", endpoint);
 
@@ -863,12 +859,38 @@ async function getBookings() {
 }
 
 /**
+ * Update a booking
+ */
+async function updateBooking(id, data) {
+  console.log(`🔄 Updating booking ${id}...`);
+  try {
+    return await apiRequest(`bookings/${id}/`, "PATCH", data);
+  } catch (error) {
+    console.error("Error updating booking:", error);
+    throw error;
+  }
+}
+
+/**
+ * Cancel a booking
+ */
+async function cancelBooking(id) {
+  console.log(`❌ Cancelling booking ${id}...`);
+  try {
+    return await apiRequest(`bookings/${id}/cancel/`, "POST");
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    throw error;
+  }
+}
+
+/**
  * Get reviews for a provider
  */
 async function getProviderReviews(providerId) {
   console.log("📊 Getting reviews for provider:", providerId);
 
-  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
+  // Using global API_BASE_URL
   const endpoint = `${API_BASE_URL}providers/${providerId}/reviews/`;
 
   console.log("API Endpoint:", endpoint);
@@ -931,7 +953,7 @@ async function getProviderReviews(providerId) {
 async function createReview(reviewData) {
   console.log("✍️ Creating new review:", reviewData);
 
-  const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
+  // Using global API_BASE_URL
   const endpoint = `${API_BASE_URL}reviews/create/`;
 
   console.log("API Endpoint:", endpoint);
@@ -1222,7 +1244,7 @@ async function createProduct(formData) {
   try {
     console.log("Creating product with FormData");
 
-    const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
+    // Using global API_BASE_URL
     const endpoint = `${API_BASE_URL}marketplace/create/`;
 
     // Get the accessToken
@@ -1298,7 +1320,7 @@ async function updateProduct(id, formData) {
   try {
     console.log("Updating product", id);
 
-    const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/";
+    // Using global API_BASE_URL
     const endpoint = `${API_BASE_URL}marketplace/${id}/`;
 
     // Get the accessToken
@@ -1445,6 +1467,79 @@ async function getMyProductComments() {
   }
 }
 
+// ===== PASSWORD RESET =====
+
+/**
+ * Request a password reset OTP via email
+ * @param {string} email - The user's registered email address
+ * @returns {Promise<Object>} API response with success message
+ */
+async function forgotPassword(email) {
+  try {
+    const response = await fetch(`${API_BASE_URL}forgotpassword/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const errorMsg =
+        data.error ||
+        data.email?.[0] ||
+        data.detail ||
+        "Failed to send OTP. Please try again.";
+      throw new Error(errorMsg);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Reset password using OTP
+ * @param {string} email - The user's registered email address
+ * @param {string} otp - The OTP received via email
+ * @param {string} newPassword - The new password
+ * @param {string} confirmNewPassword - Confirm the new password
+ * @returns {Promise<Object>} API response with success message
+ */
+async function resetPassword(email, otp, newPassword, confirmNewPassword) {
+  try {
+    const response = await fetch(`${API_BASE_URL}reset/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        otp,
+        new_password: newPassword,
+        confirm_new_password: confirmNewPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const errorMsg =
+        data.error ||
+        data.otp?.[0] ||
+        data.new_password?.[0] ||
+        data.detail ||
+        "Password reset failed. Please try again.";
+      throw new Error(errorMsg);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Reset password error:", error);
+    throw error;
+  }
+}
+
 // ===== EXPORT API FUNCTIONS =====
 
 window.api = {
@@ -1454,6 +1549,8 @@ window.api = {
   logout,
   isAuthenticated,
   verifyToken,
+  forgotPassword,
+  resetPassword,
 
   // Token management
   saveTokens,
@@ -1473,9 +1570,9 @@ window.api = {
 
   // Bookings
   createBooking,
-  getProviders,
-  getProviderById,
   getBookings,
+  updateBooking,
+  cancelBooking,
 
   // Reviews
   getProviderReviews,

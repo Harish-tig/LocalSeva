@@ -36,7 +36,7 @@ The service booking component functions similarly to platforms like UrbanClap or
 
 **Booking Workflow:**
 ```
-Customer Request → Provider Quote → Customer Acceptance → Service In Progress → Completion → Review
+Customer Request → Provider Acceptance → Service In Progress → Completion → Review
 ```
 
 ### 🛒 Marketplace Module
@@ -99,8 +99,8 @@ Built using modern web technologies, LocalSeva employs a robust architecture:
 | **User Management** | Complete registration, login, and profile management system |
 | **Provider Discovery** | Advanced filtering by location, experience, price range, and ratings |
 | **Smart Booking System** | Create detailed service requests with address and scheduling |
-| **Quote Management** | Receive and compare multiple quotes from different providers |
-| **Status Tracking** | Real-time booking status: PENDING → QUOTE_GIVEN → ACCEPTED → IN_PROGRESS → COMPLETED |
+| **Direct Booking** | Simplified direct booking flow without complex quotes |
+| **Status Tracking** | Real-time booking status: PENDING → ACCEPTED → IN_PROGRESS → COMPLETED |
 | **Review System** | Rate and review providers after service completion (1-5 stars) |
 | **Provider Profiles** | Detailed profiles with experience, specializations, and pricing |
 | **Safety Reporting** | Report fraudulent providers, bad service, or safety concerns |
@@ -122,10 +122,13 @@ Built using modern web technologies, LocalSeva employs a robust architecture:
 
 - JWT token-based authentication with refresh mechanism
 - Secure password hashing and validation
+- Secure 2-step OTP based password reset flow
+- API Rate Limiting for auth endpoints (3/min)
 - User reporting system for misconduct
 - Profile verification indicators
 - Review moderation capabilities
 - Image upload validation and sanitization
+- Redis caching for provider lists (60s) and marketplace (5min)
 
 ---
 
@@ -147,8 +150,10 @@ HTML5 + CSS3 + Vanilla JavaScript
 ```
 Django 4.2 + Django REST Framework 3.14
 ├── JWT Authentication (djangorestframework-simplejwt)
+├── API Rate Limiting (DRF Throttling)
+├── Redis Caching for performance
 ├── SQLite Database (Development)
-├── PostgreSQL Ready (Production)
+├── PostgreSQL Ready (Production via .env)
 ├── CORS Headers (django-cors-headers)
 ├── File Upload Support
 ├── RESTful API Design
@@ -198,11 +203,13 @@ LocalSeva/
 │   └── requirements.txt               # Python dependencies
 │
 ├── localseva_frontend/                # Frontend Application
-│   ├── index.html                     # Landing/Home page
-│   ├── signup.html                    # Registration & Login page
+│   ├── home.html                      # API Documentation & Landing page
+│   ├── index.html                     # Login page
+│   ├── signup.html                    # Registration page
 │   ├── profile.html                   # User profile management
 │   │
 │   ├── services.html                  # Browse service providers
+│   ├── find-service.html              # Search and filter service providers
 │   ├── service-detail.html            # Provider details & booking
 │   ├── my-services.html               # User's service bookings dashboard
 │   │
@@ -245,6 +252,8 @@ Before setting up LocalSeva, ensure you have the following installed on your sys
   - Verify: `python --version` or `python3 --version`
 - **pip** - Python package manager (comes with Python)
   - Verify: `pip --version`
+- **Redis server** - Required for API caching
+  - Verify: `redis-cli ping` (should return PONG)
 - **Git** - Version control system - [Download Git](https://git-scm.com/)
   - Verify: `git --version`
 

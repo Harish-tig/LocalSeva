@@ -1,5 +1,4 @@
 from pathlib import Path
-
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,7 +14,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*'] # Allowed hosts should be driven by env ideally, but keeping as '*' for local dev ease of use per minimal edits.
+
+
+
 
 
 # Application definition
@@ -81,16 +83,38 @@ WSGI_APPLICATION = 'localseva_backend.wsgi.application'
 # }
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+if os.getenv('USE_POSTGRES') == 'True':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        }
     }
 }
+
+
 
 
 # Password validation
@@ -157,10 +181,16 @@ CLOUDINARY_STORAGE = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-    )
+    ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '3/minute',
+        'register': '3/minute'
+    }
 }
 
 
@@ -175,3 +205,16 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
+#email config
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_PORT = int(os.getenv('SMTP_PORT'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+EMAIL_HOST = os.getenv('SMTP_SERVER')
+EMAIL_HOST_USER = os.getenv('DEFAULT_EMAIL_FROM')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_EMAIL_FROM')
+EMAIL_HOST_PASSWORD = os.getenv('APP_PASS')
+
+#deployement config
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

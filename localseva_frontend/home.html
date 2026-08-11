@@ -10,38 +10,38 @@
     />
     <style>
       :root {
-        --primary-blue: #7495e8;
-        --light-blue: #a8c1ff;
-        --lighter-blue: #d9e4ff;
-        --dark-blue: #4a6bc2;
-        --text-dark: #333333;
-        --text-light: #666666;
-        --background: #f8faff;
-        --white: #ffffff;
-        --shadow: rgba(116, 149, 232, 0.15);
-        --gray-bg: #f5f7fc;
-        --green: #4caf50;
-        --yellow: #ffc107;
-        --purple: #9c27b0;
-        --teal: #009688;
-        --orange: #ff9800;
-        --pink: #e91e63;
-        --cyan: #00bcd4;
-        --indigo: #3f51b5;
+        --primary-blue: #0d8fa8;    /* teal-500 — our main accent */
+        --light-blue:   #4dacc1;    /* teal-300 */
+        --lighter-blue: #b3dce5;    /* teal-100 */
+        --dark-blue:    #01242f;    /* teal-900 — brand dark */
+        --text-dark:    #01242f;
+        --text-light:   #3f6370;
+        --background:   #eef4f5;    /* teal-tinted off-white */
+        --white:        #f7fbfc;
+        --shadow:       rgba(1, 36, 47, 0.10);
+        --gray-bg:      #e4ecee;
+        --green:  #10b981;
+        --yellow: #f59e0b;
+        --purple: #7c3aed;
+        --teal:   #0d8fa8;
+        --orange: #f97316;
+        --pink:   #ec4899;
+        --cyan:   #22d3ee;
+        --indigo: #6366f1;
       }
 
       /* Dark mode variables */
       .dark-mode {
-        --primary-blue: #8aabff;
-        --light-blue: #6d8feb;
-        --lighter-blue: #3a4d8a;
-        --dark-blue: #2a3c7a;
-        --text-dark: #f0f0f0;
-        --text-light: #b0b0b0;
-        --background: #121212;
-        --white: #1e1e1e;
-        --shadow: rgba(0, 0, 0, 0.3);
-        --gray-bg: #2d2d2d;
+        --primary-blue: #22d3ee;
+        --light-blue:   #0d8fa8;
+        --lighter-blue: #044a5c;
+        --dark-blue:    #010f15;
+        --text-dark:    #e8f4f6;
+        --text-light:   #80c4d3;
+        --background:   #030e11;
+        --white:        #0a1f25;
+        --shadow:       rgba(0, 0, 0, 0.40);
+        --gray-bg:      #0d2830;
       }
 
       * {
@@ -421,6 +421,11 @@
         width: max-content;
         padding: 0 1rem;
         animation: scrollProviders 30s linear infinite;
+        animation-play-state: paused;
+      }
+
+      .providers-container.loaded {
+        animation-play-state: running;
       }
 
       .providers-wrapper:hover .providers-container {
@@ -1417,29 +1422,30 @@
       <div class="hero-visual">
         <!-- Video Carousel with 4 videos -->
         <div class="video-carousel">
-          <div class="video-slide active">
-            <video class="hero-video" autoplay muted playsinline>
-              <source src="static\VID_20260120222610.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <div class="video-slide">
-            <video class="hero-video" muted playsinline>
-              <source src="static\VID_20260120222639.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <div class="video-slide">
-            <video class="hero-video" muted playsinline>
-              <source src="static\VID_20260120222719.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          <div class="video-slide">
-            <video class="hero-video" muted playsinline>
-              <source src="static\VID_20260120222811.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <div class="video-slide active">
+              <video class="hero-video" autoplay muted playsinline>
+                <source src="static/VID_20260120222610.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div class="video-slide">
+              <video class="hero-video" muted playsinline>
+                <source src="static/VID_20260120222639.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div class="video-slide">
+              <video class="hero-video" muted playsinline>
+                <source src="static/VID_20260120222719.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div class="video-slide">
+              <video class="hero-video" muted playsinline>
+                <source src="static/VID_20260120222811.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
           <div class="video-controls">
             <div class="video-dot active" data-index="0"></div>
@@ -1447,9 +1453,10 @@
             <div class="video-dot" data-index="2"></div>
             <div class="video-dot" data-index="3"></div>
           </div>
-        </div>
-      </div>
-    </section>
+        </div><!-- /.video-carousel -->
+      </div><!-- /.hero-visual -->
+    </section><!-- /#home -->
+
 
     <!-- Service Providers Section -->
     <section class="service-providers-section" id="find-service">
@@ -1472,30 +1479,30 @@
       <div class="categories-container">
         <h3 class="categories-title">Browse By <span>Category</span></h3>
         <div class="categories-row">
-          <div class="category-item">
+          <div class="category-item" data-category="Plumbing">
             <i class="fas fa-faucet" style="margin-right: 5px"></i> Plumbing
           </div>
-          <div class="category-item">
+          <div class="category-item" data-category="Cleaning">
             <i class="fas fa-broom" style="margin-right: 5px"></i> Cleaning
           </div>
-          <div class="category-item">
+          <div class="category-item" data-category="Electrical">
             <i class="fas fa-bolt" style="margin-right: 5px"></i> Electrical
           </div>
-          <div class="category-item">
+          <div class="category-item" data-category="Tutoring">
             <i class="fas fa-graduation-cap" style="margin-right: 5px"></i>
             Tutor
           </div>
-          <div class="category-item">
+          <div class="category-item" data-category="Carpentry">
             <i class="fas fa-hammer" style="margin-right: 5px"></i> Carpentry
           </div>
-          <div class="category-item" \>
+          <div class="category-item" data-category="Fitness">
             <i class="fas fa-dumbbell" style="margin-right: 5px"></i> Fitness
           </div>
-          <div class="category-item">
+          <div class="category-item" data-category="Delivery">
             <i class="fas fa-truck-moving" style="margin-right: 5px"></i>
-            Delivery & Moving
+            Delivery &amp; Moving
           </div>
-          <div class="category-item">
+          <div class="category-item" data-category="Ceramic">
             <i class="fas fa-tile" style="margin-right: 5px"></i> Ceramic
           </div>
         </div>
@@ -1656,13 +1663,13 @@
 
     <script>
       // API Configuration
-      const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/providers/";
+      const API_BASE_URL = "http://127.0.0.1:8000/api/user/providers/";
 
       // DOM Elements
       const providersContainer = document.getElementById("providersContainer");
       const loadingSpinner = document.getElementById("loadingSpinner");
       const topProviderSingle = document.getElementById("topProviderSingle");
-      //const categoryItems = document.querySelectorAll(".category-item");
+      const categoryItems = document.querySelectorAll(".category-item");
       const themeToggle = document.getElementById("themeToggle");
 
       // Video carousel elements
@@ -1748,7 +1755,8 @@
           console.error("Error fetching service providers:", error);
           loadingSpinner.style.display = "none";
 
-          // Fallback to mock data if API fails
+          // Fallback to mock data on error (for development)
+          console.log("Falling back to mock data");
           return getMockProviders();
         }
       }
@@ -1806,20 +1814,15 @@
           }
         }
 
-        // Format price - Dynamic from API - DEBUGGING
+        // Format price - Dynamic from API
         const price = provider.base_price || "50";
         const pricingType = provider.pricing_type || "FLEXIBLE";
-        console.log(`Provider ${provider.username || provider.id}:`, {
-          base_price: provider.base_price,
-          pricing_type: provider.pricing_type,
-          calculated_price: price,
-        });
 
         const priceText =
           pricingType === "FIXED" ? `₹${price}` : `₹${price}/hr`;
 
-        // Services completed count - Dynamic from API or default
-        const servicesCompleted = provider.services_completed || "0";
+        // Completed bookings count from API
+        const servicesCompleted = provider.completed_bookings_count || 0;
 
         return `
                 <div class="provider-card" data-id="${provider.id}">
@@ -1907,7 +1910,7 @@
         }
 
         const rating = provider.rating || 4.5;
-        const servicesCompleted = provider.services_completed || "0";
+        const servicesCompleted = provider.completed_bookings_count || 0;
 
         return `
                 <div class="hero-provider-single">
@@ -1956,13 +1959,15 @@
                     </div>
                 `;
         } else {
-          // Add provider cards (duplicate for continuous scrolling effect)
+          // Duplicate providers for continuous scroll, build all cards at once (no flickering)
           const providersToShow = [...providers, ...providers];
-
-          providersToShow.forEach((provider) => {
-            providersContainer.innerHTML += createProviderCard(provider);
-          });
+          providersContainer.innerHTML = providersToShow
+            .map((provider) => createProviderCard(provider))
+            .join("");
         }
+
+        // Start animation after loading
+        providersContainer.classList.add("loaded");
 
         // Load top single provider in hero section
         loadTopProviderSingle();
@@ -2304,10 +2309,39 @@
         }
       }
 
-      // Function to handle category filter
+      // Function to handle category filter — filters allProviders client-side, no re-fetch
       function handleCategoryFilter(category) {
-        currentFilters = { search: category };
-        loadProviders();
+        // Highlight the clicked item
+        categoryItems.forEach((item) => item.classList.remove("active"));
+        const clicked = Array.from(categoryItems).find(
+          (item) => item.getAttribute("data-category") === category
+        );
+        if (clicked) clicked.classList.add("active");
+
+        // Filter the already-loaded providers array
+        const filtered = category
+          ? allProviders.filter((p) => {
+              const cats = p.categories || [];
+              return cats.some(
+                (c) => c.toLowerCase() === category.toLowerCase()
+              );
+            })
+          : allProviders;
+
+        // Rebuild cards without re-fetching
+        if (!filtered || filtered.length === 0) {
+          providersContainer.innerHTML = `
+            <div class="no-results">
+              <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-light);"></i>
+              <h3>No providers found for "${category}"</h3>
+              <p>Try a different category</p>
+            </div>`;
+        } else {
+          const toShow = [...filtered, ...filtered];
+          providersContainer.innerHTML = toShow
+            .map((p) => createProviderCard(p))
+            .join("");
+        }
 
         // Scroll to providers section
         document
@@ -2320,69 +2354,66 @@
         return [
           {
             id: 1,
-            username: "Flash Electrician",
+            username: "Ramesh Verma",
             avatar: "",
             role: "SERVICE",
             bio: "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
-            location: "Downtown, City Center",
+            location: "Kandivali",
             experience_years: 8,
             pricing_type: "FIXED",
             base_price: "500",
             is_available: true,
             rating: 4.8,
             total_reviews: 250,
-            services_completed: "150",
-            categories: ["ELECTRICAL", "HOME_REPAIR"],
-            description:
-              "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
+            completed_bookings_count: 150,
+            categories: ["ELECTRICAL"],
+            description: "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
             availability: "Mon-Sat: 9AM-7PM",
-            service_locations: ["Downtown", "City Center", "Suburbs"],
+            service_locations: ["Kandivali", "Borivali", "Malad"],
             phone: "+91 9876543210",
-            email: "flash@example.com",
+            email: "ramesh.verma@example.com",
           },
           {
             id: 2,
-            username: "Plumber Joe",
+            username: "Suresh Patil",
             avatar: "",
             role: "SERVICE",
             bio: "Professional plumber with 10 years experience in residential and commercial plumbing.",
-            location: "New York, NY",
+            location: "Andheri",
             experience_years: 10,
             pricing_type: "FIXED",
             base_price: "400",
             is_available: true,
             rating: 4.5,
             total_reviews: 120,
-            services_completed: "200",
-            categories: ["PLUMBING", "HOME_MAINTENANCE"],
-            description:
-              "Professional plumber with 10 years experience in residential and commercial plumbing.",
+            completed_bookings_count: 200,
+            categories: ["PLUMBING"],
+            description: "Professional plumber with 10 years experience in residential and commercial plumbing.",
             availability: "24/7 Emergency Service",
-            service_locations: ["Manhattan", "Brooklyn", "Queens"],
+            service_locations: ["Andheri", "Malad", "Borivali"],
             phone: "+91 9876543211",
-            email: "joe@example.com",
+            email: "suresh.patil@example.com",
           },
           {
             id: 3,
-            username: "Maria's Cleaning",
+            username: "Priya Nair",
             avatar: "",
             role: "SERVICE",
             bio: "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
-            location: "Suburbia",
+            location: "Malad",
             experience_years: 5,
             pricing_type: "FLEXIBLE",
             base_price: "300",
             is_available: true,
             rating: 4.9,
             total_reviews: 89,
-            services_completed: "120",
-            categories: ["CLEANING", "HOME_SERVICES"],
-            description:
-              "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
+            completed_bookings_count: 120,
+            categories: ["CLEANING"],
+            description: "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
             availability: "Mon-Fri: 8AM-6PM",
-            service_locations: ["All areas"],
+            service_locations: ["Malad", "Kandivali", "Borivali"],
             phone: "+91 9876543212",
-            email: "maria@example.com",
+            email: "priya.nair@example.com",
           },
         ];
       }
