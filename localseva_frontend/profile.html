@@ -29,6 +29,7 @@
         width: 120px;
         height: 120px;
         margin: 0 auto var(--space-4);
+        cursor: pointer;
       }
       
       .avatar-preview {
@@ -43,6 +44,33 @@
         justify-content: center;
         font-size: 3rem;
         color: var(--primary);
+        overflow: hidden;
+        transition: opacity var(--transition-base, 0.2s);
+      }
+      
+      .avatar-edit-icon {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: var(--primary);
+        color: #ffffff;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--surface);
+        box-shadow: var(--shadow-sm);
+        transition: transform var(--transition-base, 0.2s);
+      }
+      
+      .avatar-upload:hover .avatar-edit-icon {
+        transform: scale(1.1);
+      }
+      
+      .avatar-upload:hover .avatar-preview {
+        opacity: 0.9;
       }
       
       .profile-info h2 {
@@ -141,10 +169,14 @@
           <div id="profileContent" style="display: none;" class="animate-fade-in max-w-4xl mx-auto">
             
             <div class="profile-header-card">
-              <div class="avatar-upload">
+              <div class="avatar-upload" id="avatarUploadContainer">
                 <div class="avatar-preview" id="avatarPreview">
                   <i class="fas fa-user"></i>
                 </div>
+                <div class="avatar-edit-icon">
+                  <i class="fas fa-camera"></i>
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;" />
               </div>
               <div class="profile-info">
                 <h2 id="displayUsername">User Name</h2>

@@ -20,6 +20,50 @@ document.addEventListener("DOMContentLoaded", function () {
     becomeProviderBtn.addEventListener("click", handleBecomeProvider);
   }
 
+  // Avatar Upload Logic
+  const avatarUploadContainer = document.getElementById("avatarUploadContainer");
+  const avatarInput = document.getElementById("avatarInput");
+  const avatarPreview = document.getElementById("avatarPreview");
+
+  if (avatarUploadContainer && avatarInput && avatarPreview) {
+    avatarUploadContainer.addEventListener("click", () => {
+      avatarInput.click();
+    });
+
+    avatarInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        showToast("Please select an image file.", "error");
+        return;
+      }
+
+      const originalContent = avatarPreview.innerHTML;
+      // Show loading spinner
+      avatarPreview.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>';
+
+      try {
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        const updatedProfile = await api.updateProfile(formData);
+        
+        if (updatedProfile && updatedProfile.avatar) {
+          avatarPreview.innerHTML = `<img src="${updatedProfile.avatar}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+          showToast("Profile picture updated successfully!", "success");
+        } else {
+          avatarPreview.innerHTML = originalContent;
+          showToast("Uploaded, but failed to load preview. Please refresh.", "warning");
+        }
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
+        avatarPreview.innerHTML = originalContent;
+        showToast(error.message || "Failed to upload profile picture.", "error");
+      }
+    });
+  }
+
   loadProfile();
 });
 
@@ -34,6 +78,16 @@ async function loadProfile() {
     // Header Info
     document.getElementById("displayUsername").textContent = profile.username || "User";
     document.getElementById("displayEmail").textContent = profile.email || "";
+    
+    // Set Avatar Preview
+    const avatarPreview = document.getElementById("avatarPreview");
+    if (avatarPreview) {
+      if (profile.avatar) {
+        avatarPreview.innerHTML = `<img src="${profile.avatar}" alt="Profile Photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+      } else {
+        avatarPreview.innerHTML = '<i class="fas fa-user"></i>';
+      }
+    }
     
     const roleBadge = document.getElementById("displayRole");
     if (profile.is_service_provider || profile.role === 'SERVICE') {
