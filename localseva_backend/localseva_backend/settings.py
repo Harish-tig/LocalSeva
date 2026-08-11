@@ -189,7 +189,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'login': '3/minute',
-        'register': '3/minute'
+        'register': '3/minute',
+        'otp': '3/minute',
+        'reset': '3/minute',
     }
 }
 

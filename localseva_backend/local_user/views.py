@@ -78,7 +78,7 @@ class LoginView(APIView):
 class ForgotPasswordView(APIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'login'
+    throttle_scope = 'otp'
 
     def post(self, request):
         serializer = ForgotPasswordSerializer(data = request.data)
@@ -100,7 +100,7 @@ class ForgotPasswordView(APIView):
 class ResetpasswordView(APIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'login'
+    throttle_scope = 'reset'
 
     def post(self, request):
         user = UserModel.objects.filter(email=request.data.get('email')).first()
