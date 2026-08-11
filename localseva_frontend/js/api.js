@@ -169,9 +169,12 @@ async function login(username, password) {
     if (data.user) {
       localStorage.setItem("userName", data.user.name || data.user.username);
       localStorage.setItem("userIsProvider", data.user.is_provider || false);
+    } else {
+      localStorage.setItem("userName", data.username || "User");
+      localStorage.setItem("userIsProvider", data.is_service_provider || false);
     }
 
-    return { success: true, user: data.user || {} };
+    return { success: true, user: data.user || { username: data.username, is_provider: data.is_service_provider } };
   } catch (error) {
     console.error("Login error:", error);
     throw error;
