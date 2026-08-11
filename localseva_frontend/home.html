@@ -1663,7 +1663,7 @@
 
     <script>
       // API Configuration
-      const API_BASE_URL = "http://127.0.0.1:8000/api/user/providers/";
+      const API_BASE_URL = "https://localseva-kuak.onrender.com/api/user/providers/";
 
       // DOM Elements
       const providersContainer = document.getElementById("providersContainer");
@@ -1749,15 +1749,25 @@
             });
           }
 
+          // Normalize relative image paths to the api origin
+          const apiOrigin = "https://localseva-kuak.onrender.com";
+          if (Array.isArray(providers)) {
+            providers.forEach(p => {
+              if (p.avatar) {
+                if (!p.avatar.startsWith('http://') && !p.avatar.startsWith('https://')) {
+                  const separator = p.avatar.startsWith('/') ? '' : '/';
+                  p.avatar = `${apiOrigin}${separator}${p.avatar}`;
+                }
+              }
+            });
+          }
+
           loadingSpinner.style.display = "none";
           return providers;
         } catch (error) {
           console.error("Error fetching service providers:", error);
           loadingSpinner.style.display = "none";
-
-          // Fallback to mock data on error (for development)
-          console.log("Falling back to mock data");
-          return getMockProviders();
+          return [];
         }
       }
 
@@ -2347,75 +2357,6 @@
         document
           .getElementById("find-service")
           .scrollIntoView({ behavior: "smooth" });
-      }
-
-      // Mock data for demo (in case API is not available)
-      function getMockProviders() {
-        return [
-          {
-            id: 1,
-            username: "Ramesh Verma",
-            avatar: "",
-            role: "SERVICE",
-            bio: "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
-            location: "Kandivali",
-            experience_years: 8,
-            pricing_type: "FIXED",
-            base_price: "500",
-            is_available: true,
-            rating: 4.8,
-            total_reviews: 250,
-            completed_bookings_count: 150,
-            categories: ["ELECTRICAL"],
-            description: "Licensed electrician with 8 years experience specializing in emergency repairs and installations.",
-            availability: "Mon-Sat: 9AM-7PM",
-            service_locations: ["Kandivali", "Borivali", "Malad"],
-            phone: "+91 9876543210",
-            email: "ramesh.verma@example.com",
-          },
-          {
-            id: 2,
-            username: "Suresh Patil",
-            avatar: "",
-            role: "SERVICE",
-            bio: "Professional plumber with 10 years experience in residential and commercial plumbing.",
-            location: "Andheri",
-            experience_years: 10,
-            pricing_type: "FIXED",
-            base_price: "400",
-            is_available: true,
-            rating: 4.5,
-            total_reviews: 120,
-            completed_bookings_count: 200,
-            categories: ["PLUMBING"],
-            description: "Professional plumber with 10 years experience in residential and commercial plumbing.",
-            availability: "24/7 Emergency Service",
-            service_locations: ["Andheri", "Malad", "Borivali"],
-            phone: "+91 9876543211",
-            email: "suresh.patil@example.com",
-          },
-          {
-            id: 3,
-            username: "Priya Nair",
-            avatar: "",
-            role: "SERVICE",
-            bio: "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
-            location: "Malad",
-            experience_years: 5,
-            pricing_type: "FLEXIBLE",
-            base_price: "300",
-            is_available: true,
-            rating: 4.9,
-            total_reviews: 89,
-            completed_bookings_count: 120,
-            categories: ["CLEANING"],
-            description: "Eco-friendly cleaning services for homes and offices with 5 years of experience.",
-            availability: "Mon-Fri: 8AM-6PM",
-            service_locations: ["Malad", "Kandivali", "Borivali"],
-            phone: "+91 9876543212",
-            email: "priya.nair@example.com",
-          },
-        ];
       }
 
       // Initialize page when DOM is loaded

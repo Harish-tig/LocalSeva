@@ -65,6 +65,24 @@ async function loadProviderDetails() {
     document.getElementById("providerName").textContent = provider.username;
     document.getElementById("providerStatus").textContent = provider.is_available ? "Available" : "Busy";
     document.getElementById("providerStatus").className = provider.is_available ? "badge badge-success" : "badge badge-warning";
+
+    // Avatar — show profile picture or initials fallback
+    const avatarEl = document.getElementById("providerAvatar");
+    if (provider.avatar) {
+      // Append cache-buster so updated profile pictures always show
+      const bust = `t=${Date.now()}`;
+      const separator = provider.avatar.includes('?') ? '&' : '?';
+      avatarEl.innerHTML = `<img src="${provider.avatar}${separator}${bust}" alt="${provider.username}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.onerror=null;this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`;
+    } else {
+      // Generate initials from username
+      const initials = (provider.username || "?")
+        .split(/[\s_]+/)
+        .map(w => w[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+      avatarEl.innerHTML = `<span style="font-size:2.5rem;font-weight:700;color:var(--primary);">${initials}</span>`;
+    }
     
     document.getElementById("providerRating").textContent = `${parseFloat(provider.rating || 0).toFixed(1)} (${provider.total_reviews || 0} reviews)`;
     document.getElementById("providerExperience").textContent = `${provider.experience_years || 0} years exp.`;

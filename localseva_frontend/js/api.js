@@ -30,6 +30,53 @@ function isAuthenticated() {
   return !!accessToken;
 }
 
+function normalizeImageUrl(url) {
+  if (!url) return null;
+  if (typeof url !== "string") return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  try {
+    const apiOrigin = new URL(API_BASE_URL).origin;
+    const separator = url.startsWith("/") ? "" : "/";
+    return `${apiOrigin}${separator}${url}`;
+  } catch (e) {
+    console.error("Error normalizing image URL:", e);
+    return url;
+  }
+}
+
+function normalizeImagesInResponse(obj) {
+  if (obj === null || obj === undefined) return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => normalizeImagesInResponse(item));
+  }
+
+  if (typeof obj === "object") {
+    const newObj = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (
+        [
+          "avatar",
+          "main_image",
+          "image_2",
+          "image_3",
+          "seller_avatar",
+          "user_avatar",
+        ].includes(key)
+      ) {
+        newObj[key] = normalizeImageUrl(value);
+      } else {
+        newObj[key] = normalizeImagesInResponse(value);
+      }
+    }
+    return newObj;
+  }
+
+  return obj;
+}
+
 function getAuthHeaders() {
   const headers = {
     "Content-Type": "application/json",
@@ -69,7 +116,7 @@ async function apiRequest(endpoint, method = "GET", data = null) {
         options.headers["Authorization"] = `Bearer ${accessToken}`;
         const retryResponse = await fetch(url, options);
         if (retryResponse.ok) {
-          return await retryResponse.json();
+          return normalizeImagesInResponse(await retryResponse.json());
         }
       }
       // Refresh failed, redirect to login
@@ -90,7 +137,7 @@ async function apiRequest(endpoint, method = "GET", data = null) {
       throw new Error(errorMessage);
     }
 
-    return await response.json();
+    return normalizeImagesInResponse(await response.json());
   } catch (error) {
     console.error("API Request failed:", error);
     throw error;
@@ -307,7 +354,7 @@ async function getProfile() {
       localStorage.setItem("userIsProvider", profileData.is_service_provider);
     }
 
-    return profileData;
+    return normalizeImagesInResponse(profileData);
   } catch (error) {
     console.error("Error in getProfile:", error);
     throw error;
@@ -382,7 +429,7 @@ async function updateProfile(profileData) {
       );
     }
 
-    return updatedProfile;
+    return normalizeImagesInResponse(updatedProfile);
   } catch (error) {
     console.error("Error in updateProfile:", error);
     throw error;
@@ -1240,12 +1287,9 @@ async function getProduct(id) {
   }
 }
 
-/**
- * Create a new product
- */
 async function createProduct(formData) {
   try {
-    console.log("Creating product with FormData");
+    console.log("Creating product");
 
     // Using global API_BASE_URL
     const endpoint = `${API_BASE_URL}marketplace/create/`;
@@ -1257,19 +1301,29 @@ async function createProduct(formData) {
       throw new Error("Authentication required. Please login first.");
     }
 
-    // Log FormData for debugging
-    console.log("FormData entries:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": ", pair[1]);
+    let finalBody = formData;
+    let headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (formData instanceof FormData) {
+      finalBody = formData;
+      // Log FormData for debugging
+      console.log("FormData entries:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+    } else {
+      // JSON body
+      headers["Content-Type"] = "application/json";
+      finalBody = JSON.stringify(formData);
+      console.log("JSON Body:", finalBody);
     }
 
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        // Don't set Content-Type for FormData
-      },
-      body: formData,
+      headers: headers,
+      body: finalBody,
     });
 
     console.log("Response status:", response.status);
@@ -1309,7 +1363,7 @@ async function createProduct(formData) {
 
     const result = await response.json();
     console.log("Product created successfully:", result);
-    return result;
+    return normalizeImagesInResponse(result);
   } catch (error) {
     console.error("Error creating product:", error);
     throw error;
@@ -1333,18 +1387,29 @@ async function updateProduct(id, formData) {
       throw new Error("Authentication required. Please login first.");
     }
 
-    // Log FormData for debugging
-    console.log("FormData entries for update:");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": ", pair[1]);
+    let finalBody = formData;
+    let headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (formData instanceof FormData) {
+      finalBody = formData;
+      // Log FormData for debugging
+      console.log("FormData entries for update:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+      }
+    } else {
+      // JSON body
+      headers["Content-Type"] = "application/json";
+      finalBody = JSON.stringify(formData);
+      console.log("JSON Body:", finalBody);
     }
 
     const response = await fetch(endpoint, {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
+      headers: headers,
+      body: finalBody,
     });
 
     console.log("Update response status:", response.status);
@@ -1364,7 +1429,7 @@ async function updateProduct(id, formData) {
 
     const result = await response.json();
     console.log("Product updated successfully:", result);
-    return result;
+    return normalizeImagesInResponse(result);
   } catch (error) {
     console.error("Error updating product:", error);
     throw error;

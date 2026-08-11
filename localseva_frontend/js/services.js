@@ -226,12 +226,12 @@ function renderServices(services) {
     // Build image section — use avatar if available, otherwise a styled placeholder
     let imageHTML;
     if (service.avatar) {
-      // Real avatar: use <img> but with a background-color backup so no flicker
+      // Real avatar: use <img> with absolute positioning so card-img-wrapper padding doesn't push it out
       imageHTML = `
-        <div class="card-img-wrapper" style="background: linear-gradient(135deg, ${gradColor1}, ${gradColor2}); position: relative; height: 180px; border-radius: var(--border-radius-sm); overflow: hidden; margin-bottom: 1rem;">
+        <div class="card-img-wrapper" style="background: linear-gradient(135deg, ${gradColor1}, ${gradColor2}); position: relative; height: 180px; padding-top: 0; border-radius: var(--border-radius-sm); overflow: hidden; margin-bottom: 1rem;">
           <img src="${service.avatar}" 
                alt="${service.name}" 
-               style="width: 100%; height: 100%; object-fit: cover; display: block;"
+               style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div style="display: none; position: absolute; inset: 0; align-items: center; justify-content: center; flex-direction: column; color: white; gap: 0.5rem;">
             <i class="${categoryIcon}" style="font-size: 2.5rem; opacity: 0.9;"></i>
@@ -241,7 +241,7 @@ function renderServices(services) {
     } else {
       // No avatar: use a styled gradient placeholder — no network request, no flicker
       imageHTML = `
-        <div class="card-img-wrapper" style="background: linear-gradient(135deg, ${gradColor1}, ${gradColor2}); height: 180px; border-radius: var(--border-radius-sm); overflow: hidden; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; gap: 0.5rem;">
+        <div class="card-img-wrapper" style="background: linear-gradient(135deg, ${gradColor1}, ${gradColor2}); height: 180px; padding-top: 0; border-radius: var(--border-radius-sm); overflow: hidden; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; gap: 0.5rem;">
           <i class="${categoryIcon}" style="font-size: 2.5rem; opacity: 0.9;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; opacity: 0.85;">${service.category}</span>
         </div>`;

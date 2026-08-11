@@ -5,6 +5,19 @@
 
 let allProducts = [];
 
+// Map backend category keys to human-readable labels
+const CATEGORY_LABELS = {
+  FURNITURE: "Furniture",
+  ELECTRONICS: "Electronics",
+  VEHICLES: "Vehicles",
+  REAL_ESTATE: "Real Estate",
+  HOME_APPLIANCES: "Home Appliances",
+  CLOTHING: "Clothing & Accessories",
+  BOOKS: "Books & Media",
+  SPORTS: "Sports Equipment",
+  OTHER: "Other"
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   // Check auth
   if (typeof api !== 'undefined' && !api.isAuthenticated()) {
@@ -150,7 +163,7 @@ function renderProducts(products) {
           
           <div class="card-meta">
             <span><i class="fas fa-map-marker-alt"></i> ${product.city || 'Unknown location'}</span>
-            <span><i class="fas fa-tag"></i> ${product.category || 'Other'}</span>
+            <span><i class="fas fa-tag"></i> ${CATEGORY_LABELS[product.category] || product.category || 'Other'}</span>
           </div>
           
           <p class="product-description-short">${product.description || 'No description provided.'}</p>
@@ -177,25 +190,39 @@ async function handleAddProduct(e) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Listing...';
     
-    // We create FormData so if they add images later, it's ready. 
-    // Right now, no file inputs in the UI, so it sends strings just like JSON.
-    const productData = {
-      title: document.getElementById("title").value,
-      price: document.getElementById("price").value,
-      condition: document.getElementById("condition").value,
-      category: document.getElementById("category").value,
-      city: document.getElementById("city").value,
-      description: document.getElementById("description").value,
-      contact_phone: document.getElementById("contact_phone").value,
-      contact_whatsapp: document.getElementById("contact_whatsapp").value
-    };
-    
-    await api.createProduct(productData);
-    
+    const formData = new FormData();
+    formData.append("title", document.getElementById("title").value);
+    formData.append("price", document.getElementById("price").value);
+    formData.append("condition", document.getElementById("condition").value);
+    formData.append("category", document.getElementById("category").value);
+    formData.append("city", document.getElementById("city").value);
+    formData.append("address", document.getElementById("address").value);
+    formData.append("description", document.getElementById("description").value);
+    formData.append("contact_phone", document.getElementById("contact_phone").value);
+    formData.append("contact_whatsapp", document.getElementById("contact_whatsapp").value);
+
+    // Main image
+    const fileInput = document.getElementById("main_image");
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      formData.append("main_image", fileInput.files[0]);
+    }
+
+    // Additional images
+    const image2Input = document.getElementById("image_2");
+    if (image2Input && image2Input.files && image2Input.files[0]) {
+      formData.append("image_2", image2Input.files[0]);
+    }
+    const image3Input = document.getElementById("image_3");
+    if (image3Input && image3Input.files && image3Input.files[0]) {
+      formData.append("image_3", image3Input.files[0]);
+    }
+
+    await api.createProduct(formData);
+
     showToast("Item listed successfully!", "success");
     closeModal("addProductModal");
     document.getElementById("addProductForm").reset();
-    
+
     // Reload products to show the new one
     loadProducts();
     

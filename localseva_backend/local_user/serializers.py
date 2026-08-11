@@ -172,6 +172,10 @@ class BookingSerializer(serializers.ModelSerializer):
     def validate(self, data):
         from django.utils import timezone
 
+        if data.get('id') == data.get('provider_id'):
+            raise serializers.ValidationError(
+                {"Message": "Cannot book Yourself!"}
+            )
         # Ensure booking is for a future date
         if data.get('scheduled_date') and data['scheduled_date'] < timezone.now():
             raise serializers.ValidationError(

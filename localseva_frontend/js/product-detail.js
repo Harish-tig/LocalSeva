@@ -7,6 +7,19 @@ let currentProductId = null;
 let currentProduct = null;
 let currentUser = null;
 
+// Map backend category keys to human-readable labels
+const CATEGORY_LABELS = {
+  FURNITURE: "Furniture",
+  ELECTRONICS: "Electronics",
+  VEHICLES: "Vehicles",
+  REAL_ESTATE: "Real Estate",
+  HOME_APPLIANCES: "Home Appliances",
+  CLOTHING: "Clothing & Accessories",
+  BOOKS: "Books & Media",
+  SPORTS: "Sports Equipment",
+  OTHER: "Other"
+};
+
 document.addEventListener("DOMContentLoaded", async function () {
   // Check auth
   if (typeof api !== 'undefined' && !api.isAuthenticated()) {
@@ -76,8 +89,14 @@ async function loadProductDetails() {
     
     const conditionText = product.condition ? product.condition.replace("_", " ") : "Unknown";
     document.getElementById("productCondition").textContent = conditionText;
-    document.getElementById("productCategory").textContent = product.category || "Other";
+    document.getElementById("productCategory").textContent = CATEGORY_LABELS[product.category] || product.category || "Other";
     document.getElementById("productLocation").textContent = product.city || "Unknown";
+    
+    // Address
+    const addressEl = document.getElementById("productAddress");
+    if (addressEl) {
+      addressEl.textContent = product.address || "Not specified";
+    }
     
     // Seller Info
     document.getElementById("sellerName").textContent = product.seller_name;
@@ -228,7 +247,8 @@ async function handleCommentSubmit(e) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
     
-    await api.createComment(currentProductId, {
+    await api.createComment({
+      product: currentProductId,
       comment: commentText
     });
     
