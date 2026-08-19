@@ -57,7 +57,7 @@ ROOT_URLCONF = 'localseva_backend.urls'
 
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    os.getenv('ALLOWED_ORIGIN')
+    os.getenv('ALLOWED_ORIGIN'),
 ]
 
 TEMPLATES = [
