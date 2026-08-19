@@ -29,3 +29,6 @@ data_backup.json
 
 
 **/local_user/management/**
+
+#front end
+frontend/

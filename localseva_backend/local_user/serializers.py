@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel
+from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel, ProductCommentReply
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.core.cache import cache
@@ -402,3 +402,38 @@ class ProductCommentSerializer(serializers.ModelSerializer):
             'comment', 'contact_info', 'is_visible', 'created_at', 'updated_at'
         ]
         read_only_fields = ['user', 'user_name', 'user_avatar', 'created_at', 'updated_at']
+
+class ProductCommentReplySerializer(serializers.ModelSerializer):
+    comment_id = serializers.IntegerField(source='reply_to_id')
+
+    class Meta:
+        model = ProductCommentReply
+        fields = [
+            'id',
+            'comment_id',
+            'reply',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = [
+            'id',
+            'created_at',
+            'updated_at'
+        ]
+
+    def validate(self, data):
+        comment = ProductComment.objects.filter(
+            id=data['reply_to_id']
+        ).first()
+
+        if not comment:
+            raise serializers.ValidationError(
+                {"comment_id": "Comment does not exist."}
+            )
+
+        if self.context['request'].user != comment.product.seller:
+            raise serializers.ValidationError(
+                {"message": "Only owners can reply to comments."}
+            )
+
+        return data

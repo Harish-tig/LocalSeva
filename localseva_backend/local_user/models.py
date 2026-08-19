@@ -225,3 +225,10 @@ class ProductComment(models.Model):
 
     def __str__(self):
         return f"Comment on {self.product.title} by {self.user.username}"
+
+#only product owner can reply to comment.
+class ProductCommentReply(models.Model):
+    reply_to = models.ForeignKey(ProductComment,on_delete=models.CASCADE, related_name="replies")
+    reply = models.CharField(max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

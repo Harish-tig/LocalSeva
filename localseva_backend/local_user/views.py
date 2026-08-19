@@ -1,3 +1,4 @@
+from django.core.serializers import serialize
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -15,9 +16,10 @@ from django.db import models
 from .serializers import (
     RegisterSerializer, LoginSerializer, ProfileSerializer,
     ServiceProviderSerializer, BookingSerializer, BookingUpdateSerializer,
-    ReviewSerializer, ReportSerializer, ProductSerializer, ProductCommentSerializer, ResetPasswordSerializer, ForgotPasswordSerializer
+    ReviewSerializer, ReportSerializer, ProductSerializer, ProductCommentSerializer, ResetPasswordSerializer, ForgotPasswordSerializer,
+    ProductCommentReplySerializer
 )
-from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel
+from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel, ProductCommentReply
 
 # User = get_user_model()
 
@@ -668,3 +670,19 @@ class UserProductCommentsListView(ListAPIView):
         return ProductComment.objects.filter(
             product__seller=self.request.user
         ).order_by('-created_at')
+
+class CommentReplyView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ProductCommentReplySerializer(data = request.data, context={'request': request})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(reply_to_id = request.data.get('comment_id'))
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED
+        )
+
+    def get(self, request):
+        data = ProductCommentReply.objects.filter(reply_to_id = request.query_params.get('comment_id'))
+        return Response(ProductCommentReplySerializer(data,many=True).data)

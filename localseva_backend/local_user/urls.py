@@ -8,7 +8,7 @@ from .views import (
     ReportCreateView, UserReportsListView,
     ProductListView, ProductCreateView, ProductDetailView,
     ProductCommentCreateView, ProductCommentListView, ProductCommentDeleteView,
-    UserProductsListView, UserProductCommentsListView, home, ResetpasswordView, ForgotPasswordView
+    UserProductsListView, UserProductCommentsListView, home, ResetpasswordView, ForgotPasswordView, CommentReplyView
 )
 
 urlpatterns = [
@@ -52,4 +52,6 @@ urlpatterns = [
     path('marketplace/comments/create/', ProductCommentCreateView.as_view(), name="create-comment"),
     path('marketplace/comments/<int:pk>/delete/', ProductCommentDeleteView.as_view(), name="delete-comment"),
     path('marketplace/my-product-comments/', UserProductCommentsListView.as_view(), name="my-product-comments"),
+    path('marketplace/comment-replies/', CommentReplyView.as_view(), name="comment-replies"),
+
 ]

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import UserModel, Profile, Booking, Review, Report, Product, ProductComment
+from .models import UserModel, Profile, Booking, Review, Report, Product, ProductComment, ProductCommentReply
 
 
 class ProfileInline(admin.StackedInline):
@@ -125,6 +125,7 @@ class ProductCommentAdmin(admin.ModelAdmin):
     search_fields = ('product__title', 'user__username', 'comment')
     list_editable = ('is_visible',)
 
+admin.site.register(model_or_iterable=ProductCommentReply)
 
 # ============= ADMIN SITE CONFIGURATION =============
 admin.site.site_header = "Service Booking Platform Admin"
