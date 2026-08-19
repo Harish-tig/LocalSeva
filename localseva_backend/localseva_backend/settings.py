@@ -16,8 +16,10 @@ DEBUG = os.getenv("DEBUG") == "True"
 
 if os.getenv("USE_POSTGRES") == "True":
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+    CORS_ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "").split(",")
 else:
     ALLOWED_HOSTS = ["*"]
+    CORS_ALLOW_ALL_ORIGINS = True
 
 
 
@@ -55,10 +57,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'localseva_backend.urls'
 
-# CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    os.getenv('ALLOWED_ORIGIN'),
-]
 
 TEMPLATES = [
     {
