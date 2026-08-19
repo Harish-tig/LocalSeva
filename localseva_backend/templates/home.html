@@ -711,7 +711,7 @@
             </div>
             <nav class="nav-links">
                 <a href="#endpoints" class="btn btn-secondary">Documentation</a>
-                <a href="https://localseva-front-end.onrender.com/home" class="btn btn-primary" target="_blank">
+                <a href="https://localseva-front-end.onrender.com/home.html" class="btn btn-primary" target="_blank">
                     Launch Platform
                 </a>
                 <a href="https://github.com/Harish-tig/LocalSeva/blob/main/API%20DOCUMENTATION.md" class="btn btn-primary" target="_blank">
@@ -1973,6 +1973,100 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
                                     <h5>Success Response (200 OK)</h5>
                                     <div class="code-block">
                                         <pre>Returns all comments on products owned by the authenticated user</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List Comment Replies Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge get">GET</span>
+                            <span class="endpoint-path">/api/user/marketplace/comment-replies/</span>
+                            <span class="endpoint-desc">List replies for a product comment</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Query Parameters</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">comment_id</span>
+                                            <span class="field-type">int - Parent comment ID</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>[
+  {
+    "id": 1,
+    "comment_id": 5,
+    "reply": "Yes, this item is still available!",
+    "created_at": "2023-10-02T11:00:00Z",
+    "updated_at": "2023-10-02T11:00:00Z"
+  }
+]</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Create Comment Reply Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/marketplace/comment-replies/</span>
+                            <span class="endpoint-desc">Post reply to a comment (Seller Only)</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Permissions & Requirements</h5>
+                                    <div class="code-block">
+                                        <pre>Product Seller Only: Only the seller who owns the product can reply to comments on it.</pre>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">comment_id</span>
+                                            <span class="field-type">int - Parent comment ID</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                        <div class="field-item">
+                                            <span class="field-name">reply</span>
+                                            <span class="field-type">string - Reply text</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Request Example</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "comment_id": 5,
+  "reply": "Yes, this item is still available!"
+}</pre>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (201 Created)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "id": 1,
+  "comment_id": 5,
+  "reply": "Yes, this item is still available!",
+  "created_at": "2023-10-02T11:00:00Z",
+  "updated_at": "2023-10-02T11:00:00Z"
+}</pre>
                                     </div>
                                 </div>
                             </div>

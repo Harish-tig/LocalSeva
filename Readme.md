@@ -44,7 +44,7 @@ Customer Request → Provider Acceptance → Service In Progress → Completion 
 The marketplace component operates like OLX or Craigslist, enabling users to buy and sell products locally through direct peer-to-peer interactions without platform-mediated transactions.
 
 **How It Works:**
-1. **For Sellers:** List products with detailed descriptions and multiple images, set competitive prices, specify product condition and location, receive buyer inquiries through comments, manage multiple product listings.
+1. **For Sellers:** List products with detailed descriptions and multiple images, set competitive prices, specify product condition and location, receive buyer inquiries through comments and reply directly to them, manage multiple product listings.
 2. **For Buyers:** Browse products by categories and filters, view detailed product information and images, contact sellers directly through the comment system, negotiate prices and arrange meetings, track products of interest.
 
 ### 🎯 Core Value Proposition
@@ -113,7 +113,7 @@ Built using modern web technologies, LocalSeva employs a robust architecture:
 | **Category System** | Organized categories: Furniture, Electronics, Vehicles, Real Estate, etc. |
 | **Condition Tags** | Mark items as New, Like New, Good, Fair, or Poor condition |
 | **Search & Filter** | Advanced filtering by category, price range, condition, and location |
-| **Comment System** | Buyers can comment on products to ask questions or express interest |
+| **Comment & Reply System** | Buyers can comment on products to ask questions, and sellers can post official replies |
 | **Seller Dashboard** | Manage all your product listings from a centralized interface |
 | **View Tracking** | Track how many users have viewed your products |
 | **Contact Integration** | Share phone/WhatsApp for direct buyer-seller communication |

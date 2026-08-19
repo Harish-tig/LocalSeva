@@ -883,6 +883,66 @@ or
 
 ---
 
+### 7.9 List Comment Replies
+**GET** `/marketplace/comment-replies/`
+
+**Query Parameters:**
+- `comment_id` (int, required) - ID of the parent product comment
+
+**Success Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "comment_id": 5,
+    "reply": "Yes, this item is still available!",
+    "created_at": "2023-10-02T11:00:00Z",
+    "updated_at": "2023-10-02T11:00:00Z"
+  }
+]
+```
+
+---
+
+### 7.10 Create Comment Reply
+**POST** `/marketplace/comment-replies/`
+
+**Request Body:**
+```json
+{
+  "comment_id": 5,
+  "reply": "Yes, this item is still available!"
+}
+```
+
+**Required Fields:**
+- `comment_id` (int) - Parent comment ID
+- `reply` (string) - Reply text (max 500 chars)
+
+**Conditions / Permissions:**
+- User must be authenticated.
+- **Product Seller Only:** Only the owner of the product associated with the comment is authorized to post a reply.
+
+**Success Response (201 Created):**
+```json
+{
+  "id": 1,
+  "comment_id": 5,
+  "reply": "Yes, this item is still available!",
+  "created_at": "2023-10-02T11:00:00Z",
+  "updated_at": "2023-10-02T11:00:00Z"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Only owners can reply to comments."
+}
+```
+
+---
+
 ## Booking Flow Diagram
 
 ```
