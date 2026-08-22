@@ -32,3 +32,6 @@ data_backup.json
 
 #front end
 frontend/
+
+#deployemnt_sec_key
+localseva-key-pair.pem
