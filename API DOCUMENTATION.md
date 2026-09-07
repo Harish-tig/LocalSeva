@@ -1,10 +1,18 @@
 
 ```
-http://localhost:8000/api/user
+http://localhost:8000/api/user/
 ```
 
+## Architecture & Cross-Domain Deployment
+LocalSeva is designed with complete frontend and backend separation:
+- **Frontend**: Served from any origin (e.g. `http://localhost:3000`, `http://localhost:5500`, or a production static host / CDN).
+- **Backend**: Django REST Framework API served from a separate API domain.
+- **Cross-Domain Configuration**:
+  - Backend CORS: configured via `ALLOWED_ORIGINS` in `.env` (comma-separated list of allowed origins).
+  - Frontend API URL: configured in `frontend/js/config.js` via `APP_CONFIG.API_BASE_URL` or overridden dynamically via `localStorage.setItem('LOCALSEVA_API_BASE_URL', 'https://api.yourdomain.com/api/user/')`.
+
 ## Authentication
-All endpoints (except register, login, service providers list, provider reviews, marketplace products, and product comments) require JWT authentication. Include the token in the header:
+All endpoints (except register, login, token refresh/verify, categories, service providers list, provider reviews, marketplace products, and product comments) require JWT authentication. Include the token in the header:
 ```
 Authorization: Bearer <your_access_token>
 ```
@@ -17,6 +25,8 @@ Authorization: Bearer <your_access_token>
    - [Login](#12-login)
    - [Forgot Password](#13-forgot-password)
    - [Reset Password](#14-reset-password)
+   - [Refresh JWT Token](#15-refresh-jwt-token)
+   - [Verify JWT Token](#16-verify-jwt-token)
    
 2. [Profile Management](#2-profile-management)
    - [Get/Update Profile](#21-getupdate-profile)
@@ -25,6 +35,7 @@ Authorization: Bearer <your_access_token>
 3. [Service Providers](#3-service-providers)
    - [List Service Providers](#31-list-service-providers)
    - [Get Provider Reviews](#32-get-provider-reviews)
+   - [List Service Categories](#33-list-service-categories)
    
 4. [Bookings](#4-bookings)
    - [Create Booking](#41-create-booking)
@@ -205,6 +216,62 @@ Authorization: Bearer <your_access_token>
 
 ---
 
+### 1.5 Refresh JWT Token
+**POST** `/token/refresh/`
+
+Exchanges a valid refresh token for a new access token without re-authenticating.
+
+**Request Body:**
+```json
+{
+  "refresh": "<your_refresh_token>"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "access": "<new_jwt_access_token>"
+}
+```
+
+**Error Response (401 Unauthorized):**
+```json
+{
+  "detail": "Token is invalid or expired",
+  "code": "token_not_valid"
+}
+```
+
+---
+
+### 1.6 Verify JWT Token
+**POST** `/token/verify/`
+
+Checks whether an access token is still valid.
+
+**Request Body:**
+```json
+{
+  "token": "<your_access_token>"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{}
+```
+
+**Error Response (401 Unauthorized):**
+```json
+{
+  "detail": "Token is invalid or expired",
+  "code": "token_not_valid"
+}
+```
+
+---
+
 ## 2. Profile Management
 
 ### 2.1 Get/Update Profile
@@ -326,6 +393,7 @@ Authorization: Bearer <your_access_token>
 [
   {
     "id": 2,
+    "user_id": 15,
     "username": "plumber_joe",
     "email": "joe@example.com",
     "avatar": "http://localhost:8000/media/profiles/joe.jpg",
@@ -364,15 +432,35 @@ Authorization: Bearer <your_access_token>
     "id": 1,
     "booking": 1,
     "user": 1,
-    "user_name": "john_doe",
-    "provider": 2,
-    "provider_name": "plumber_joe",
+    "user_name": "customer_sam",
     "rating": 5,
-    "comment": "Excellent service! Fixed my leaking pipe quickly.",
-    "created_at": "2023-10-05T14:30:00Z"
+    "comment": "Prompt and clean job.",
+    "created_at": "2023-10-02T10:00:00Z"
   }
 ]
 ```
+
+---
+
+### 3.3 List Service Categories
+**GET** `/categories/`
+
+Public endpoint that returns the canonical list of active service categories. Useful for dynamic dropdowns and search filters.
+
+**Success Response (200 OK):**
+```json
+{
+  "categories": [
+    "CARPENTRY",
+    "CLEANING",
+    "ELECTRICAL",
+    "FITNESS",
+    "PLUMBING",
+    "TUTORING"
+  ]
+}
+```
+
 
 ---
 
@@ -611,12 +699,13 @@ Authorization: Bearer <your_access_token>
 ```
 
 **Required Fields:**
-- `reported_user` (int) - User ID being reported
 - `report_type` (string) - "FRAUD", "BAD_SERVICE", "UNPROFESSIONAL", "HARASSMENT", "SAFETY", "OTHER"
 - `description` (string) - Detailed report description
+- At least one identifier: `reported_user` (UserModel PK) OR `reported_profile_id` (Profile PK). When `reported_profile_id` is supplied, `reported_user` is auto-derived by the backend.
 
 **Optional Fields:**
-- `reported_profile_id` (int) - Required if reporting a service provider
+- `reported_user` (int) - User ID being reported
+- `reported_profile_id` (int) - Profile ID of the service provider
 - `booking` (int) - Related booking ID
 - `evidence_image` (file) - Image evidence
 

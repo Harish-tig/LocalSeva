@@ -686,3 +686,32 @@ class CommentReplyView(APIView):
     def get(self, request):
         data = ProductCommentReply.objects.filter(reply_to_id = request.query_params.get('comment_id'))
         return Response(ProductCommentReplySerializer(data,many=True).data)
+
+
+class ServiceCategoryListView(APIView):
+    """
+    Public endpoint that returns the canonical list of service categories.
+    Derives categories from all active service-provider profiles.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    # Canonical categories — if the DB has no providers yet, these defaults are returned
+    CANONICAL_CATEGORIES = [
+        'CARPENTRY', 'CLEANING', 'ELECTRICAL', 'FITNESS', 'PLUMBING', 'TUTORING'
+    ]
+
+    def get(self, request):
+        # Pull unique categories from all SERVICE profiles
+        provider_profiles = Profile.objects.filter(role='SERVICE')
+        db_categories = set()
+        for profile in provider_profiles:
+            if profile.categories:
+                for cat in profile.categories:
+                    db_categories.add(cat.upper())
+
+        if db_categories:
+            categories = sorted(db_categories)
+        else:
+            categories = self.CANONICAL_CATEGORIES
+
+        return Response({'categories': categories}, status=status.HTTP_200_OK)

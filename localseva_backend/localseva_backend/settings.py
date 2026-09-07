@@ -8,18 +8,41 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key-change-in-production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
 
-if os.getenv("USE_POSTGRES") == "True":
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-    CORS_ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "").split(",")
+# --- Hosts & CORS ---
+# ALLOWED_HOSTS: always respect env if provided, otherwise permissive in dev
+_allowed_hosts_env = os.getenv("ALLOWED_HOSTS", "")
+if _allowed_hosts_env:
+    ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
 else:
     ALLOWED_HOSTS = ["*"]
+
+# CORS: if ALLOWED_ORIGINS is set, use explicit list; otherwise permissive in dev
+_allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
+if _allowed_origins_env:
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in _allowed_origins_env.split(",") if o.strip()]
+    CORS_ALLOW_ALL_ORIGINS = False
+else:
     CORS_ALLOW_ALL_ORIGINS = True
+
+# Required for cross-domain JWT auth (Authorization header)
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 
 
@@ -213,14 +236,13 @@ SIMPLE_JWT = {
 
 #email config
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_PORT = int(os.getenv('SMTP_PORT'))
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
-EMAIL_HOST = os.getenv('SMTP_SERVER')
-EMAIL_HOST_USER = os.getenv('DEFAULT_EMAIL_FROM')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_EMAIL_FROM')
-EMAIL_HOST_PASSWORD = os.getenv('APP_PASS')
+EMAIL_PORT = int(os.getenv('SMTP_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True')
+EMAIL_HOST = os.getenv('SMTP_SERVER', '')
+EMAIL_HOST_USER = os.getenv('DEFAULT_EMAIL_FROM', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_EMAIL_FROM', '')
+EMAIL_HOST_PASSWORD = os.getenv('APP_PASS', '')
 
-#deployement config
-
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+#deployment config — secure cookies only in production
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG

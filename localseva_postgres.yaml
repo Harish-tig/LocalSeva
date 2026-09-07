@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: localseva_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    networks:
+      - localseva-net
+    volumes:
+          - localseva_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  localseva_postgres_data:
+    external: true
+
+networks:
+  localseva-net:
+    external: true

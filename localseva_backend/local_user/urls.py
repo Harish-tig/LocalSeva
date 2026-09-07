@@ -1,5 +1,6 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path, include
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from .views import (
     RegisterView, LoginView, ProfileUpdateView,
     BecomeServiceProviderView, ServiceProviderListView,
@@ -8,7 +9,8 @@ from .views import (
     ReportCreateView, UserReportsListView,
     ProductListView, ProductCreateView, ProductDetailView,
     ProductCommentCreateView, ProductCommentListView, ProductCommentDeleteView,
-    UserProductsListView, UserProductCommentsListView, home, ResetpasswordView, ForgotPasswordView, CommentReplyView
+    UserProductsListView, UserProductCommentsListView, home, ResetpasswordView, ForgotPasswordView, CommentReplyView,
+    ServiceCategoryListView
 )
 
 urlpatterns = [
@@ -19,6 +21,9 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name="login"),
     path('forgotpassword/',ForgotPasswordView.as_view(),name="forgotpassword"),
     path('reset/',ResetpasswordView.as_view(),name='resetpassword'),
+    # JWT Token Refresh & Verify
+    path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token-verify'),
 
     # Profile Management
     path('profile/', ProfileUpdateView.as_view(), name="profile"),
@@ -27,6 +32,9 @@ urlpatterns = [
     # Service Providers Listing
     path('providers/', ServiceProviderListView.as_view(), name="providers"),
     path('providers/<int:provider_id>/reviews/', ProviderReviewsListView.as_view(), name="provider-reviews"),
+
+    # Service Categories (public)
+    path('categories/', ServiceCategoryListView.as_view(), name="categories"),
 
     # Bookings (Simplified Flow)
     path('bookings/', BookingListView.as_view(), name="bookings"),

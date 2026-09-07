@@ -926,6 +926,63 @@
   "is_service_provider": false
 }</pre>
                                     </div>
+                    <!-- Refresh Token Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/token/refresh/</span>
+                            <span class="endpoint-desc">Refresh expired JWT access token</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">refresh</span>
+                                            <span class="field-type">string</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verify Token Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/token/verify/</span>
+                            <span class="endpoint-desc">Verify validity of JWT access token</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">token</span>
+                                            <span class="field-type">string</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{}</pre>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1102,6 +1159,7 @@
                                         <pre>[
   {
     "id": 2,
+    "user_id": 15,
     "username": "plumber_joe",
     "bio": "Professional plumber with 10 years experience",
     "location": "New York, NY",
@@ -1109,7 +1167,8 @@
     "pricing_type": "FIXED",
     "base_price": "500.00",
     "rating": 4.5,
-    "total_reviews": 12
+    "total_reviews": 12,
+    "categories": ["PLUMBING", "ELECTRICAL"]
   }
 ]</pre>
                                     </div>
@@ -1151,6 +1210,35 @@
     "created_at": "2023-10-05T14:30:00Z"
   }
 ]</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Categories Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge get">GET</span>
+                            <span class="endpoint-path">/api/user/categories/</span>
+                            <span class="endpoint-desc">List canonical active service categories (public)</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "categories": [
+    "CARPENTRY",
+    "CLEANING",
+    "ELECTRICAL",
+    "FITNESS",
+    "PLUMBING",
+    "TUTORING"
+  ]
+}</pre>
                                     </div>
                                 </div>
                             </div>

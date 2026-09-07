@@ -1,0 +1,16 @@
+services:
+  backend:
+    image: localseva_backend:1.1 
+    container_name: localseva_backend
+
+    env_file: .env.docker
+
+    ports:
+      - "8000:8000"
+
+    networks:
+      - localseva-net
+
+networks:
+  localseva-net:
+    external: true

@@ -134,11 +134,12 @@ class ServiceProviderSerializer(serializers.ModelSerializer):
     """For listing service providers - uses Profile model"""
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
 
     class Meta:
         model = Profile
         fields = [
-            "id", "username", "email", "avatar", "role", "bio", "phone", "location",
+            "id", "user_id", "username", "email", "avatar", "role", "bio", "phone", "location",
             "experience_years", "pricing_type", "base_price", "is_available",
             "rating", "total_reviews", "created_at", "is_service_provider",
             "categories", "availability", "description", "service_locations",'completed_bookings_count'
@@ -172,10 +173,14 @@ class BookingSerializer(serializers.ModelSerializer):
     def validate(self, data):
         from django.utils import timezone
 
-        if data.get('id') == data.get('provider_id'):
+        # Prevent self-booking: compare the request user with the provider's user
+        request = self.context.get('request')
+        service_provider = data.get('service_provider')
+        if request and service_provider and service_provider.user == request.user:
             raise serializers.ValidationError(
-                {"Message": "Cannot book Yourself!"}
+                {"Message": "You cannot book yourself."}
             )
+
         # Ensure booking is for a future date
         if data.get('scheduled_date') and data['scheduled_date'] < timezone.now():
             raise serializers.ValidationError(
@@ -183,7 +188,6 @@ class BookingSerializer(serializers.ModelSerializer):
             )
 
         # Ensure service provider is available
-        service_provider = data.get('service_provider')
         if service_provider and not service_provider.is_available:
             raise serializers.ValidationError(
                 {"service_provider": "This service provider is not currently available"}
@@ -196,17 +200,24 @@ class BookingSerializer(serializers.ModelSerializer):
             )
 
         # Ensure user has selected a category that the provider offers
+        # Use case-insensitive comparison to handle casing differences
         if 'service_category' in data and service_provider:
-            # Get provider's categories (stored as JSONField/list)
             provider_categories = service_provider.categories or []
 
-            # If provider has specified categories, validate against them
             if provider_categories:
-                if data['service_category'] not in provider_categories:
+                # Case-insensitive match: normalize both sides to uppercase
+                provider_cats_upper = [c.upper() for c in provider_categories]
+                submitted_cat = data['service_category'].upper()
+                if submitted_cat not in provider_cats_upper:
                     raise serializers.ValidationError({
                         "service_category": f"Service provider does not offer this category. "
                                             f"Available categories: {', '.join(provider_categories)}"
                     })
+                # Normalize the submitted category to the canonical form stored by provider
+                for cat in provider_categories:
+                    if cat.upper() == submitted_cat:
+                        data['service_category'] = cat
+                        break
 
         # Additional validation for service_category if not checking against provider
         if 'service_category' in data and not data.get('service_category'):
@@ -330,6 +341,11 @@ class ReportSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    # Make reported_user optional — it will be auto-derived from reported_profile if omitted
+    reported_user = serializers.PrimaryKeyRelatedField(
+        queryset=UserModel.objects.all(),
+        required=False
+    )
 
     class Meta:
         model = Report
@@ -347,16 +363,27 @@ class ReportSerializer(serializers.ModelSerializer):
     def validate(self, data):
         request = self.context.get('request')
 
+        # Auto-derive reported_user from reported_profile if not explicitly provided
+        reported_profile = data.get('reported_profile')
+        reported_user = data.get('reported_user')
+
+        if not reported_user and reported_profile:
+            data['reported_user'] = reported_profile.user
+            reported_user = data['reported_user']
+
+        if not reported_user:
+            raise serializers.ValidationError(
+                {"reported_user": "Either reported_user or reported_profile_id must be provided."}
+            )
+
         if request:
             # Ensure user can't report themselves
-            reported_user = data.get('reported_user')
-            if reported_user and reported_user == request.user:
+            if reported_user == request.user:
                 raise serializers.ValidationError(
                     {"reported_user": "You cannot report yourself"}
                 )
 
-            # If reporting a service provider, ensure reported_profile is set
-            reported_profile = data.get('reported_profile')
+            # If reporting a service provider, ensure reported_profile role is SERVICE
             if reported_profile and reported_profile.role != 'SERVICE':
                 raise serializers.ValidationError(
                     {"reported_profile": "Can only report service providers"}

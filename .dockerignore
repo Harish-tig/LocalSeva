@@ -1,0 +1,53 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+.env.*
+
+# Django
+db.sqlite3
+*.log
+
+# Database dumps
+# Database / local data
+**/data.json
+**/data_backup.json
+**/data_backup_clean.json
+**/db.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Tests / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker / Compose
+Dockerfile
+*.yml
+*.yaml
+
+# Frontend
+frontend/
+
+# AWS / deployment secrets
+localseva-key-pair.pem
+helpcmd.txt

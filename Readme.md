@@ -13,11 +13,12 @@
 - [Project Description](#-project-description)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
+- [Project Structure & Repositories](#-project-structure--repositories)
 - [Prerequisites](#-prerequisites)
 - [Installation & Setup](#-installation--setup)
 - [Running the Application](#-running-the-application)
-- [Configuration](#-configuration)
+- [Containerization & Docker Deployment](#-containerization--docker-deployment)
+- [Configuration & Environment Variables](#-configuration--environment-variables)
 - [Application Pages](#-application-pages)
 
 ---
@@ -77,16 +78,14 @@ The marketplace component operates like OLX or Craigslist, enabling users to buy
 - Selling books, clothing, and sports equipment
 - General household items
 
-### 🏗️ Technical Architecture
+### 🏗️ Technical Architecture & Cross-Domain Deployment
 
-Built using modern web technologies, LocalSeva employs a robust architecture:
+Built using modern web technologies, LocalSeva is engineered as two **completely decoupled applications**:
 
-- **Frontend:** Vanilla JavaScript with responsive design for universal compatibility
-- **Backend:** Django REST Framework providing scalable RESTful APIs
-- **Authentication:** JWT-based secure authentication system
-- **Database:** SQLite (development) with easy PostgreSQL upgrade path (production)
-- **File Management:** Integrated media handling for avatars and product images
-- **Security:** CORS protection, token-based auth, input validation, and XSS prevention
+- **Frontend Application:** Standalone HTML/CSS/JavaScript client served independently (via Live Server, static hosting, S3, or CDN). Configured via `frontend/js/config.js` with zero-build environment overrides (`localStorage.setItem('LOCALSEVA_API_BASE_URL', ...)`).
+- **Backend API Application:** Django REST Framework providing stateless, JWT-authenticated RESTful APIs. Supports both SQLite (local dev) and PostgreSQL (production).
+- **Cross-Domain Communication:** High-performance, cross-origin communication with configurable CORS headers (`ALLOWED_ORIGINS` in `.env`), credentials support, and JWT bearer authentication.
+- **Authentication & Security:** JWT-based stateless auth (`/login/`, `/register/`, `/token/refresh/`, `/token/verify/`), scoped throttling, input validation, and secure cookie headers in production.
 
 ---
 
@@ -171,73 +170,84 @@ Django 4.2 + Django REST Framework 3.14
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Structure & Repositories
+
+> 💡 **Separate Repository Architecture**: The frontend and backend are maintained in **separate Git repositories** to support independent deployments, separate CI/CD pipelines, and different domain hosting:
+> - **Backend Repository** (Current Repo): `localseva_backend` + Docker orchestration files
+> - **Frontend Repository**: [LocalSeva Frontend Repository](https://github.com/your-username/localseva-frontend) *(standalone client)*
+
+Below is the complete file tree across both repositories:
+
+### ⚙️ Backend Repository (`localseva_backend`)
 
 ```
-LocalSeva/
+localseva/
 ├── localseva_backend/                 # Django Backend Application
-│   ├── local_user/                    # User Authentication App
-│   │   ├── models.py                  # User, Profile, Booking, Product models
-│   │   ├── serializers.py             # DRF Serializers
-│   │   ├── views.py                   # API Views
-│   │   ├── urls.py                    # App URL routing
-│   │   └── admin.py                   # Admin configurations
-│   │   #other files like signals,apps,utils,helpers etc
-│   ├── localseva_backend/             # Main Django Project
-│   │   ├── settings.py                # Project settings & configuration
-│   │   ├── urls.py                    # Main URL routing
-│   │   ├── wsgi.py                    # WSGI configuration
-│   │   └── asgi.py                    # ASGI configuration
-│   │
-│   ├── media/                         # User uploaded files
-│   │   ├── avatars/                   # User profile pictures
-│   │   └── products/                  # Product images
-│   │
-│   ├── static/                        # Static files
-│   │   ├── css/                       # Stylesheets
-│   │   ├── js/                        # JavaScript files
-│   │   └── images/                    # Static images
-│   │
-│   ├── db.sqlite3                     # SQLite database
-│   ├── manage.py                      # Django management script
-│   └── requirements.txt               # Python dependencies
+│   ├── local_user/                    # Core User, Booking & Marketplace App
+│   │   ├── models.py                  # UserModel, Profile, Booking, Product, Report models
+│   │   ├── serializers.py             # DRF Serializers with field-level validation
+│   │   ├── views.py                   # REST API Views & canonical category endpoint
+│   │   ├── urls.py                    # Endpoint routing (auth, profile, bookings, mart)
+│   │   ├── admin.py                   # Django Admin configurations
+│   │   ├── utils.py                   # Email utilities & OTP generation
+│   │   └── migrations/                # Database migrations
+│   ├── localseva_backend/             # Project Settings & Root Routing
+│   │   ├── settings.py                # CORS, JWT, database & security configuration
+│   │   ├── urls.py                    # Root URLconf
+│   │   ├── wsgi.py                    # WSGI entrypoint for production
+│   │   └── asgi.py                    # ASGI entrypoint
+│   ├── media/                         # Uploaded media (avatars, product images)
+│   ├── static/                        # Backend static assets
+│   ├── manage.py                      # Django management CLI
+│   └── db.sqlite3                     # Development SQLite database
 │
-├── localseva_frontend/                # Frontend Application
-│   ├── home.html                      # API Documentation & Landing page
-│   ├── index.html                     # Login page
+├── Dockerfile                         # Python 3 base image Dockerfile
+├── localseva-docker-compose.yaml      # Multi-container orchestration (Backend + Postgres + Redis)
+├── localseva_backend.yaml             # Standalone backend service Compose file
+├── localseva_postgres.yaml            # Standalone PostgreSQL 16 Compose file
+├── localseva_redis.yaml               # Standalone Redis 8.10 Compose file
+├── .env.example                       # Detailed template for environment variables
+├── .env.docker                        # Environment file for Docker Compose
+├── requirements.txt                   # Production Python dependencies
+├── API DOCUMENTATION.md               # Complete REST API specification
+├── apidocstatic/                      # Interactive static API documentation
+│   └── index.html                     # Swagger-style interactive doc viewer
+├── .dockerignore                      # Docker build exclusions
+└── .gitignore                         # Git ignore patterns (includes frontend/)
+```
+
+### 🎨 Frontend Repository (`frontend/`)
+
+```
+frontend/                              # Standalone Frontend Application
+├── index.html                         # Landing page with video carousel & category filter
+├── css/
+│   └── main.css                       # Comprehensive design system, dark/light themes & utilities
+├── js/
+│   ├── config.js                      # Centralized API configuration & runtime domain overrides
+│   ├── api.js                         # DRF API client, token management & error extraction
+│   ├── main.js                        # Theme toggle, mobile sidebar & strict route protection
+│   ├── auth.js                        # Login, signup & password reset forms (handles next param)
+│   ├── dashboard.js                   # Bookings management & activity dashboard
+│   ├── mart.js                        # Marketplace listings, filters & product upload modal
+│   ├── profile.js                     # Profile settings, category chips & provider upgrade
+│   ├── services.js                    # Service provider discovery & category filter pills
+│   ├── service-detail.js              # Provider detail, direct booking, reviews & reports
+│   ├── service-detail-guest.js        # Read-only provider details for unauthenticated guests
+│   ├── product-detail.js              # Product gallery, buyer comments & seller replies
+│   └── product-detail-guest.js        # Read-only product details for unauthenticated guests
+├── html/
+│   ├── dashboard.html                 # User bookings & profile activity dashboard
+│   ├── login.html                     # Login page with password reset modal
 │   ├── signup.html                    # Registration page
-│   ├── profile.html                   # User profile management
-│   │
-│   ├── services.html                  # Browse service providers
-│   ├── find-service.html              # Search and filter service providers
-│   ├── service-detail.html            # Provider details & booking
-│   ├── my-services.html               # User's service bookings dashboard
-│   │
-│   ├── shop.html                      # Marketplace product listings
-│   ├── product-detail.html            # Product details & comments
-│   ├── add-item.html                  # Create new product listing
-│   ├── my-products.html               # Seller's product dashboard
-│   ├── my-product-comments.html       # Comments on seller's products
-│   ├── my-activity.html               # All user activity overview
-│   │
-│   ├── css/                           # Stylesheets
-│   │   ├── style.css                  # Main stylesheet
-│   │   ├── responsive.css             # Mobile responsive styles
-│   │   └── components.css             # Reusable components
-│   │
-│   ├── js/                            # JavaScript modules
-│   │   ├── auth.js                    # Authentication logic
-│   │   ├── api.js                     # API communication
-│   │   ├── utils.js                   # Utility functions
-│   │   └── main.js                    # Main application logic
-│   │
-│   └── assets/                        # Static assets
-│       ├── images/                    # Images, logos, icons
-│       └── icons/                     # SVG icons
-│
-├── .gitignore                         # Git ignore rules
-├── README.md                          # This file
-└── LICENSE                            # MIT License
+│   ├── profile.html                   # User profile settings & provider mode
+│   ├── services.html                  # Service discovery and search
+│   ├── service-detail.html            # Provider booking, review & report interface
+│   ├── service-detail-guest.html      # Guest-accessible provider view
+│   ├── mart.html                      # Marketplace product listings
+│   ├── product-detail.html            # Product inquiry & comment interface
+│   └── product-detail-guest.html      # Guest-accessible product view
+└── static/                            # Video slides, category icons & visual assets
 ```
 
 ---
@@ -415,7 +425,7 @@ Open a **new terminal window/tab** (keep the backend running) and choose one of 
 
 1. Open VS Code
 2. Install **Live Server** extension if not already installed
-3. Navigate to `localseva_frontend` folder
+3. Navigate to `frontend` folder
 4. Right-click on `index.html`
 5. Select **"Open with Live Server"**
 
@@ -424,13 +434,13 @@ Open a **new terminal window/tab** (keep the backend running) and choose one of 
 **Advantages:**
 - Auto-reload on file changes
 - Best development experience
-- No CORS issues
+- Cross-domain API integration enabled out-of-the-box
 
 #### Method B: Using Python HTTP Server
 
 ```bash
 # Navigate to frontend directory
-cd localseva_frontend
+cd frontend
 
 # Start simple HTTP server on port 3000
 python -m http.server 3000
@@ -443,215 +453,223 @@ python -m http.server 3000
 #### Method C: Direct File Access
 
 ```bash
-# Simply open the HTML file in browser
-cd localseva_frontend
+# Open the HTML file in browser
+cd frontend
 start index.html       # On Windows
 open index.html        # On macOS
 xdg-open index.html    # On Linux
 ```
 
-⚠️ **Warning:** This method may cause CORS errors when making API requests. Use Method A or B for development.
+### ⚙️ Cross-Domain Configuration
 
-### Access Points
-
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend App** | http://localhost:3000 or http://localhost:5500 | Main user interface |
-| **Backend API** | http://localhost:8000/api/ | REST API endpoints |
-| **Admin Panel** | http://localhost:8000/admin/ | Django administration |
-| **API Browsable** | http://localhost:8000/api/bookings/ | DRF browsable API |
+1. **Frontend API URL (`frontend/js/config.js`):**
+   ```javascript
+   // Default is http://127.0.0.1:8000/api/user/
+   // To override for a staging or production backend without rebuilding:
+   localStorage.setItem('LOCALSEVA_API_BASE_URL', 'https://api.yourdomain.com/api/user/');
+   ```
 
 ---
 
-## ⚙️ Configuration
+## 🐳 Containerization & Docker Deployment
 
-### Backend Configuration
+LocalSeva provides enterprise-grade containerization for its backend services, enabling reproducible deployments across development, staging, and production environments.
 
-#### 1. CORS Settings
+### 🏗️ Container Architecture
 
-Ensure CORS is properly configured in `localseva_backend/localseva_backend/settings.py`:
+The backend infrastructure consists of three interconnected services:
 
-```python
-# CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
+```
+                      ┌─────────────────────────────────────────┐
+                      │        Docker Bridge Network            │
+                      │            (localseva-net)              │
+                      │                                         │
+┌────────────────┐    │   ┌─────────────────────────────────┐   │
+│ Frontend App   │────┼──▶│ localseva_backend (Port: 8000)  │   │
+│ (Any Domain)   │    │   └───────────────┬─────────────────┘   │
+└────────────────┘    │                   │                     │
+                      │         ┌─────────┴─────────┐           │
+                      │         ▼                   ▼           │
+                      │   ┌───────────┐       ┌───────────┐     │
+                      │   │ postgres  │       │   redis   │     │
+                      │   │ (Port 5432│       │ (Port 6379│     │
+                      │   │  DB Data) │       │   Cache)  │     │
+                      │   └─────┬─────┘       └───────────┘     │
+                      │         │                               │
+                      └─────────┼───────────────────────────────┘
+                                ▼
+                   localseva_postgres_data (Persistent Volume)
 ```
 
-#### 2. Media Files Configuration
+### 📄 Docker Files Overview
 
-Verify in `settings.py`:
+| File | Purpose | Description |
+|---|---|---|
+| **`Dockerfile`** | Backend Image Specification | Uses official `python:3` base, sets up `/app` working directory, caches pip dependencies, copies project files, exposes port `8000`, and launches the Django development/production server. |
+| **`localseva-docker-compose.yaml`** | Full-Stack Orchestration | Defines all three services (`backend`, `postgres`, `redis`) connected to the external network `localseva-net` and persistent volume `localseva_postgres_data`. |
+| **`localseva_backend.yaml`** | Standalone Backend Compose | Runs only the Django backend container (`localseva_backend:1.1`) mapped to port `8000:8000`, loading environment variables from `.env.docker`. |
+| **`localseva_postgres.yaml`** | Standalone PostgreSQL Compose | Runs PostgreSQL 16 on port `5432:5432` with credentials loaded from environment variables and data persisted in `localseva_postgres_data`. |
+| **`localseva_redis.yaml`** | Standalone Redis Compose | Runs Redis 8.10 cache server exposed on port `6379:6379` connected to `localseva-net`. |
+| **`.env.docker`** | Docker Environment File | Pre-configured environment variables tailored for inter-container communication (e.g., `DB_HOST=postgres`, `REDIS_URL=redis://redis:6379/0`). |
+| **`.dockerignore`** | Build Exclusions | Prevents build bloat by excluding `.venv/`, `.git/`, media dumps, local test artifacts, and `__pycache__`. |
 
-```python
-# Media files (uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-```
+---
 
-And in `localseva_backend/localseva_backend/urls.py`:
+### 🚀 Running with Docker Compose
 
-```python
-from django.conf import settings
-from django.conf.urls.static import static
+Follow these steps to spin up the containerized backend:
 
-urlpatterns = [
-    # ... your URL patterns
-]
+#### Step 1: Create the Shared Docker Network and Volume
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-```
+The Compose configurations use `external: true` for the network and volume so that services can be restarted independently without data loss:
 
-#### 3. JWT Settings
-
-JWT configuration in `settings.py`:
-
-```python
-from datetime import timedelta
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
-}
-```
-
-#### 4. Database Configuration
-
-**Development (SQLite - Default):**
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-```
-
-**Production (PostgreSQL - Optional):**
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'localseva',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
-
-### Frontend Configuration
-
-#### API Base URL
-
-If your backend runs on a different port, update the API URL in frontend JavaScript files:
-
-```javascript
-// In js/api.js or js/config.js
-const API_BASE_URL = 'http://localhost:8000/api/';
-```
-
-#### Authentication Token Storage
-
-Tokens are stored in browser's localStorage:
-
-```javascript
-// After successful login
-localStorage.setItem('access_token', response.access);
-localStorage.setItem('refresh_token', response.refresh);
-localStorage.setItem('user_id', response.user_id);
-```
-
-### Environment Variables (Optional)
-
-For better security, create a `.env` file in `localseva_backend/`:
-
-```env
-# .env file
-SECRET_KEY=your-secret-key-here-change-in-production
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# CORS
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5500
-
-# Database (for PostgreSQL)
-DB_NAME=localseva
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_HOST=localhost
-DB_PORT=5432
-
-# Email (Optional - for future features)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-```
-
-**Install python-decouple:**
 ```bash
-pip install python-decouple
+# Create shared bridge network
+docker network create localseva-net
+
+# Create persistent volume for PostgreSQL data
+docker volume create localseva_postgres_data
 ```
 
-**Use in settings.py:**
-```python
-from decouple import config
+#### Step 2: Build the Backend Docker Image
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
+```bash
+# Build the backend image with tag localseva_backend:1.1
+docker build -t localseva_backend:1.1 .
+```
+
+#### Step 3: Launch Services
+
+**Option A — Launch Full Stack (Recommended):**
+```bash
+# Start backend, postgres, and redis together
+docker compose -f localseva-docker-compose.yaml up -d
+```
+
+**Option B — Launch Services Independently (Modular):**
+```bash
+# Start PostgreSQL database
+docker compose -f localseva_postgres.yaml up -d
+
+# Start Redis cache
+docker compose -f localseva_redis.yaml up -d
+
+# Start Backend API
+docker compose -f localseva_backend.yaml up -d
+```
+
+#### Step 4: Run Migrations and Create Admin User
+
+```bash
+# Apply database migrations inside the backend container
+docker exec -it localseva_backend python localseva_backend/manage.py migrate
+
+# Create a Django superuser
+docker exec -it localseva_backend python localseva_backend/manage.py createsuperuser
+```
+
+#### Step 5: Stop Services
+
+```bash
+# Stop all containers
+docker compose -f localseva-docker-compose.yaml down
+```
+
+---
+
+## ⚙️ Configuration & Environment Variables
+
+### 🔐 Detailed Environment Variables Guide (`.env.example`)
+
+All configurable settings are declared in `.env.example`. Copy this file to `.env` (for local development) or `.env.docker` (for Docker deployment):
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Type | Default / Example | Description |
+|---|---|---|---|
+| **`SECRET_KEY`** | string | *random string* | **Required in production.** Cryptographic signing key for Django sessions, password reset hashes, and CSRF protection. In local dev (`DEBUG=True`), falls back to a safe dev key. |
+| **`DEBUG`** | boolean | `True` | Set to `True` for development (detailed error traces). Set to `False` in production (enforces secure cookies and generic 500 error pages). |
+| **`USE_POSTGRES`** | boolean | `True` or `False` | **Database engine selector.** When `True`, connects to PostgreSQL using the credentials below. When `False`, uses local file-based SQLite (`db.sqlite3`). |
+| **`DB_NAME`** | string | `localseva_db` | PostgreSQL database name. Must match `POSTGRES_DB` in Compose. |
+| **`DB_USER`** | string | `postgres` | PostgreSQL username. |
+| **`DB_PASSWORD`** | string | `your_secure_password` | PostgreSQL user password. |
+| **`DB_HOST`** | string | `postgres` or `localhost` | Database host. Use `postgres` inside Docker network, or `localhost`/`127.0.0.1` for local native execution. |
+| **`DB_PORT`** | integer | `5432` | PostgreSQL listening port. |
+| **`REDIS_URL`** | URI | `redis://redis:6379/0` | Connection string for Redis cache backend. Provider listings and marketplace queries are cached here. Use `redis://localhost:6379/0` if running Redis natively. |
+| **`CLOUD_NAME`** | string | *optional* | Cloudinary cloud name for cloud media storage (avatars, product images). |
+| **`API_KEY`** | string | *optional* | Cloudinary API key. |
+| **`API_SECRET`** | string | *optional* | Cloudinary API secret. |
+| **`SMTP_SERVER`** | string | `smtp.gmail.com` | SMTP email server hostname for sending OTP password resets. |
+| **`SMTP_PORT`** | integer | `587` | SMTP port (defaults safely to `587` if omitted). |
+| **`EMAIL_USE_TLS`** | boolean | `True` | Enable TLS encryption for outgoing email. |
+| **`DEFAULT_EMAIL_FROM`**| string | `your-email@gmail.com` | From-address displayed on password reset emails. |
+| **`APP_PASS`** | string | *app password* | Google App Password (or SMTP authentication password). |
+| **`ALLOWED_ORIGINS`** | string | `http://localhost:3000,http://localhost:5500` | **Cross-Domain CORS Allowlist.** Comma-separated list of origins permitted to make authenticated cross-domain API requests. |
+| **`ALLOWED_HOSTS`** | string | `*` or `api.yourdomain.com` | Comma-separated list of allowed host/domain headers that the Django backend can serve. |
+
+---
+
+### 🌐 Frontend Configuration (`frontend/js/config.js`)
+
+Because the frontend is a separate application, its API destination is managed via `frontend/js/config.js`:
+
+```javascript
+// Default API Base URL
+const defaultApiBase = "http://127.0.0.1:8000/api/user/";
+
+// Runtime override via localStorage (zero-rebuild deployment)
+const storedApiBase = localStorage.getItem("LOCALSEVA_API_BASE_URL");
+
+const config = {
+  API_BASE_URL: storedApiBase || defaultApiBase,
+  CANONICAL_CATEGORIES: [
+    "CARPENTRY", "CLEANING", "ELECTRICAL", "FITNESS", "PLUMBING", "TUTORING"
+  ],
+};
+```
+
+**Switching environments in the browser without rebuilding:**
+```javascript
+// Open DevTools console on the frontend and run:
+setApiBaseUrl('https://api.yourproductiondomain.com/api/user/');
+// To reset back to default:
+localStorage.removeItem('LOCALSEVA_API_BASE_URL');
 ```
 
 ---
 
 ## 📱 Application Pages
 
-### Public Pages (No Authentication Required)
+The frontend application provides a complete, responsive user experience structured across public and protected routes:
 
-| Page | File | Route | Description |
-|------|------|-------|-------------|
-| **Landing Page** | `index.html` | `/` | Homepage with service categories and marketplace preview |
-| **Sign Up/Login** | `signup.html` | `/signup` | User registration and authentication |
-| **Browse Services** | `services.html` | `/services` | List of all service providers with filters |
-| **Service Details** | `service-detail.html` | `/service-detail` | Individual provider profile and booking form |
-| **Marketplace** | `shop.html` | `/shop` | Browse all products for sale |
-| **Product Details** | `product-detail.html` | `/product-detail` | Product information and buyer comments |
+### 🌍 Public Pages (No Authentication Required)
 
-### Private Pages (Authentication Required)
+| Page | File | URL Path | Description |
+|---|---|---|---|
+| **Landing / Home** | `index.html` | `/index.html` | Hero video carousel, interactive category filters, top service providers preview, and dark/light mode toggle. |
+| **Services Discovery** | `services.html` | `/html/services.html` | Searchable directory of service providers with canonical category pills, location filters, and rating badges. |
+| **Service Details (Guest)** | `service-detail-guest.html` | `/html/service-detail-guest.html?id=:id` | Read-only view of a service provider's profile, rates, reviews, and experience. Prompt to log in to book or review. |
+| **Marketplace** | `mart.html` | `/html/mart.html` | Peer-to-peer product listings with price filters, condition tags, and search. |
+| **Product Details (Guest)** | `product-detail-guest.html` | `/html/product-detail-guest.html?id=:id` | Product photo gallery, description, condition, and public buyer inquiries. |
+| **Login** | `login.html` | `/html/login.html` | User login with demo credentials shortcut, forgot password modal, and `next` URL redirect support. |
+| **Sign Up** | `signup.html` | `/html/signup.html` | User registration with auto-login token generation. |
 
-| Page | File | Route | Description |
-|------|------|-------|-------------|
-| **User Profile** | `profile.html` | `/profile` | View and edit profile, become a service provider |
-| **My Services** | `my-services.html` | `/my-services` | View bookings as customer or provider |
-| **My Activity** | `my-activity.html` | `/my-activity` | Complete activity overview (bookings + products) |
-| **Add Product** | `add-item.html` | `/add-item` | Create new marketplace product listing |
-| **My Products** | `my-products.html` | `/my-products` | Manage your product listings |
-| **Product Comments** | `my-product-comments.html` | `/my-product-comments` | View and respond to buyer inquiries |
+### 🔒 Protected Pages (Authentication Required)
 
-### Admin Panel
+| Page | File | URL Path | Description |
+|---|---|---|---|
+| **User Dashboard** | `dashboard.html` | `/html/dashboard.html` | Customer and provider booking overview, status tracking (`PENDING` → `ACCEPTED` → `IN_PROGRESS` → `COMPLETED`), and cancel actions. |
+| **User Profile** | `profile.html` | `/html/profile.html` | Profile management, avatar upload, and Service Provider upgrade mode with canonical category multi-select chips. |
+| **Service Details (Interactive)** | `service-detail.html` | `/html/service-detail.html?id=:id` | Direct service booking modal with future date-time picker, review submission, and safety reporting form. |
+| **Product Details (Interactive)** | `product-detail.html` | `/html/product-detail.html?id=:id` | Product comments system, buyer questions, and direct seller replies. |
 
-| Page | URL | Description |
-|------|-----|-------------|
-| **Django Admin** | `/admin/` | Full database management interface |
+### 🛠️ Administration & Documentation
+
+| Interface | URL Path | Description |
+|---|---|---|
+| **Django Admin Panel** | `http://localhost:8000/admin/` | Full database management, user verification, report moderation, and booking inspection. |
+| **Interactive API Docs** | `/apidocstatic/index.html` | Swagger-style interactive API documentation viewer. |
 
 ---

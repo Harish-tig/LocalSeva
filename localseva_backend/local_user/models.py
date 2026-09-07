@@ -19,8 +19,9 @@ class Profile(models.Model):
     ]
 
     PRICING_TYPE_CHOICES = [
-        ('FIXED', 'Fixed Price'),  # Base price is fixed, may have additional charges
-        ('FLEXIBLE', 'Flexible'),  # Price varies based on location/service description
+        ('FIXED', 'Fixed Price'),      # Base price is fixed, may have additional charges
+        ('HOURLY', 'Hourly Rate'),    # Charged per hour of service
+        ('FLEXIBLE', 'Flexible'),      # Price varies based on location/service description
     ]
 
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name="profile")
