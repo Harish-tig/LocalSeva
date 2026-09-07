@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel, ProductCommentReply
+from .constants import WESTERN_LINE_LOCATIONS, normalize_location, is_valid_location
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.core.cache import cache
@@ -93,6 +94,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     is_service_provider = serializers.BooleanField(source='user.is_service_provider', read_only=True)
+    location = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Profile
@@ -128,6 +130,35 @@ class ProfileSerializer(serializers.ModelSerializer):
                     })
 
         return data
+
+    def validate_location(self, value):
+        if not value:
+            return ""
+        normalized = normalize_location(value)
+        if not normalized:
+            raise serializers.ValidationError(
+                f"'{value}' is not a supported Mumbai Western Line location. Please choose from supported stations."
+            )
+        return normalized
+
+    def validate_service_locations(self, value):
+        if not value:
+            return []
+        if isinstance(value, str):
+            value = [s.strip() for s in value.split(',') if s.strip()]
+        if not isinstance(value, list):
+            raise serializers.ValidationError("service_locations must be a list or comma-separated string.")
+        
+        normalized_list = []
+        for loc in value:
+            norm = normalize_location(str(loc))
+            if not norm:
+                raise serializers.ValidationError(
+                    f"'{loc}' is not a supported Mumbai Western Line location. Please choose from supported stations."
+                )
+            if norm not in normalized_list:
+                normalized_list.append(norm)
+        return normalized_list
 
 #changes here
 class ServiceProviderSerializer(serializers.ModelSerializer):

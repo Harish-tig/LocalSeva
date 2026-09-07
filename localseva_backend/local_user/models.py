@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
+from .constants import LOCATION_CHOICES
 
 
 class UserModel(AbstractUser):
@@ -31,7 +32,7 @@ class Profile(models.Model):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="USER")
     bio = models.TextField(max_length=500, blank=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
-    location = models.CharField(max_length=50, blank=True)
+    location = models.CharField(max_length=50, choices=LOCATION_CHOICES, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Service provider specific fields (only filled when role = "SERVICE")

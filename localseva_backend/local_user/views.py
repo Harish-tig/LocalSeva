@@ -20,6 +20,7 @@ from .serializers import (
     ProductCommentReplySerializer
 )
 from .models import Profile, Booking, Review, Report, Product, ProductComment, UserModel, ProductCommentReply
+from .constants import WESTERN_LINE_LOCATIONS
 
 # User = get_user_model()
 
@@ -233,11 +234,15 @@ class ServiceProviderListView(ListAPIView):
         """Apply query param filters directly on cached JSON data — no DB hit"""
         result = list(data)
 
-        # Filter by location (partial match)
+        # Filter by location (matches primary location or service_locations)
         location = params.get('location')
         if location:
             loc = location.lower()
-            result = [d for d in result if loc in (d.get('location') or '').lower()]
+            result = [
+                d for d in result
+                if loc in (d.get('location') or '').lower() or
+                any(loc in str(s).lower() for s in (d.get('service_locations') or []))
+            ]
 
         # Filter by minimum experience years
         min_experience = params.get('min_experience')
@@ -715,3 +720,15 @@ class ServiceCategoryListView(APIView):
             categories = self.CANONICAL_CATEGORIES
 
         return Response({'categories': categories}, status=status.HTTP_200_OK)
+
+
+class SupportedLocationsView(APIView):
+    """
+    Public endpoint that returns the canonical list of supported Mumbai Western Line locations.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        return Response({
+            'locations': WESTERN_LINE_LOCATIONS
+        }, status=status.HTTP_200_OK)

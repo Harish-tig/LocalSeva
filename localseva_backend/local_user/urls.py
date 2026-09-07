@@ -10,7 +10,7 @@ from .views import (
     ProductListView, ProductCreateView, ProductDetailView,
     ProductCommentCreateView, ProductCommentListView, ProductCommentDeleteView,
     UserProductsListView, UserProductCommentsListView, home, ResetpasswordView, ForgotPasswordView, CommentReplyView,
-    ServiceCategoryListView
+    ServiceCategoryListView, SupportedLocationsView
 )
 
 urlpatterns = [
@@ -33,8 +33,9 @@ urlpatterns = [
     path('providers/', ServiceProviderListView.as_view(), name="providers"),
     path('providers/<int:provider_id>/reviews/', ProviderReviewsListView.as_view(), name="provider-reviews"),
 
-    # Service Categories (public)
+    # Service Categories & Locations (public)
     path('categories/', ServiceCategoryListView.as_view(), name="categories"),
+    path('locations/', SupportedLocationsView.as_view(), name="locations"),
 
     # Bookings (Simplified Flow)
     path('bookings/', BookingListView.as_view(), name="bookings"),
