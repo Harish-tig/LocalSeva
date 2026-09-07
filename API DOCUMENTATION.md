@@ -287,8 +287,8 @@ Checks whether an access token is still valid.
   "avatar": "http://localhost:8000/media/profiles/avatar.jpg",
   "role": "USER",
   "bio": "I need home services",
-  "phone": "+1234567890",
-  "location": "New York, NY",
+  "phone": "+919820112233",
+  "location": "Kandivali",
   "experience_years": 0,
   "pricing_type": "",
   "base_price": null,
@@ -314,8 +314,8 @@ Checks whether an access token is still valid.
   "avatar": "<binary_file>",
   "role": "SERVICE",
   "bio": "Professional plumber with 10 years experience",
-  "phone": "+1234567890",
-  "location": "New York, NY",
+  "phone": "+919820112233",
+  "location": "Kandivali",
   "experience_years": 10,
   "pricing_type": "FIXED",
   "base_price": "500.00",
@@ -323,10 +323,12 @@ Checks whether an access token is still valid.
   "categories": ["PLUMBING", "ELECTRICAL"],
   "availability": "Mon-Fri 9AM-6PM",
   "description": "Licensed plumber specializing in emergency repairs",
-  "service_locations": ["Manhattan", "Brooklyn"],
+  "service_locations": ["Kandivali", "Borivali", "Malad"],
   "is_marketplace_seller": true
 }
 ```
+
+**Location Validation:** `location` and items in `service_locations` are restricted to supported **Mumbai Western Line railway corridor stations** (e.g. `Churchgate` to `Virar`). Both endpoints independently reject any unsupported location with `400 Bad Request`. Case-insensitive normalization and common aliases (e.g. `'bhayender'` -> `'Bhayandar'`) are handled automatically.
 
 **Note:** When changing role to "SERVICE", these fields become required:
 - `experience_years`
@@ -399,8 +401,8 @@ Checks whether an access token is still valid.
     "avatar": "http://localhost:8000/media/profiles/joe.jpg",
     "role": "SERVICE",
     "bio": "Professional plumber with 10 years experience",
-    "phone": "+1234567890",
-    "location": "New York, NY",
+    "phone": "+919820112233",
+    "location": "Borivali",
     "experience_years": 10,
     "pricing_type": "FIXED",
     "base_price": "500.00",
@@ -412,7 +414,7 @@ Checks whether an access token is still valid.
     "categories": ["PLUMBING", "ELECTRICAL"],
     "availability": "Mon-Fri 9AM-6PM",
     "description": "Licensed plumber specializing in emergency repairs",
-    "service_locations": ["Manhattan", "Brooklyn"]
+    "service_locations": ["Borivali", "Kandivali", "Malad"]
   }
 ]
 ```
@@ -457,6 +459,50 @@ Public endpoint that returns the canonical list of active service categories. Us
     "FITNESS",
     "PLUMBING",
     "TUTORING"
+  ]
+}
+```
+
+---
+
+### 3.4 List Supported Locations
+**GET** `/locations/`
+
+Public endpoint that returns the canonical list of supported **Mumbai Western Line railway corridor stations** (Churchgate through Virar). Used by frontend dropdowns and search filters.
+
+**Success Response (200 OK):**
+```json
+{
+  "locations": [
+    "Churchgate",
+    "Marine Lines",
+    "Charni Road",
+    "Grant Road",
+    "Mumbai Central",
+    "Mahalaxmi",
+    "Lower Parel",
+    "Prabhadevi",
+    "Dadar",
+    "Matunga Road",
+    "Mahim",
+    "Bandra",
+    "Khar Road",
+    "Santacruz",
+    "Vile Parle",
+    "Andheri",
+    "Jogeshwari",
+    "Ram Mandir",
+    "Goregaon",
+    "Malad",
+    "Kandivali",
+    "Borivali",
+    "Dahisar",
+    "Mira Road",
+    "Bhayandar",
+    "Naigaon",
+    "Vasai Road",
+    "Nalasopara",
+    "Virar"
   ]
 }
 ```

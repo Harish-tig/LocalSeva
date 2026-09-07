@@ -95,8 +95,8 @@ Built using modern web technologies, LocalSeva is engineered as two **completely
 
 | Feature | Description |
 |---------|-------------|
-| **User Management** | Complete registration, login, and profile management system |
-| **Provider Discovery** | Advanced filtering by location, experience, price range, and ratings |
+| **User Management** | Complete registration, login, and profile management with Mumbai Western Line location selection |
+| **Provider Discovery** | Advanced filtering by Mumbai Western Line railway corridor stations, experience, price range, and ratings |
 | **Smart Booking System** | Create detailed service requests with address and scheduling |
 | **Direct Booking** | Simplified direct booking flow without complex quotes |
 | **Status Tracking** | Real-time booking status: PENDING → ACCEPTED → IN_PROGRESS → COMPLETED |
@@ -661,7 +661,7 @@ The frontend application provides a complete, responsive user experience structu
 | Page | File | URL Path | Description |
 |---|---|---|---|
 | **User Dashboard** | `dashboard.html` | `/html/dashboard.html` | Customer and provider booking overview, status tracking (`PENDING` → `ACCEPTED` → `IN_PROGRESS` → `COMPLETED`), and cancel actions. |
-| **User Profile** | `profile.html` | `/html/profile.html` | Profile management, avatar upload, and Service Provider upgrade mode with canonical category multi-select chips. |
+| **User Profile** | `profile.html` | `/html/profile.html` | Profile management, Western Line location select dropdown, avatar upload, and Service Provider upgrade mode with canonical category multi-select chips and areas served manager. |
 | **Service Details (Interactive)** | `service-detail.html` | `/html/service-detail.html?id=:id` | Direct service booking modal with future date-time picker, review submission, and safety reporting form. |
 | **Product Details (Interactive)** | `product-detail.html` | `/html/product-detail.html?id=:id` | Product comments system, buyer questions, and direct seller replies. |
 
