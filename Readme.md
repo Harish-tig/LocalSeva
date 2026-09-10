@@ -80,12 +80,21 @@ The marketplace component operates like OLX or Craigslist, enabling users to buy
 
 ### 🏗️ Technical Architecture & Cross-Domain Deployment
 
-Built using modern web technologies, LocalSeva is engineered as two **completely decoupled applications**:
+LocalSeva is built using modern cloud web technologies and engineered as two **completely decoupled tiers**:
 
-- **Frontend Application:** Standalone HTML/CSS/JavaScript client served independently (via Live Server, static hosting, S3, or CDN). Configured via `frontend/js/config.js` with zero-build environment overrides (`localStorage.setItem('LOCALSEVA_API_BASE_URL', ...)`).
-- **Backend API Application:** Django REST Framework providing stateless, JWT-authenticated RESTful APIs. Supports both SQLite (local dev) and PostgreSQL (production).
-- **Cross-Domain Communication:** High-performance, cross-origin communication with configurable CORS headers (`ALLOWED_ORIGINS` in `.env`), credentials support, and JWT bearer authentication.
-- **Authentication & Security:** JWT-based stateless auth (`/login/`, `/register/`, `/token/refresh/`, `/token/verify/`), scoped throttling, input validation, and secure cookie headers in production.
+![Application Architecture](application%20architecture.png)
+
+#### 🏢 Cloud Infrastructure & Architecture Breakdown
+
+| Layer / Service | Platform | Role & Responsibilities |
+|---|---|---|
+| **Frontend Client** | **Render / CDN / Any Domain** | Standalone HTML5, CSS3, and Vanilla JavaScript client. Communicates with the backend exclusively via cross-origin REST APIs (`frontend/js/config.js`), storing JWT access & refresh tokens in `localStorage`. |
+| **Backend API Engine** | **AWS EC2 (Django REST)** | Core Django 4.2 & DRF 3.14 API server. Implements SimpleJWT authentication, scoped rate limiting (3 req/min on auth endpoints), SHA-256 OTP hashing, business logic, models, URL routing, and Django Admin panel. |
+| **Relational Database** | **Render PostgreSQL** | Production relational database storing User models, Profiles, Bookings, Marketplace Listings, Reviews, and Reports. *(Falls back to SQLite for local development).* |
+| **In-Memory Cache & OTP** | **Render Redis** | High-performance in-memory cache accelerating Provider listings (60s cache) and Marketplace queries (5min cache) with automatic database fallback. Also stores temporary hashed OTPs for password recovery. |
+| **Media & Static Storage** | **Cloudinary** | Offloaded cloud object storage managing profile avatars and multi-image marketplace product listings via `django-cloudinary-storage`. |
+| **Email Verification** | **SMTP Mail Service** | Transactional email provider sending 6-digit OTP codes for password recovery and account verification over TLS (port 587). |
+| **Admin Moderation** | **Django Admin** | Secure interface restricted to administrators and superusers for reviewing user reports (fraud, bad service, safety) and managing platform integrity. |
 
 ---
 
@@ -475,9 +484,11 @@ xdg-open index.html    # On Linux
 
 LocalSeva provides enterprise-grade containerization for its backend services, enabling reproducible deployments across development, staging, and production environments.
 
-### 🏗️ Container Architecture
+### 🏗️ Container Architecture & Deployment Topology
 
-The backend infrastructure consists of three interconnected services:
+![Docker Deployment](docker-deployement.png)
+
+The backend infrastructure runs as an isolated multi-container topology connected through a custom bridge network:
 
 ```
                       ┌─────────────────────────────────────────┐

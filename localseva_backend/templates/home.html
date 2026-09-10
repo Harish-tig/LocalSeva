@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -699,7 +700,253 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--tertiary);
         }
+
+        /* Architecture & Docker Sections */
+        .architecture-section, .docker-section {
+            padding: 5rem 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--white);
+        }
+
+        .docker-section {
+            background: var(--lighter-gray);
+        }
+
+        .diagram-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 16px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .diagram-card:hover {
+            border-color: var(--primary);
+        }
+
+        .diagram-img-wrapper {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 4px;
+            background: #0d1117;
+            text-align: center;
+            border: 1px solid #2d3748;
+        }
+
+        .diagram-img {
+            width: 100%;
+            height: auto;
+            max-height: 520px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+            transition: transform 0.3s ease;
+        }
+
+        .diagram-img-wrapper:hover .diagram-img {
+            transform: scale(1.015);
+        }
+
+        .zoom-hint {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .arch-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .docker-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .arch-cards-grid, .docker-cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .arch-cards-grid, .docker-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .arch-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+            transition: all 0.25s ease;
+        }
+
+        .arch-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .arch-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .arch-tag {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background: var(--lighter-gray);
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+
+        .arch-card h5 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.01em;
+        }
+
+        .arch-card p {
+            font-size: 0.875rem;
+            color: var(--tertiary);
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .arch-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+            font-size: 0.8125rem;
+            color: var(--secondary);
+        }
+
+        .arch-card ul li {
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .arch-card ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Modal Lightbox */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .image-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content-wrapper {
+            position: relative;
+            max-width: 95vw;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-img {
+            max-width: 100%;
+            max-height: 84vh;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-caption {
+            margin-top: 1rem;
+            color: var(--white);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -38px;
+            right: 0;
+            color: var(--white);
+            font-size: 2.25rem;
+            font-weight: 300;
+            cursor: pointer;
+            line-height: 1;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+
+        .badge-info {
+            color: #1d4ed8;
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+        }
+
+        .badge-success {
+            color: #15803d;
+            background-color: #dcfce7;
+            border: 1px solid #bbf7d0;
+        }
     </style>
+
 </head>
 <body>
 <header id="header">
@@ -710,8 +957,10 @@
                 <p>API Documentation</p>
             </div>
             <nav class="nav-links">
-                <a href="#endpoints" class="btn btn-secondary">Documentation</a>
-                <a href="https://localseva-front-end.onrender.com/home.html" class="btn btn-primary" target="_blank">
+                <a href="#architecture" class="btn btn-secondary">Architecture</a>
+                <a href="#docker" class="btn btn-secondary">Docker</a>
+                <a href="#endpoints" class="btn btn-secondary">API Endpoints</a>
+                <a href="https://localseva-front-end.onrender.com" class="btn btn-primary" target="_blank">
                     Launch Platform
                 </a>
                 <a href="https://github.com/Harish-tig/LocalSeva/blob/main/API%20DOCUMENTATION.md" class="btn btn-primary" target="_blank">
@@ -739,19 +988,27 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">Authentication</span>
-                        <span class="meta-value">JWT Token-based</span>
+                        <span class="meta-value">SimpleJWT + OTP Hashing</span>
                     </div>
                     <div class="meta-item">
-                        <span class="meta-label">Architecture</span>
-                        <span class="meta-value">RESTful Design</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Caching</span>
-                        <span class="meta-value">Redis</span>
+                        <span class="meta-label">Backend Host</span>
+                        <span class="meta-value">AWS EC2 (Django REST)</span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">Database</span>
-                        <span class="meta-value">PostgreSQL / SQLite</span>
+                        <span class="meta-value">PostgreSQL (Render) / SQLite</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Caching & OTP</span>
+                        <span class="meta-value">Redis (Render) - Query & OTP</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Storage</span>
+                        <span class="meta-value">Cloudinary (Media & Static)</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Container</span>
+                        <span class="meta-value">Docker (localseva-net Bridge)</span>
                     </div>
                 </div>
             </div>
@@ -762,7 +1019,7 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-number">28+</div>
+                    <div class="stat-number">33+</div>
                     <div class="stat-label">Endpoints</div>
                 </div>
                 <div class="stat-item">
@@ -808,29 +1065,170 @@
                 </div>
                 <div class="feature-card">
                     <div class="feature-number">03</div>
-                    <h4>Authentication & Authorization</h4>
+                    <h4>Authentication & Security</h4>
                     <p>
-                        Secure JWT-based authentication with role-based access control. Separate
-                        permissions for customers, service providers, and marketplace sellers
-                        ensure data security. Critical endpoints are protected with strict 3/minute rate limiting.
+                        Stateless JWT token authentication with role-based access control (User, Service Provider, Seller). Includes SHA-256 OTP hashing for password recovery, secure password validation, and strict 3/min scoped rate limiting on all auth endpoints.
                     </p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-number">04</div>
-                    <h4>Reviews & Safety</h4>
+                    <h4>Performance & Safety</h4>
                     <p>
-                        Comprehensive review system with star ratings and written feedback. Highly requested endpoints like Product and Provider lists are accelerated via Redis caching with automatic DB fallbacks.
-                    </p>
-                    <p>
-                        User reporting mechanism for fraud, poor service, or safety concerns
-                        maintains platform integrity and user trust.
+                        Accelerated with Redis caching (60s provider list, 5min marketplace list) with automatic PostgreSQL fallback. Mumbai Western Line station validation (29 corridor stations) guarantees regional accuracy, paired with an integrated user reporting and admin review system.
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="endpoints" class="endpoints">
+    
+    <!-- System Architecture Section -->
+    <section id="architecture" class="architecture-section">
+        <div class="container">
+            <div class="section-header">
+                <h3>Application Architecture</h3>
+                <p>Decoupled multi-tier cloud infrastructure engineered for resilience, low latency, and strict security</p>
+            </div>
+
+            <div class="diagram-card">
+                <div class="diagram-img-wrapper" onclick="openModal('{% static \'images/application-architecture.png\' %}', 'LocalSeva - Application Cloud Architecture')">
+                    <img src="{% static 'images/application-architecture.png' %}" 
+                         onerror="this.onerror=null; this.src='/static/images/application-architecture.png';" 
+                         alt="Application Architecture Diagram" 
+                         class="diagram-img">
+                    <div class="zoom-hint">
+                        <span>🔍 Click diagram to enlarge</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-cards-grid">
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">Client Tier</span>
+                    </div>
+                    <h5>Decoupled Frontend</h5>
+                    <p>Standalone HTML5, CSS3 & Vanilla JavaScript client hosted on Render, CDN, or static host.</p>
+                    <ul>
+                        <li>Cross-Domain HTTP API communication</li>
+                        <li>Configurable CORS origins via .env</li>
+                        <li>JWT Bearer token storage in LocalStorage</li>
+                        <li>Zero-build runtime API URL switching</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">API Engine</span>
+                    </div>
+                    <h5>Django DRF Backend (AWS EC2)</h5>
+                    <p>Stateless REST API hosted on AWS EC2 running Django 4.2 & Django REST Framework 3.14.</p>
+                    <ul>
+                        <li>DRF Scoped Rate Limiter (3 req/min on auth)</li>
+                        <li>SimpleJWT token issuance & verification</li>
+                        <li>OTP hashing & verification logic</li>
+                        <li>Built-in Django Admin moderation panel</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">Data Tier</span>
+                    </div>
+                    <h5>PostgreSQL & Redis (Render)</h5>
+                    <p>Managed data persistence and high-speed in-memory caching hosted on Render services.</p>
+                    <ul>
+                        <li>PostgreSQL storing relational app data</li>
+                        <li>Redis in-memory caching for queries</li>
+                        <li>Hashed OTP verification storage</li>
+                        <li>Automatic database query fallback on cache miss</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">Cloud Services</span>
+                    </div>
+                    <h5>Media & SMTP Mail</h5>
+                    <p>Offloaded media delivery and transactional email handling for user verification.</p>
+                    <ul>
+                        <li>Cloudinary cloud storage for avatars & photos</li>
+                        <li>SMTP Mail Service for password reset OTP</li>
+                        <li>TLS encrypted email delivery</li>
+                        <li>Preserves backend compute bandwidth</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Docker Deployment Section -->
+    <section id="docker" class="docker-section">
+        <div class="container">
+            <div class="section-header">
+                <h3>Local Development & Docker Deployment</h3>
+                <p>Reproducible, isolated multi-container orchestration powered by Docker Compose and bridge networking</p>
+            </div>
+
+            <div class="diagram-card">
+                <div class="diagram-img-wrapper" onclick="openModal('{% static \'images/docker-deployement.png\' %}', 'LocalSeva - Local Development & Docker Deployment Topology')">
+                    <img src="{% static 'images/docker-deployement.png' %}" 
+                         onerror="this.onerror=null; this.src='/static/images/docker-deployement.png';" 
+                         alt="Docker Deployment Diagram" 
+                         class="diagram-img">
+                    <div class="zoom-hint">
+                        <span>🔍 Click diagram to enlarge</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="docker-cards-grid">
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">Network</span>
+                    </div>
+                    <h5>Bridge Network (localseva-net)</h5>
+                    <p>Isolated user-defined Docker bridge network facilitating fast inter-container DNS discovery.</p>
+                    <ul>
+                        <li>Inter-service DNS resolution by container name</li>
+                        <li>Isolation from host network clutter</li>
+                        <li>External network declaration prevents teardown</li>
+                        <li>Cross-origin ingress from any frontend origin</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">Services</span>
+                    </div>
+                    <h5>Containerized Stack</h5>
+                    <p>Three coordinated microservices running seamlessly in dedicated Linux containers.</p>
+                    <ul>
+                        <li><strong>backend (Port 8000):</strong> Python 3 / Django WSGI API</li>
+                        <li><strong>redis (Port 6379):</strong> Redis 8.10 cache server</li>
+                        <li><strong>postgres (Port 5432):</strong> PostgreSQL 16 database</li>
+                        <li>Independent standalone compose configs available</li>
+                    </ul>
+                </div>
+
+                <div class="arch-card">
+                    <div class="arch-card-header">
+                        <span class="arch-tag">Persistence</span>
+                    </div>
+                    <h5>Named Volumes & Storage</h5>
+                    <p>Guaranteed relational data persistence across container rebuilds and host restarts.</p>
+                    <ul>
+                        <li>Volume: <code>localseva_postgres_data</code></li>
+                        <li>Mounted at <code>/var/lib/postgresql/data</code></li>
+                        <li>Declared external for disaster recovery</li>
+                        <li>Zero database loss during container updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section id="endpoints" class="endpoints">
         <div class="container">
             <div class="section-header">
                 <h3>API Endpoints</h3>
@@ -1051,7 +1449,85 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                
+                    <!-- Refresh Token Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/token/refresh/</span>
+                            <span class="endpoint-desc">Exchange refresh token for new access token</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">refresh</span>
+                                            <span class="field-type">string - Valid JWT refresh token</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Request Example</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}</pre>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verify Token Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge post">POST</span>
+                            <span class="endpoint-path">/api/user/token/verify/</span>
+                            <span class="endpoint-desc">Verify if JWT token is still valid</span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Required Fields</h5>
+                                    <div class="field-list">
+                                        <div class="field-item">
+                                            <span class="field-name">token</span>
+                                            <span class="field-type">string - JWT access or refresh token</span>
+                                            <span class="required-badge">Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Request Example</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}</pre>
+                                    </div>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+</div>
             </div>
 
             <div class="endpoint-category">
@@ -1187,7 +1663,7 @@
                         <div class="endpoint-item">
                             <span class="method-badge get">GET</span>
                             <span class="endpoint-path">/api/user/providers/</span>
-                            <span class="endpoint-desc">List all service providers with filters</span>
+                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">List all service providers with filters <span class="badge badge-success">Cached: 60s (Redis)</span></span>
                             <span class="expand-icon">+</span>
                         </div>
                         <div class="endpoint-details">
@@ -1280,7 +1756,73 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                
+                    <!-- Service Categories Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge get">GET</span>
+                            <span class="endpoint-path">/api/user/categories/</span>
+                            <span class="endpoint-desc">List active canonical service categories <span class="badge badge-info">Public</span></span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Description</h5>
+                                    <p style="font-size: 0.875rem; color: var(--tertiary); margin-bottom: 0.75rem;">Returns the platform's active canonical service categories used for dropdowns, profile creation, and marketplace matching.</p>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "categories": [
+    "CARPENTRY",
+    "CLEANING",
+    "ELECTRICAL",
+    "FITNESS",
+    "PLUMBING",
+    "TUTORING"
+  ]
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supported Locations Endpoint -->
+                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                        <div class="endpoint-item">
+                            <span class="method-badge get">GET</span>
+                            <span class="endpoint-path">/api/user/locations/</span>
+                            <span class="endpoint-desc">List supported Mumbai Western Line railway corridor stations <span class="badge badge-info">Public</span></span>
+                            <span class="expand-icon">+</span>
+                        </div>
+                        <div class="endpoint-details">
+                            <div class="endpoint-details-content">
+                                <div class="detail-section">
+                                    <h5>Description</h5>
+                                    <p style="font-size: 0.875rem; color: var(--tertiary); margin-bottom: 0.75rem;">Returns the 29 validated railway stations from Churchgate to Virar. User and provider profile locations are strictly validated against this list.</p>
+                                </div>
+                                <div class="detail-section">
+                                    <h5>Success Response (200 OK)</h5>
+                                    <div class="code-block">
+                                        <pre>{
+  "locations": [
+    "Churchgate", "Marine Lines", "Charni Road", "Grant Road", "Mumbai Central",
+    "Mahalaxmi", "Lower Parel", "Prabhadevi", "Dadar", "Matunga Road",
+    "Mahim", "Bandra", "Khar Road", "Santacruz", "Vile Parle",
+    "Andheri", "Jogeshwari", "Ram Mandir", "Goregaon", "Malad",
+    "Kandivali", "Borivali", "Dahisar", "Mira Road", "Bhayandar",
+    "Naigaon", "Vasai Road", "Nalasopara", "Virar"
+  ]
+}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+</div>
             </div>
 
             <div class="endpoint-category">
@@ -1593,7 +2135,7 @@
                         <div class="endpoint-item">
                             <span class="method-badge get">GET</span>
                             <span class="endpoint-path">/api/user/marketplace/</span>
-                            <span class="endpoint-desc">List products with filters</span>
+                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">List products with filters <span class="badge badge-success">Cached: 5min (Redis)</span></span>
                             <span class="expand-icon">+</span>
                         </div>
                         <div class="endpoint-details">
@@ -2085,7 +2627,7 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
             <h3>Ready to Get Started?</h3>
             <p>Start using LocalSeva to book services or list products for sale</p>
             <div class="cta-buttons">
-                <a href="https://localseva-front-end.onrender.com/home" class="btn btn-light" target="_blank">
+                <a href="https://localseva-front-end.onrender.com" class="btn btn-light" target="_blank">
                     Launch Platform
                 </a>
                 <a href="https://github.com/Harish-tig/LocalSeva" class="btn btn-outline" target="_blank">
@@ -2109,8 +2651,10 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
             </div>
             <div class="footer-section">
                 <h5>Navigation</h5>
+                <a href="#architecture">Architecture</a>
+                <a href="#docker">Docker Deployment</a>
                 <a href="#endpoints">API Documentation</a>
-                <a href="https://localseva-front-end.onrender.com/home" target="_blank">Platform</a>
+                <a href="https://localseva-front-end.onrender.com" target="_blank">Platform</a>
                 <a href="https://github.com/Harish-tig/LocalSeva" target="_blank">GitHub Repository</a>
             </div>
             <div class="footer-section">
@@ -2121,14 +2665,15 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
             </div>
             <div class="footer-section">
                 <h5>Technology</h5>
-                <p>Django 4.2</p>
-                <p>Django REST Framework 3.14</p>
-                <p>JWT Authentication</p>
+                <p>Django 4.2 + DRF 3.14</p>
+                <p>JWT Auth & OTP Hashing</p>
+                <p>Redis Caching</p>
                 <p>PostgreSQL / SQLite</p>
+                <p>Docker Containerization</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2025 LocalSeva</p>
+            <p>© 2026 LocalSeva</p>
         </div>
     </div>
 </footer>
@@ -2200,6 +2745,47 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
     document.querySelectorAll('.feature-card, .endpoint-category, .stat-item').forEach(el => {
         observer.observe(el);
     });
+
+    // Lightbox modal functionality
+    function openModal(src, caption) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const modalCaption = document.getElementById('modalCaption');
+        
+        modalImg.src = src;
+        modalCaption.textContent = caption || '';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModalDirect() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function closeModal(event) {
+        if (event.target.id === 'imageModal' || event.target.classList.contains('modal-close')) {
+            closeModalDirect();
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModalDirect();
+        }
+    });
+
 </script>
+
+<!-- Lightbox Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeModal(event)">
+    <div class="modal-content-wrapper">
+        <span class="modal-close" onclick="closeModalDirect()">&times;</span>
+        <img id="modalImage" class="modal-img" src="" alt="Enlarged Diagram">
+        <div id="modalCaption" class="modal-caption"></div>
+    </div>
+</div>
+
 </body>
 </html>

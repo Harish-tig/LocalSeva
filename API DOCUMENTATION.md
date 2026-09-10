@@ -1,63 +1,101 @@
+# 📚 LocalSeva REST API Specification & System Architecture
 
 ```
-http://localhost:8000/api/user/
+Base URL: http://localhost:8000/api/user/
 ```
 
-## Architecture & Cross-Domain Deployment
-LocalSeva is designed with complete frontend and backend separation:
-- **Frontend**: Served from any origin (e.g. `http://localhost:3000`, `http://localhost:5500`, or a production static host / CDN).
-- **Backend**: Django REST Framework API served from a separate API domain.
-- **Cross-Domain Configuration**:
-  - Backend CORS: configured via `ALLOWED_ORIGINS` in `.env` (comma-separated list of allowed origins).
-  - Frontend API URL: configured in `frontend/js/config.js` via `APP_CONFIG.API_BASE_URL` or overridden dynamically via `localStorage.setItem('LOCALSEVA_API_BASE_URL', 'https://api.yourdomain.com/api/user/')`.
+## 🏗️ System Architecture & Cloud Infrastructure
 
-## Authentication
-All endpoints (except register, login, token refresh/verify, categories, service providers list, provider reviews, marketplace products, and product comments) require JWT authentication. Include the token in the header:
-```
-Authorization: Bearer <your_access_token>
-```
+LocalSeva is engineered as a modern, completely decoupled distributed system:
+
+![Application Architecture](application%20architecture.png)
+
+### 🏢 Cloud Infrastructure Tiers
+
+| Layer | Host / Provider | Technology | Key Responsibilities |
+|---|---|---|---|
+| **Frontend Client** | **Render / CDN / Any Domain** | HTML5, CSS3, Vanilla JS | Standalone client application communicating cross-origin via CORS with JWT Bearer tokens in `localStorage`. Zero-build runtime API switching via `frontend/js/config.js`. |
+| **Backend API Engine** | **AWS EC2** | Django 4.2 + DRF 3.14 | Stateless REST API service providing SimpleJWT token auth, scoped rate limiting (3 req/min on auth), SHA-256 OTP hashing, domain business logic, and Django Admin panel. |
+| **Relational Database** | **Render Services** | PostgreSQL 16 | Production relational database persisting users, profiles, bookings, products, comments, reviews, and reports. *(SQLite used for local dev).* |
+| **In-Memory Cache & OTP** | **Render Services** | Redis 8.10 | High-throughput caching for Provider lists (60s cache) and Marketplace products (5min cache) with automatic database fallback. Also stores hashed OTP tokens for password recovery. |
+| **Media Object Storage** | **Cloudinary** | Cloudinary API | Cloud storage for profile avatars and multi-image marketplace product listings via `django-cloudinary-storage`. |
+| **Transactional Email** | **SMTP Mail Service** | SMTP / TLS (Port 587) | Generates and delivers 6-digit verification and password recovery OTP emails. |
+| **Admin Moderation** | **Django Admin** | Django Admin Contrib | Restricted admin dashboard for superusers to verify reports (fraud, bad service, safety) and manage listings. |
 
 ---
 
-## Table of Contents
+## 🐳 Docker Deployment & Containerization Topology
+
+LocalSeva provides enterprise-grade containerization for local development and production deployments:
+
+![Docker Deployment](docker-deployement.png)
+
+### 📦 Container Network & Services
+
+- **Bridge Network (`localseva-net`):** User-defined Docker bridge network facilitating isolated, high-speed inter-container communication and DNS discovery.
+- **Backend Service (`localseva_backend`):** Python 3 / Django REST Framework container listening on port `8000:8000`.
+- **Cache Service (`localseva_redis`):** Redis 8.10 in-memory cache container listening on port `6379:6379`.
+- **Database Service (`localseva_postgres`):** PostgreSQL 16 relational database container listening on port `5432:5432`.
+- **Data Persistence:** Dedicated named volume `localseva_postgres_data` mounted to `/var/lib/postgresql/data` ensuring zero data loss across container lifecycle events.
+
+---
+
+## 🔐 Authentication & Rate Limiting
+
+- **JWT Authentication:** All endpoints (except register, login, password reset/forgot, token refresh/verify, categories, locations, service providers list, provider reviews, marketplace products, and product comments) require JWT authentication:
+  ```
+  Authorization: Bearer <your_access_token>
+  ```
+- **Scoped Rate Limiting:** Auth endpoints (`/register/`, `/login/`, `/forgotpassword/`, `/reset/`) are strictly throttled to **3 requests per minute** per user/IP via DRF's `ScopedRateThrottle`.
+- **Cache Acceleration:** Public query endpoints (`/providers/` and `/marketplace/`) are cached in Redis with automatic database fallbacks on cache misses.
+- **Location Validation:** Profile locations and provider service areas are validated against the **29 Mumbai Western Line railway corridor stations** (Churchgate to Virar).
+
+---
+
+## 📋 Table of Contents
+
 1. [Authentication](#1-authentication)
-   - [Register User](#11-register-user)
-   - [Login](#12-login)
-   - [Forgot Password](#13-forgot-password)
-   - [Reset Password](#14-reset-password)
-   - [Refresh JWT Token](#15-refresh-jwt-token)
-   - [Verify JWT Token](#16-verify-jwt-token)
-   
+   - [1.1 Register User](#11-register-user)
+   - [1.2 Login](#12-login)
+   - [1.3 Forgot Password](#13-forgot-password)
+   - [1.4 Reset Password](#14-reset-password)
+   - [1.5 Refresh JWT Token](#15-refresh-jwt-token)
+   - [1.6 Verify JWT Token](#16-verify-jwt-token)
+
 2. [Profile Management](#2-profile-management)
-   - [Get/Update Profile](#21-getupdate-profile)
-   - [Become Service Provider](#22-become-service-provider)
-   
+   - [2.1 Get/Update Profile](#21-getupdate-profile)
+   - [2.2 Become Service Provider](#22-become-service-provider)
+
 3. [Service Providers](#3-service-providers)
-   - [List Service Providers](#31-list-service-providers)
-   - [Get Provider Reviews](#32-get-provider-reviews)
-   - [List Service Categories](#33-list-service-categories)
-   
+   - [3.1 List Service Providers](#31-list-service-providers)
+   - [3.2 Get Provider Reviews](#32-get-provider-reviews)
+   - [3.3 List Service Categories](#33-list-service-categories)
+   - [3.4 List Supported Locations](#34-list-supported-locations)
+
 4. [Bookings](#4-bookings)
-   - [Create Booking](#41-create-booking)
-   - [List Bookings](#42-list-bookings)
-   - [Get/Update Booking](#43-getupdate-booking)
-   
+   - [4.1 Create Booking](#41-create-booking)
+   - [4.2 List Bookings](#42-list-bookings)
+   - [4.3 Get/Update Booking](#43-getupdate-booking)
+   - [4.4 Cancel Booking](#44-cancel-booking)
+
 5. [Reviews](#5-reviews)
-   - [Create Review](#51-create-review)
-   
+   - [5.1 Create Review](#51-create-review)
+
 6. [Reports](#6-reports)
-   - [Create Report](#61-create-report)
-   - [List My Reports](#62-list-my-reports)
-   
+   - [6.1 Create Report](#61-create-report)
+   - [6.2 List My Reports](#62-list-my-reports)
+
 7. [Marketplace (OLX-like)](#7-marketplace-olx-like)
-   - [List Products](#71-list-products)
-   - [Create Product](#72-create-product)
-   - [Get/Update/Delete Product](#73-getupdatedelete-product)
-   - [List Product Comments](#74-list-product-comments)
-   - [Create Comment](#75-create-comment)
-   - [Delete/Hide Comment](#76-deletehide-comment)
-   - [List My Products](#77-list-my-products)
-   - [List Comments on My Products](#78-list-comments-on-my-products)
+   - [7.1 List Products](#71-list-products)
+   - [7.2 Create Product](#72-create-product)
+   - [7.3 Get/Update/Delete Product](#73-getupdatedelete-product)
+   - [7.4 List Product Comments](#74-list-product-comments)
+   - [7.5 Create Comment](#75-create-comment)
+   - [7.6 Delete/Hide Comment](#76-deletehide-comment)
+   - [7.7 List My Products](#77-list-my-products)
+   - [7.8 List Comments on My Products](#78-list-comments-on-my-products)
+   - [7.9 List Comment Replies](#79-list-comment-replies)
+   - [7.10 Create Comment Reply](#710-create-comment-reply)
 
 ---
 
@@ -1078,35 +1116,34 @@ or
 
 ---
 
-## Booking Flow Diagram
+## Booking Lifecycle & Flow Diagram
 
 ```
-User (Customer)                  Service Provider
-     |                                |
-     | 1. POST /bookings/create/      |
-     |-------------------------------->|
-     |                                |
-     | 2. Status: PENDING             |
-     |<--------------------------------|
-     |                                |
-     | 3. PUT quote_price             |
-     |<--------------------------------|
-     | 4. Status: QUOTE_GIVEN         |
-     |                                |
-     | 5. PUT status: ACCEPTED        |
-     |-------------------------------->|
-     | 6. Status: ACCEPTED            |
-     |                                |
-     | 7. PUT status: IN_PROGRESS     |
-     |<--------------------------------|
-     | 8. Status: IN_PROGRESS         |
-     |                                |
-     | 9. PUT status: COMPLETED       |
-     |<--------------------------------|
-     | 10. Status: COMPLETED          |
-     |                                |
-     | 11. POST /reviews/create/      |
-     |-------------------------------->|
+Customer (User)                                Service Provider
+     |                                                |
+     | 1. POST /bookings/create/                      |
+     |----------------------------------------------->|
+     |                                                |
+     | 2. Booking Created (Status: PENDING)           |
+     |<-----------------------------------------------|
+     |                                                |
+     |    [Optional: Customer can cancel]             |
+     |    POST /bookings/{id}/cancel/                 |
+     |    (Status -> CANCELLED)                       |
+     |                                                |
+     | 3. PUT /bookings/{id}/ (status: ACCEPTED)      |
+     |<-----------------------------------------------|
+     |                                                |
+     | 4. PUT /bookings/{id}/ (status: IN_PROGRESS)   |
+     |<-----------------------------------------------|
+     |                                                |
+     | 5. PUT /bookings/{id}/ (status: COMPLETED)     |
+     |    (Provider sets final_price if flexible)     |
+     |<-----------------------------------------------|
+     |                                                |
+     | 6. POST /reviews/create/                       |
+     |----------------------------------------------->|
+     |                                                |
 ```
 
 ---
