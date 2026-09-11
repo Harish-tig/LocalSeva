@@ -1,12 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LocalSeva API - Service Booking & Marketplace Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet">
+        rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -367,10 +368,21 @@
             color: var(--white);
         }
 
-        .method-badge.get { background: var(--primary); }
-        .method-badge.post { background: var(--secondary); }
-        .method-badge.put { background: var(--tertiary); }
-        .method-badge.delete { background: #8b8b8b; }
+        .method-badge.get {
+            background: var(--primary);
+        }
+
+        .method-badge.post {
+            background: var(--secondary);
+        }
+
+        .method-badge.put {
+            background: var(--tertiary);
+        }
+
+        .method-badge.delete {
+            background: #8b8b8b;
+        }
 
         .endpoint-path {
             font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
@@ -666,6 +678,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -702,7 +715,8 @@
         }
 
         /* Architecture & Docker Sections */
-        .architecture-section, .docker-section {
+        .architecture-section,
+        .docker-section {
             padding: 5rem 0;
             border-bottom: 1px solid var(--border);
             background: var(--white);
@@ -765,7 +779,7 @@
             gap: 6px;
             letter-spacing: 0.02em;
             pointer-events: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .arch-cards-grid {
@@ -781,13 +795,17 @@
         }
 
         @media (max-width: 992px) {
-            .arch-cards-grid, .docker-cards-grid {
+
+            .arch-cards-grid,
+            .docker-cards-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 640px) {
-            .arch-cards-grid, .docker-cards-grid {
+
+            .arch-cards-grid,
+            .docker-cards-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -948,161 +966,169 @@
     </style>
 
 </head>
+
 <body>
-<header id="header">
-    <div class="container">
-        <div class="header-content">
-            <div class="brand">
-                <h1>LocalSeva</h1>
-                <p>API Documentation</p>
-            </div>
-            <nav class="nav-links">
-                <a href="#architecture" class="btn btn-secondary">Architecture</a>
-                <a href="#docker" class="btn btn-secondary">Docker</a>
-                <a href="#endpoints" class="btn btn-secondary">API Endpoints</a>
-                <a href="https://localseva-front-end.onrender.com" class="btn btn-primary" target="_blank">
-                    Launch Platform
-                </a>
-                <a href="https://github.com/Harish-tig/LocalSeva/blob/main/API%20DOCUMENTATION.md" class="btn btn-primary" target="_blank">
-                    Detailed Docs
-                </a>
-            </nav>
-        </div>
-    </div>
-</header>
-
-<main>
-    <section class="hero">
+    <header id="header">
         <div class="container">
-            <div class="hero-content">
-                <h2>Service Booking & Marketplace Platform API</h2>
-                <p>
-                    A comprehensive RESTful API combining professional service booking with peer-to-peer
-                    marketplace functionality. Built with Django REST Framework, featuring JWT authentication,
-                    real-time status tracking, and secure data handling.
-                </p>
-                <div class="hero-meta">
-                    <div class="meta-item">
-                        <span class="meta-label">Framework</span>
-                        <span class="meta-value">Django 4.2 + DRF 3.14</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Authentication</span>
-                        <span class="meta-value">SimpleJWT + OTP Hashing</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Backend Host</span>
-                        <span class="meta-value">AWS EC2 (Django REST)</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Database</span>
-                        <span class="meta-value">PostgreSQL (Render) / SQLite</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Caching & OTP</span>
-                        <span class="meta-value">Redis (Render) - Query & OTP</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Storage</span>
-                        <span class="meta-value">Cloudinary (Media & Static)</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label">Container</span>
-                        <span class="meta-value">Docker (localseva-net Bridge)</span>
-                    </div>
+            <div class="header-content">
+                <div class="brand">
+                    <h1>LocalSeva</h1>
+                    <p>API Documentation</p>
                 </div>
+                <nav class="nav-links">
+                    <a href="#architecture" class="btn btn-secondary">Architecture</a>
+                    <a href="#docker" class="btn btn-secondary">Docker</a>
+                    <a href="#endpoints" class="btn btn-secondary">API Endpoints</a>
+                    <a href="https://localseva-front-end.onrender.com" class="btn btn-primary" target="_blank">
+                        Launch Platform
+                    </a>
+                    <a href="https://github.com/Harish-tig/LocalSeva/blob/main/API%20DOCUMENTATION.md"
+                        class="btn btn-primary" target="_blank">
+                        Detailed Docs
+                    </a>
+                </nav>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section class="stats">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">33+</div>
-                    <div class="stat-label">Endpoints</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">2</div>
-                    <div class="stat-label">Core Modules</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">7</div>
-                    <div class="stat-label">Resource Types</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">100%</div>
-                    <div class="stat-label">RESTful</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="features">
-        <div class="container">
-            <div class="section-header">
-                <h3>Platform Capabilities</h3>
-                <p>Two integrated modules providing comprehensive service booking and marketplace functionality</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-number">01</div>
-                    <h4>Service Booking Module</h4>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2>Service Booking & Marketplace Platform API</h2>
                     <p>
-                        Complete workflow management from booking creation to service completion.
-                        Providers submit quotes, customers accept offers, and both parties track
-                        real-time status updates throughout the service lifecycle.
+                        A comprehensive RESTful API combining professional service booking with peer-to-peer
+                        marketplace functionality. Built with Django REST Framework, featuring JWT authentication,
+                        real-time status tracking, and secure data handling.
                     </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">02</div>
-                    <h4>Marketplace Module</h4>
-                    <p>
-                        Peer-to-peer product listings with category management, condition tracking,
-                        and buyer-seller communication. Direct contact exchange and comment system
-                        facilitate transparent transactions.
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">03</div>
-                    <h4>Authentication & Security</h4>
-                    <p>
-                        Stateless JWT token authentication with role-based access control (User, Service Provider, Seller). Includes SHA-256 OTP hashing for password recovery, secure password validation, and strict 3/min scoped rate limiting on all auth endpoints.
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-number">04</div>
-                    <h4>Performance & Safety</h4>
-                    <p>
-                        Accelerated with Redis caching (60s provider list, 5min marketplace list) with automatic PostgreSQL fallback. Mumbai Western Line station validation (29 corridor stations) guarantees regional accuracy, paired with an integrated user reporting and admin review system.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    
-    <!-- System Architecture Section -->
-    <section id="architecture" class="architecture-section">
-        <div class="container">
-            <div class="section-header">
-                <h3>Application Architecture</h3>
-                <p>Decoupled multi-tier cloud infrastructure engineered for resilience, low latency, and strict security</p>
-            </div>
-
-            <div class="diagram-card">
-                <div class="diagram-img-wrapper" onclick="openModal('{% static \'images/application-architecture.png\' %}', 'LocalSeva - Application Cloud Architecture')">
-                    <img src="{% static 'images/application-architecture.png' %}" 
-                         onerror="this.onerror=null; this.src='/static/images/application-architecture.png';" 
-                         alt="Application Architecture Diagram" 
-                         class="diagram-img">
-                    <div class="zoom-hint">
-                        <span>🔍 Click diagram to enlarge</span>
+                    <div class="hero-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Framework</span>
+                            <span class="meta-value">Django 4.2 + DRF 3.14</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Authentication</span>
+                            <span class="meta-value">SimpleJWT + OTP Hashing</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Backend Host</span>
+                            <span class="meta-value">AWS EC2 (Django REST)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Database</span>
+                            <span class="meta-value">PostgreSQL (Render) / SQLite</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Caching & OTP</span>
+                            <span class="meta-value">Redis (Render) - Query & OTP</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Storage</span>
+                            <span class="meta-value">Cloudinary (Media & Static)</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Container</span>
+                            <span class="meta-value">Docker (localseva-net Bridge)</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="arch-cards-grid">
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">33+</div>
+                        <div class="stat-label">Endpoints</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Core Modules</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">Resource Types</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">RESTful</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h3>Platform Capabilities</h3>
+                    <p>Two integrated modules providing comprehensive service booking and marketplace functionality</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-number">01</div>
+                        <h4>Service Booking Module</h4>
+                        <p>
+                            Complete workflow management from booking creation to service completion.
+                            Providers submit quotes, customers accept offers, and both parties track
+                            real-time status updates throughout the service lifecycle.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-number">02</div>
+                        <h4>Marketplace Module</h4>
+                        <p>
+                            Peer-to-peer product listings with category management, condition tracking,
+                            and buyer-seller communication. Direct contact exchange and comment system
+                            facilitate transparent transactions.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-number">03</div>
+                        <h4>Authentication & Security</h4>
+                        <p>
+                            Stateless JWT token authentication with role-based access control (User, Service Provider,
+                            Seller). Includes SHA-256 OTP hashing for password recovery, secure password validation, and
+                            strict 3/min scoped rate limiting on all auth endpoints.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-number">04</div>
+                        <h4>Performance & Safety</h4>
+                        <p>
+                            Accelerated with Redis caching (60s provider list, 5min marketplace list) with automatic
+                            PostgreSQL fallback. Mumbai Western Line station validation (29 corridor stations)
+                            guarantees regional accuracy, paired with an integrated user reporting and admin review
+                            system.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- System Architecture Section -->
+        <section id="architecture" class="architecture-section">
+            <div class="container">
+                <div class="section-header">
+                    <h3>Application Architecture</h3>
+                    <p>Decoupled multi-tier cloud infrastructure engineered for resilience, low latency, and strict
+                        security</p>
+                </div>
+
+                <div class="diagram-card">
+                    <div class="diagram-img-wrapper" data-image="{% static 'images/application-architecture.png' %}"
+                        onclick="openModal(this.dataset.image, 'LocalSeva - Application Cloud Architecture')">
+                        <img src="{% static 'images/application-architecture.png' %}"
+                            onerror="this.onerror=null; this.src='/static/images/application-architecture.png';"
+                            alt="Application Architecture Diagram" class="diagram-img">
+                        <div class="zoom-hint">
+                            <span>🔍 Click diagram to enlarge</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arch-cards-grid">
                 <div class="arch-card">
                     <div class="arch-card-header">
                         <span class="arch-tag">Client Tier</span>
@@ -1158,188 +1184,194 @@
                         <li>Preserves backend compute bandwidth</li>
                     </ul>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Docker Deployment Section -->
-    <section id="docker" class="docker-section">
-        <div class="container">
-            <div class="section-header">
-                <h3>Local Development & Docker Deployment</h3>
-                <p>Reproducible, isolated multi-container orchestration powered by Docker Compose and bridge networking</p>
-            </div>
-
-            <div class="diagram-card">
-                <div class="diagram-img-wrapper" onclick="openModal('{% static \'images/docker-deployement.png\' %}', 'LocalSeva - Local Development & Docker Deployment Topology')">
-                    <img src="{% static 'images/docker-deployement.png' %}" 
-                         onerror="this.onerror=null; this.src='/static/images/docker-deployement.png';" 
-                         alt="Docker Deployment Diagram" 
-                         class="diagram-img">
-                    <div class="zoom-hint">
-                        <span>🔍 Click diagram to enlarge</span>
-                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="docker-cards-grid">
-                <div class="arch-card">
-                    <div class="arch-card-header">
-                        <span class="arch-tag">Network</span>
-                    </div>
-                    <h5>Bridge Network (localseva-net)</h5>
-                    <p>Isolated user-defined Docker bridge network facilitating fast inter-container DNS discovery.</p>
-                    <ul>
-                        <li>Inter-service DNS resolution by container name</li>
-                        <li>Isolation from host network clutter</li>
-                        <li>External network declaration prevents teardown</li>
-                        <li>Cross-origin ingress from any frontend origin</li>
-                    </ul>
+        <!-- Docker Deployment Section -->
+        <section id="docker" class="docker-section">
+            <div class="container">
+                <div class="section-header">
+                    <h3>Local Development & Docker Deployment</h3>
+                    <p>Reproducible, isolated multi-container orchestration powered by Docker Compose and bridge
+                        networking</p>
                 </div>
 
-                <div class="arch-card">
-                    <div class="arch-card-header">
-                        <span class="arch-tag">Services</span>
-                    </div>
-                    <h5>Containerized Stack</h5>
-                    <p>Three coordinated microservices running seamlessly in dedicated Linux containers.</p>
-                    <ul>
-                        <li><strong>backend (Port 8000):</strong> Python 3 / Django WSGI API</li>
-                        <li><strong>redis (Port 6379):</strong> Redis 8.10 cache server</li>
-                        <li><strong>postgres (Port 5432):</strong> PostgreSQL 16 database</li>
-                        <li>Independent standalone compose configs available</li>
-                    </ul>
-                </div>
-
-                <div class="arch-card">
-                    <div class="arch-card-header">
-                        <span class="arch-tag">Persistence</span>
-                    </div>
-                    <h5>Named Volumes & Storage</h5>
-                    <p>Guaranteed relational data persistence across container rebuilds and host restarts.</p>
-                    <ul>
-                        <li>Volume: <code>localseva_postgres_data</code></li>
-                        <li>Mounted at <code>/var/lib/postgresql/data</code></li>
-                        <li>Declared external for disaster recovery</li>
-                        <li>Zero database loss during container updates</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-<section id="endpoints" class="endpoints">
-        <div class="container">
-            <div class="section-header">
-                <h3>API Endpoints</h3>
-                <p>Complete REST API reference organized by resource type - click any endpoint to view details</p>
-            </div>
-
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Authentication</h4>
-                </div>
-                <div class="endpoint-list">
-                    <!-- Register Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/register/</span>
-                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Register new user account <span class="badge badge-warning">Rate Limited: 3/min</span></span>
-                            <span class="expand-icon">+</span>
+                <div class="diagram-card">
+                    <div class="diagram-img-wrapper" data-image="{% static 'images/docker-deployement.png' %}"
+                        onclick="openModal(this.dataset.image, 'LocalSeva - Local Development & Docker Deployment Topology')">
+                        <img src="{% static 'images/docker-deployement.png' %}"
+                            onerror="this.onerror=null; this.src='/static/images/docker-deployement.png';"
+                            alt="Docker Deployment Diagram" class="diagram-img">
+                        <div class="zoom-hint">
+                            <span>🔍 Click diagram to enlarge</span>
                         </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">username</span>
-                                            <span class="field-type">string, unique, max 50 chars</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">email</span>
-                                            <span class="field-type">string, valid email, unique</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">password</span>
-                                            <span class="field-type">string, min 8 chars</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">password2</span>
-                                            <span class="field-type">string, must match password</span>
-                                            <span class="required-badge">Required</span>
+                    </div>
+                </div>
+
+                <div class="docker-cards-grid">
+                    <div class="arch-card">
+                        <div class="arch-card-header">
+                            <span class="arch-tag">Network</span>
+                        </div>
+                        <h5>Bridge Network (localseva-net)</h5>
+                        <p>Isolated user-defined Docker bridge network facilitating fast inter-container DNS discovery.
+                        </p>
+                        <ul>
+                            <li>Inter-service DNS resolution by container name</li>
+                            <li>Isolation from host network clutter</li>
+                            <li>External network declaration prevents teardown</li>
+                            <li>Cross-origin ingress from any frontend origin</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-card">
+                        <div class="arch-card-header">
+                            <span class="arch-tag">Services</span>
+                        </div>
+                        <h5>Containerized Stack</h5>
+                        <p>Three coordinated microservices running seamlessly in dedicated Linux containers.</p>
+                        <ul>
+                            <li><strong>backend (Port 8000):</strong> Python 3 / Django WSGI API</li>
+                            <li><strong>redis (Port 6379):</strong> Redis 8.10 cache server</li>
+                            <li><strong>postgres (Port 5432):</strong> PostgreSQL 16 database</li>
+                            <li>Independent standalone compose configs available</li>
+                        </ul>
+                    </div>
+
+                    <div class="arch-card">
+                        <div class="arch-card-header">
+                            <span class="arch-tag">Persistence</span>
+                        </div>
+                        <h5>Named Volumes & Storage</h5>
+                        <p>Guaranteed relational data persistence across container rebuilds and host restarts.</p>
+                        <ul>
+                            <li>Volume: <code>localseva_postgres_data</code></li>
+                            <li>Mounted at <code>/var/lib/postgresql/data</code></li>
+                            <li>Declared external for disaster recovery</li>
+                            <li>Zero database loss during container updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="endpoints" class="endpoints">
+            <div class="container">
+                <div class="section-header">
+                    <h3>API Endpoints</h3>
+                    <p>Complete REST API reference organized by resource type - click any endpoint to view details</p>
+                </div>
+
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Authentication</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- Register Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/register/</span>
+                                <span class="endpoint-desc"
+                                    style="display: flex; gap: 8px; align-items: center;">Register new user account
+                                    <span class="badge badge-warning">Rate Limited: 3/min</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">username</span>
+                                                <span class="field-type">string, unique, max 50 chars</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">email</span>
+                                                <span class="field-type">string, valid email, unique</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">password</span>
+                                                <span class="field-type">string, min 8 chars</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">password2</span>
+                                                <span class="field-type">string, must match password</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "username": "john_doe",
   "email": "john@example.com",
   "password": "SecurePass123",
   "password2": "SecurePass123"
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (201 Created)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (201 Created)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "User registered successfully",
   "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user_id": 1,
   "username": "john_doe"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Login Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/login/</span>
-                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Authenticate and receive JWT tokens <span class="badge badge-warning">Rate Limited: 3/min</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">username</span>
-                                            <span class="field-type">string</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">password</span>
-                                            <span class="field-type">string</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Login Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/login/</span>
+                                <span class="endpoint-desc"
+                                    style="display: flex; gap: 8px; align-items: center;">Authenticate and receive JWT
+                                    tokens <span class="badge badge-warning">Rate Limited: 3/min</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">username</span>
+                                                <span class="field-type">string</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">password</span>
+                                                <span class="field-type">string</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "username": "john_doe",
   "password": "SecurePass123"
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "Login successful",
   "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -1347,214 +1379,218 @@
   "username": "john_doe",
   "is_service_provider": false
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Forgot Password Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/forgotpassword/</span>
-                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Request password reset OTP via email <span class="badge badge-warning">Rate Limited: 3/min</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">email</span>
-                                            <span class="field-type">string</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Forgot Password Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/forgotpassword/</span>
+                                <span class="endpoint-desc"
+                                    style="display: flex; gap: 8px; align-items: center;">Request password reset OTP via
+                                    email <span class="badge badge-warning">Rate Limited: 3/min</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">email</span>
+                                                <span class="field-type">string</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "email": "user@example.com"
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "otp sent successfully"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Reset Password Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/reset/</span>
-                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Reset password using OTP <span class="badge badge-warning">Rate Limited: 3/min</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">email</span>
-                                            <span class="field-type">string</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">otp</span>
-                                            <span class="field-type">string (6 digits)</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">new_password</span>
-                                            <span class="field-type">string</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">confirm_new_password</span>
-                                            <span class="field-type">string</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Reset Password Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/reset/</span>
+                                <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">Reset
+                                    password using OTP <span class="badge badge-warning">Rate Limited:
+                                        3/min</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">email</span>
+                                                <span class="field-type">string</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">otp</span>
+                                                <span class="field-type">string (6 digits)</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">new_password</span>
+                                                <span class="field-type">string</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">confirm_new_password</span>
+                                                <span class="field-type">string</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "email": "user@example.com",
   "otp": "123456",
   "new_password": "NewSecurePassword123",
   "confirm_new_password": "NewSecurePassword123"
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "Password reset successful"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                
-                    <!-- Refresh Token Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/token/refresh/</span>
-                            <span class="endpoint-desc">Exchange refresh token for new access token</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">refresh</span>
-                                            <span class="field-type">string - Valid JWT refresh token</span>
-                                            <span class="required-badge">Required</span>
+
+                        <!-- Refresh Token Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/token/refresh/</span>
+                                <span class="endpoint-desc">Exchange refresh token for new access token</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">refresh</span>
+                                                <span class="field-type">string - Valid JWT refresh token</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Verify Token Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/token/verify/</span>
-                            <span class="endpoint-desc">Verify if JWT token is still valid</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">token</span>
-                                            <span class="field-type">string - JWT access or refresh token</span>
-                                            <span class="required-badge">Required</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                            </div>
+                        </div>
+
+                        <!-- Verify Token Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/token/verify/</span>
+                                <span class="endpoint-desc">Verify if JWT token is still valid</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">token</span>
+                                                <span class="field-type">string - JWT access or refresh token</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{}</pre>
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{}</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-</div>
-            </div>
-
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Profile Management</h4>
                 </div>
-                <div class="endpoint-list">
-                    <!-- Get Profile Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/profile/</span>
-                            <span class="endpoint-desc">Retrieve current user profile</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Authentication Required</h5>
-                                    <div class="code-block">
-                                        <pre>Authorization: Bearer &lt;access_token&gt;</pre>
+
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Profile Management</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- Get Profile Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/profile/</span>
+                                <span class="endpoint-desc">Retrieve current user profile</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Authentication Required</h5>
+                                        <div class="code-block">
+                                            <pre>Authorization: Bearer &lt;access_token&gt;</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "id": 1,
   "username": "john_doe",
   "email": "john@example.com",
@@ -1566,77 +1602,77 @@
   "rating": 0.0,
   "total_reviews": 0
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Update Profile Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge put">PUT</span>
-                            <span class="endpoint-path">/api/user/profile/</span>
-                            <span class="endpoint-desc">Update user profile information</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Optional Fields (all fields are optional)</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">bio</span>
-                                            <span class="field-type">string</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">phone</span>
-                                            <span class="field-type">string</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">location</span>
-                                            <span class="field-type">string - Mumbai Western Line station</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">avatar</span>
-                                            <span class="field-type">file</span>
+                        <!-- Update Profile Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge put">PUT</span>
+                                <span class="endpoint-path">/api/user/profile/</span>
+                                <span class="endpoint-desc">Update user profile information</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Optional Fields (all fields are optional)</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">bio</span>
+                                                <span class="field-type">string</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">phone</span>
+                                                <span class="field-type">string</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">location</span>
+                                                <span class="field-type">string - Mumbai Western Line station</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">avatar</span>
+                                                <span class="field-type">file</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "bio": "Professional plumber with 10 years experience",
   "phone": "+919820112233",
   "location": "Kandivali"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Become Provider Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/profile/become-provider/</span>
-                            <span class="endpoint-desc">Register as service provider</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Request Body</h5>
-                                    <div class="code-block">
-                                        <pre>Empty - No request body required</pre>
+                        <!-- Become Provider Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/profile/become-provider/</span>
+                                <span class="endpoint-desc">Register as service provider</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Request Body</h5>
+                                        <div class="code-block">
+                                            <pre>Empty - No request body required</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "You are now marked as a service provider!",
   "next_step": "Please update your profile to add service provider details",
   "required_fields": {
@@ -1645,58 +1681,60 @@
     "base_price": "Required (Average base/visiting charge)"
   }
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Service Providers</h4>
-                </div>
-                <div class="endpoint-list">
-                    <!-- List Providers Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/providers/</span>
-                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">List all service providers with filters <span class="badge badge-success">Cached: 60s (Redis)</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Query Parameters</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">location</span>
-                                            <span class="field-type">string - Filter by location</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">min_experience</span>
-                                            <span class="field-type">int - Minimum years of experience</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">max_price</span>
-                                            <span class="field-type">float - Maximum base price</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">pricing_type</span>
-                                            <span class="field-type">string - FIXED or FLEXIBLE</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">search</span>
-                                            <span class="field-type">string - Search username, bio, location</span>
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Service Providers</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- List Providers Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/providers/</span>
+                                <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">List
+                                    all service providers with filters <span class="badge badge-success">Cached: 60s
+                                        (Redis)</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Query Parameters</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">location</span>
+                                                <span class="field-type">string - Filter by location</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">min_experience</span>
+                                                <span class="field-type">int - Minimum years of experience</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">max_price</span>
+                                                <span class="field-type">float - Maximum base price</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">pricing_type</span>
+                                                <span class="field-type">string - FIXED or FLEXIBLE</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">search</span>
+                                                <span class="field-type">string - Search username, bio, location</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 2,
     "username": "plumber_joe",
@@ -1712,36 +1750,36 @@
     "total_reviews": 12
   }
 ]</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Provider Reviews Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/providers/{id}/reviews/</span>
-                            <span class="endpoint-desc">Retrieve provider reviews</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>URL Parameters</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">id</span>
-                                            <span class="field-type">int - Service provider's profile ID</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Provider Reviews Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/providers/{id}/reviews/</span>
+                                <span class="endpoint-desc">Retrieve provider reviews</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>URL Parameters</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">id</span>
+                                                <span class="field-type">int - Service provider's profile ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 1,
     "user_name": "john_doe",
@@ -1751,30 +1789,33 @@
     "created_at": "2023-10-05T14:30:00Z"
   }
 ]</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                
-                    <!-- Service Categories Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/categories/</span>
-                            <span class="endpoint-desc">List active canonical service categories <span class="badge badge-info">Public</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Description</h5>
-                                    <p style="font-size: 0.875rem; color: var(--tertiary); margin-bottom: 0.75rem;">Returns the platform's active canonical service categories used for dropdowns, profile creation, and marketplace matching.</p>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+
+                        <!-- Service Categories Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/categories/</span>
+                                <span class="endpoint-desc">List active canonical service categories <span
+                                        class="badge badge-info">Public</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Description</h5>
+                                        <p style="font-size: 0.875rem; color: var(--tertiary); margin-bottom: 0.75rem;">
+                                            Returns the platform's active canonical service categories used for
+                                            dropdowns, profile creation, and marketplace matching.</p>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "categories": [
     "CARPENTRY",
     "CLEANING",
@@ -1784,30 +1825,33 @@
     "TUTORING"
   ]
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Supported Locations Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/locations/</span>
-                            <span class="endpoint-desc">List supported Mumbai Western Line railway corridor stations <span class="badge badge-info">Public</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Description</h5>
-                                    <p style="font-size: 0.875rem; color: var(--tertiary); margin-bottom: 0.75rem;">Returns the 29 validated railway stations from Churchgate to Virar. User and provider profile locations are strictly validated against this list.</p>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                        <!-- Supported Locations Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/locations/</span>
+                                <span class="endpoint-desc">List supported Mumbai Western Line railway corridor stations
+                                    <span class="badge badge-info">Public</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Description</h5>
+                                        <p style="font-size: 0.875rem; color: var(--tertiary); margin-bottom: 0.75rem;">
+                                            Returns the 29 validated railway stations from Churchgate to Virar. User and
+                                            provider profile locations are strictly validated against this list.</p>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "locations": [
     "Churchgate", "Marine Lines", "Charni Road", "Grant Road", "Mumbai Central",
     "Mahalaxmi", "Lower Parel", "Prabhadevi", "Dadar", "Matunga Road",
@@ -1817,75 +1861,75 @@
     "Naigaon", "Vasai Road", "Nalasopara", "Virar"
   ]
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-</div>
-            </div>
-
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Bookings</h4>
                 </div>
-                <div class="endpoint-list">
-                    <!-- Create Booking Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/bookings/create/</span>
-                            <span class="endpoint-desc">Create new service booking</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">provider_id</span>
-                                            <span class="field-type">int - Service provider's ID</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">service_category</span>
-                                            <span class="field-type">string - e.g., "Plumbing"</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">description</span>
-                                            <span class="field-type">string - Service description</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">address</span>
-                                            <span class="field-type">string - Service address</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">scheduled_date</span>
-                                            <span class="field-type">datetime - Future date/time</span>
-                                            <span class="required-badge">Required</span>
+
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Bookings</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- Create Booking Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/bookings/create/</span>
+                                <span class="endpoint-desc">Create new service booking</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">provider_id</span>
+                                                <span class="field-type">int - Service provider's ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">service_category</span>
+                                                <span class="field-type">string - e.g., "Plumbing"</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">description</span>
+                                                <span class="field-type">string - Service description</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">address</span>
+                                                <span class="field-type">string - Service address</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">scheduled_date</span>
+                                                <span class="field-type">datetime - Future date/time</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "provider_id": 2,
   "service_category": "Plumbing",
   "description": "Leaking pipe in kitchen sink",
   "address": "123 Main St, New York, NY",
   "scheduled_date": "2023-10-15T10:00:00Z"
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (201 Created)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (201 Created)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "id": 1,
   "user_name": "john_doe",
   "provider_name": "plumber_joe",
@@ -1893,39 +1937,39 @@
   "status": "PENDING",
   "created_at": "2023-10-10T09:00:00Z"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- List Bookings Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/bookings/</span>
-                            <span class="endpoint-desc">List user or provider bookings</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Query Parameters</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">type</span>
-                                            <span class="field-type">string - "user" (default) or "provider"</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">status</span>
-                                            <span class="field-type">string - Filter by booking status</span>
+                        <!-- List Bookings Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/bookings/</span>
+                                <span class="endpoint-desc">List user or provider bookings</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Query Parameters</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">type</span>
+                                                <span class="field-type">string - "user" (default) or "provider"</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">status</span>
+                                                <span class="field-type">string - Filter by booking status</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 1,
     "user_name": "john_doe",
@@ -1935,179 +1979,180 @@
     "scheduled_date": "2023-10-15T10:00:00Z"
   }
 ]</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Update Booking Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge put">PUT</span>
-                            <span class="endpoint-path">/api/user/bookings/{id}/</span>
-                            <span class="endpoint-desc">Update booking status or details</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                <div class="detail-section">
-                                    <h5>Status Flow</h5>
-                                    <div class="code-block">
-                                        <pre>PENDING → ACCEPTED → IN_PROGRESS → COMPLETED</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cancel Booking Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/bookings/{id}/cancel/</span>
-                            <span class="endpoint-desc">Cancel an active booking (Customer only, status must be PENDING or ACCEPTED)</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">None</span>
-                                            <span class="field-type">No request body required</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                            </div>
+                        </div>
+
+                        <!-- Update Booking Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge put">PUT</span>
+                                <span class="endpoint-path">/api/user/bookings/{id}/</span>
+                                <span class="endpoint-desc">Update booking status or details</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Status Flow</h5>
+                                        <div class="code-block">
+                                            <pre>PENDING → ACCEPTED → IN_PROGRESS → COMPLETED</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cancel Booking Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/bookings/{id}/cancel/</span>
+                                <span class="endpoint-desc">Cancel an active booking (Customer only, status must be
+                                    PENDING or ACCEPTED)</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">None</span>
+                                                <span class="field-type">No request body required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "Booking cancelled successfully"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Reviews & Reports</h4>
-                </div>
-                <div class="endpoint-list">
-                    <!-- Create Review Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/reviews/create/</span>
-                            <span class="endpoint-desc">Submit service review</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">booking</span>
-                                            <span class="field-type">int - Completed booking ID</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">provider_id</span>
-                                            <span class="field-type">int - Provider's ID</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">rating</span>
-                                            <span class="field-type">int - 1 to 5</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">comment</span>
-                                            <span class="field-type">string - Review text</span>
-                                            <span class="required-badge">Required</span>
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Reviews & Reports</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- Create Review Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/reviews/create/</span>
+                                <span class="endpoint-desc">Submit service review</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">booking</span>
+                                                <span class="field-type">int - Completed booking ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">provider_id</span>
+                                                <span class="field-type">int - Provider's ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">rating</span>
+                                                <span class="field-type">int - 1 to 5</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">comment</span>
+                                                <span class="field-type">string - Review text</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "booking": 1,
   "provider_id": 2,
   "rating": 5,
   "comment": "Excellent service! Fixed my leaking pipe quickly."
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Create Report Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/reports/create/</span>
-                            <span class="endpoint-desc">Report user or service issue</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">reported_user</span>
-                                            <span class="field-type">int - User ID being reported</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">report_type</span>
-                                            <span class="field-type">FRAUD, BAD_SERVICE, HARASSMENT, SAFETY, OTHER</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">description</span>
-                                            <span class="field-type">string - Detailed report</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Create Report Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/reports/create/</span>
+                                <span class="endpoint-desc">Report user or service issue</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">reported_user</span>
+                                                <span class="field-type">int - User ID being reported</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">report_type</span>
+                                                <span class="field-type">FRAUD, BAD_SERVICE, HARASSMENT, SAFETY,
+                                                    OTHER</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">description</span>
+                                                <span class="field-type">string - Detailed report</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "reported_user": 2,
   "report_type": "FRAUD",
   "description": "Charged extra without explanation"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- List My Reports Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/reports/my/</span>
-                            <span class="endpoint-desc">List user's submitted reports</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                        <!-- List My Reports Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/reports/my/</span>
+                                <span class="endpoint-desc">List user's submitted reports</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 1,
     "reported_user_name": "plumber_joe",
@@ -2117,58 +2162,61 @@
     "created_at": "2023-10-05T14:30:00Z"
   }
 ]</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Marketplace Products</h4>
-                </div>
-                <div class="endpoint-list">
-                    <!-- List Products Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/marketplace/</span>
-                            <span class="endpoint-desc" style="display: flex; gap: 8px; align-items: center;">List products with filters <span class="badge badge-success">Cached: 5min (Redis)</span></span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Query Parameters</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">category</span>
-                                            <span class="field-type">FURNITURE, ELECTRONICS, VEHICLES, etc.</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">condition</span>
-                                            <span class="field-type">NEW, LIKE_NEW, GOOD, FAIR, POOR</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">city</span>
-                                            <span class="field-type">string - Filter by city</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">min_price / max_price</span>
-                                            <span class="field-type">float - Price range</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">search</span>
-                                            <span class="field-type">string - Search title, description</span>
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Marketplace Products</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- List Products Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/marketplace/</span>
+                                <span class="endpoint-desc"
+                                    style="display: flex; gap: 8px; align-items: center;">List products with filters
+                                    <span class="badge badge-success">Cached: 5min (Redis)</span></span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Query Parameters</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">category</span>
+                                                <span class="field-type">FURNITURE, ELECTRONICS, VEHICLES,
+                                                    etc.</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">condition</span>
+                                                <span class="field-type">NEW, LIKE_NEW, GOOD, FAIR, POOR</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">city</span>
+                                                <span class="field-type">string - Filter by city</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">min_price / max_price</span>
+                                                <span class="field-type">float - Price range</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">search</span>
+                                                <span class="field-type">string - Search title, description</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 1,
     "seller_name": "john_doe",
@@ -2181,95 +2229,95 @@
     "comment_count": 3
   }
 ]</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Create Product Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/marketplace/create/</span>
-                            <span class="endpoint-desc">Create product listing</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">title</span>
-                                            <span class="field-type">string - Product title</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">description</span>
-                                            <span class="field-type">string - Product description</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">category</span>
-                                            <span class="field-type">string - Product category</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">condition</span>
-                                            <span class="field-type">string - Product condition</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">price</span>
-                                            <span class="field-type">decimal - Product price</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">address</span>
-                                            <span class="field-type">string - Pickup address</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">city</span>
-                                            <span class="field-type">string - City</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Optional Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">main_image</span>
-                                            <span class="field-type">file - Main product image</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">image_2</span>
-                                            <span class="field-type">file - Secondary product image</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">image_3</span>
-                                            <span class="field-type">file - Tertiary product image</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">contact_phone</span>
-                                            <span class="field-type">string - Contact phone number</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">contact_whatsapp</span>
-                                            <span class="field-type">string - WhatsApp number</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">contact_email</span>
-                                            <span class="field-type">boolean - Allow email contact</span>
+                        <!-- Create Product Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/marketplace/create/</span>
+                                <span class="endpoint-desc">Create product listing</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">title</span>
+                                                <span class="field-type">string - Product title</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">description</span>
+                                                <span class="field-type">string - Product description</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">category</span>
+                                                <span class="field-type">string - Product category</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">condition</span>
+                                                <span class="field-type">string - Product condition</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">price</span>
+                                                <span class="field-type">decimal - Product price</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">address</span>
+                                                <span class="field-type">string - Pickup address</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">city</span>
+                                                <span class="field-type">string - City</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Optional Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">main_image</span>
+                                                <span class="field-type">file - Main product image</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">image_2</span>
+                                                <span class="field-type">file - Secondary product image</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">image_3</span>
+                                                <span class="field-type">file - Tertiary product image</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">contact_phone</span>
+                                                <span class="field-type">string - Contact phone number</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">contact_whatsapp</span>
+                                                <span class="field-type">string - WhatsApp number</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">contact_email</span>
+                                                <span class="field-type">boolean - Allow email contact</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "title": "Sofa Set - 3 Seater",
   "description": "Hardly used, in excellent condition",
   "category": "FURNITURE",
@@ -2278,32 +2326,32 @@
   "address": "123 Main St, New York",
   "city": "New York"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Get Product Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/marketplace/{id}/</span>
-                            <span class="endpoint-desc">Retrieve product details</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Note</h5>
-                                    <div class="code-block">
-                                        <pre>Retrieving a product increments its view count automatically</pre>
+                        <!-- Get Product Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/marketplace/{id}/</span>
+                                <span class="endpoint-desc">Retrieve product details</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Note</h5>
+                                        <div class="code-block">
+                                            <pre>Retrieving a product increments its view count automatically</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "id": 1,
   "seller_name": "john_doe",
   "title": "Sofa Set - 3 Seater",
@@ -2314,110 +2362,110 @@
   "contact_phone": "+1234567890",
   "views": 46
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Update Product Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge put">PUT</span>
-                            <span class="endpoint-path">/api/user/marketplace/{id}/</span>
-                            <span class="endpoint-desc">Update product information</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Permissions</h5>
-                                    <div class="code-block">
-                                        <pre>Only the product seller can update their own products</pre>
+                        <!-- Update Product Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge put">PUT</span>
+                                <span class="endpoint-path">/api/user/marketplace/{id}/</span>
+                                <span class="endpoint-desc">Update product information</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Permissions</h5>
+                                        <div class="code-block">
+                                            <pre>Only the product seller can update their own products</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example (partial update allowed)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example (partial update allowed)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "price": "14000.00",
   "description": "Price reduced! Hardly used sofa set"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Delete Product Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge delete">DELETE</span>
-                            <span class="endpoint-path">/api/user/marketplace/{id}/</span>
-                            <span class="endpoint-desc">Remove product listing</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Note</h5>
-                                    <div class="code-block">
-                                        <pre>This is a soft delete - product is deactivated, not permanently deleted</pre>
+                        <!-- Delete Product Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge delete">DELETE</span>
+                                <span class="endpoint-path">/api/user/marketplace/{id}/</span>
+                                <span class="endpoint-desc">Remove product listing</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Note</h5>
+                                        <div class="code-block">
+                                            <pre>This is a soft delete - product is deactivated, not permanently deleted</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "Product deactivated successfully"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- List My Products Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/marketplace/my-products/</span>
-                            <span class="endpoint-desc">List seller's products</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>Returns all products created by the authenticated user</pre>
+                        <!-- List My Products Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/marketplace/my-products/</span>
+                                <span class="endpoint-desc">List seller's products</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>Returns all products created by the authenticated user</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="endpoint-category">
-                <div class="category-header">
-                    <h4>Product Comments</h4>
-                </div>
-                <div class="endpoint-list">
-                    <!-- List Product Comments Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/marketplace/{id}/comments/</span>
-                            <span class="endpoint-desc">List product comments</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                <div class="endpoint-category">
+                    <div class="category-header">
+                        <h4>Product Comments</h4>
+                    </div>
+                    <div class="endpoint-list">
+                        <!-- List Product Comments Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/marketplace/{id}/comments/</span>
+                                <span class="endpoint-desc">List product comments</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 1,
     "user_name": "buyer123",
@@ -2426,128 +2474,128 @@
     "created_at": "2023-10-02T10:00:00Z"
   }
 ]</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Create Comment Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/marketplace/comments/create/</span>
-                            <span class="endpoint-desc">Add comment to product</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">product</span>
-                                            <span class="field-type">int - Product ID</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">comment</span>
-                                            <span class="field-type">string - Comment text</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Create Comment Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/marketplace/comments/create/</span>
+                                <span class="endpoint-desc">Add comment to product</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">product</span>
+                                                <span class="field-type">int - Product ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">comment</span>
+                                                <span class="field-type">string - Comment text</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "product": 1,
   "comment": "Interested in this sofa. WhatsApp me at 9876543210",
   "contact_info": "WhatsApp: 9876543210"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Delete Comment Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge delete">DELETE</span>
-                            <span class="endpoint-path">/api/user/marketplace/comments/{id}/delete/</span>
-                            <span class="endpoint-desc">Remove or hide comment</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Permissions</h5>
-                                    <div class="code-block">
-                                        <pre>Comment owner: Can delete their own comment
+                        <!-- Delete Comment Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge delete">DELETE</span>
+                                <span class="endpoint-path">/api/user/marketplace/comments/{id}/delete/</span>
+                                <span class="endpoint-desc">Remove or hide comment</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Permissions</h5>
+                                        <div class="code-block">
+                                            <pre>Comment owner: Can delete their own comment
 Product seller: Can hide inappropriate comments (soft delete)</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "message": "Comment deleted successfully"
 }
 // or
 {
   "message": "Comment hidden successfully"
 }</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- List My Product Comments Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/marketplace/my-product-comments/</span>
-                            <span class="endpoint-desc">List comments on seller's products</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>Returns all comments on products owned by the authenticated user</pre>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- List Comment Replies Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge get">GET</span>
-                            <span class="endpoint-path">/api/user/marketplace/comment-replies/</span>
-                            <span class="endpoint-desc">List replies for a product comment</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Query Parameters</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">comment_id</span>
-                                            <span class="field-type">int - Parent comment ID</span>
-                                            <span class="required-badge">Required</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (200 OK)</h5>
-                                    <div class="code-block">
-                                        <pre>[
+                            </div>
+                        </div>
+
+                        <!-- List My Product Comments Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/marketplace/my-product-comments/</span>
+                                <span class="endpoint-desc">List comments on seller's products</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>Returns all comments on products owned by the authenticated user</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- List Comment Replies Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/user/marketplace/comment-replies/</span>
+                                <span class="endpoint-desc">List replies for a product comment</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Query Parameters</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">comment_id</span>
+                                                <span class="field-type">int - Parent comment ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Success Response (200 OK)</h5>
+                                        <div class="code-block">
+                                            <pre>[
   {
     "id": 1,
     "comment_id": 5,
@@ -2556,62 +2604,63 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
     "updated_at": "2023-10-02T11:00:00Z"
   }
 ]</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Create Comment Reply Endpoint -->
-                    <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
-                        <div class="endpoint-item">
-                            <span class="method-badge post">POST</span>
-                            <span class="endpoint-path">/api/user/marketplace/comment-replies/</span>
-                            <span class="endpoint-desc">Post reply to a comment (Seller Only)</span>
-                            <span class="expand-icon">+</span>
-                        </div>
-                        <div class="endpoint-details">
-                            <div class="endpoint-details-content">
-                                <div class="detail-section">
-                                    <h5>Permissions & Requirements</h5>
-                                    <div class="code-block">
-                                        <pre>Product Seller Only: Only the seller who owns the product can reply to comments on it.</pre>
-                                    </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Required Fields</h5>
-                                    <div class="field-list">
-                                        <div class="field-item">
-                                            <span class="field-name">comment_id</span>
-                                            <span class="field-type">int - Parent comment ID</span>
-                                            <span class="required-badge">Required</span>
-                                        </div>
-                                        <div class="field-item">
-                                            <span class="field-name">reply</span>
-                                            <span class="field-type">string - Reply text</span>
-                                            <span class="required-badge">Required</span>
+                        <!-- Create Comment Reply Endpoint -->
+                        <div class="endpoint-wrapper" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-item">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/user/marketplace/comment-replies/</span>
+                                <span class="endpoint-desc">Post reply to a comment (Seller Only)</span>
+                                <span class="expand-icon">+</span>
+                            </div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-details-content">
+                                    <div class="detail-section">
+                                        <h5>Permissions & Requirements</h5>
+                                        <div class="code-block">
+                                            <pre>Product Seller Only: Only the seller who owns the product can reply to comments on it.</pre>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Request Example</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Required Fields</h5>
+                                        <div class="field-list">
+                                            <div class="field-item">
+                                                <span class="field-name">comment_id</span>
+                                                <span class="field-type">int - Parent comment ID</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                            <div class="field-item">
+                                                <span class="field-name">reply</span>
+                                                <span class="field-type">string - Reply text</span>
+                                                <span class="required-badge">Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h5>Request Example</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "comment_id": 5,
   "reply": "Yes, this item is still available!"
 }</pre>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="detail-section">
-                                    <h5>Success Response (201 Created)</h5>
-                                    <div class="code-block">
-                                        <pre>{
+                                    <div class="detail-section">
+                                        <h5>Success Response (201 Created)</h5>
+                                        <div class="code-block">
+                                            <pre>{
   "id": 1,
   "comment_id": 5,
   "reply": "Yes, this item is still available!",
   "created_at": "2023-10-02T11:00:00Z",
   "updated_at": "2023-10-02T11:00:00Z"
 }</pre>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2619,173 +2668,178 @@ Product seller: Can hide inappropriate comments (soft delete)</pre>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="cta">
+        <section class="cta">
+            <div class="container">
+                <h3>Ready to Get Started?</h3>
+                <p>Start using LocalSeva to book services or list products for sale</p>
+                <div class="cta-buttons">
+                    <a href="https://localseva-front-end.onrender.com" class="btn btn-light" target="_blank">
+                        Launch Platform
+                    </a>
+                    <a href="https://github.com/Harish-tig/LocalSeva" class="btn btn-outline" target="_blank">
+                        View on GitHub
+                    </a>
+                    <a href="https://github.com/Harish-tig/LocalSeva/blob/main/API%20DOCUMENTATION.md"
+                        class="btn btn-outline" target="_blank">
+                        Detailed API Docs
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
         <div class="container">
-            <h3>Ready to Get Started?</h3>
-            <p>Start using LocalSeva to book services or list products for sale</p>
-            <div class="cta-buttons">
-                <a href="https://localseva-front-end.onrender.com" class="btn btn-light" target="_blank">
-                    Launch Platform
-                </a>
-                <a href="https://github.com/Harish-tig/LocalSeva" class="btn btn-outline" target="_blank">
-                    View on GitHub
-                </a>
-                <a href="https://github.com/Harish-tig/LocalSeva/blob/main/API%20DOCUMENTATION.md" class="btn btn-outline" target="_blank">
-                    Detailed API Docs
-                </a>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h5>About</h5>
+                    <p>LocalSeva is a comprehensive service booking and marketplace platform built with Django REST
+                        Framework.</p>
+                </div>
+                <div class="footer-section">
+                    <h5>Navigation</h5>
+                    <a href="#architecture">Architecture</a>
+                    <a href="#docker">Docker Deployment</a>
+                    <a href="#endpoints">API Documentation</a>
+                    <a href="https://localseva-front-end.onrender.com" target="_blank">Platform</a>
+                    <a href="https://github.com/Harish-tig/LocalSeva" target="_blank">GitHub Repository</a>
+                </div>
+                <div class="footer-section">
+                    <h5>Resources</h5>
+                    <p>Service Providers</p>
+                    <p>Marketplace</p>
+                    <p>Admin Panel</p>
+                </div>
+                <div class="footer-section">
+                    <h5>Technology</h5>
+                    <p>Django 4.2 + DRF 3.14</p>
+                    <p>JWT Auth & OTP Hashing</p>
+                    <p>Redis Caching</p>
+                    <p>PostgreSQL / SQLite</p>
+                    <p>Docker Containerization</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 LocalSeva</p>
             </div>
         </div>
-    </section>
-</main>
+    </footer>
 
-<footer>
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h5>About</h5>
-                <p>LocalSeva is a comprehensive service booking and marketplace platform built with Django REST
-                    Framework.</p>
-            </div>
-            <div class="footer-section">
-                <h5>Navigation</h5>
-                <a href="#architecture">Architecture</a>
-                <a href="#docker">Docker Deployment</a>
-                <a href="#endpoints">API Documentation</a>
-                <a href="https://localseva-front-end.onrender.com" target="_blank">Platform</a>
-                <a href="https://github.com/Harish-tig/LocalSeva" target="_blank">GitHub Repository</a>
-            </div>
-            <div class="footer-section">
-                <h5>Resources</h5>
-                <p>Service Providers</p>
-                <p>Marketplace</p>
-                <p>Admin Panel</p>
-            </div>
-            <div class="footer-section">
-                <h5>Technology</h5>
-                <p>Django 4.2 + DRF 3.14</p>
-                <p>JWT Auth & OTP Hashing</p>
-                <p>Redis Caching</p>
-                <p>PostgreSQL / SQLite</p>
-                <p>Docker Containerization</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 LocalSeva</p>
-        </div>
-    </div>
-</footer>
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
 
-<script>
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Header scroll effect
+        const header = document.getElementById('header');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
             }
-        });
-    });
-
-    // Header scroll effect
-    const header = document.getElementById('header');
-    let lastScroll = 0;
-
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        if (currentScroll > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-        lastScroll = currentScroll;
-    });
-
-    // Toggle endpoint details
-    function toggleEndpoint(element) {
-        const isActive = element.classList.contains('active');
-
-        // Close all other endpoints
-        document.querySelectorAll('.endpoint-wrapper.active').forEach(wrapper => {
-            wrapper.classList.remove('active');
+            lastScroll = currentScroll;
         });
 
-        // Toggle current endpoint
-        if (!isActive) {
-            element.classList.add('active');
-        }
-    }
+        // Toggle endpoint details
+        function toggleEndpoint(element) {
+            // Prevent toggling when clicking/selecting inside open details (e.g. copying code or fields)
+            if (window.event && window.event.target && window.event.target.closest('.endpoint-details')) {
+                return;
+            }
+            const isActive = element.classList.contains('active');
 
-    // Close endpoint when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.endpoint-wrapper')) {
+            // Close all other endpoints
             document.querySelectorAll('.endpoint-wrapper.active').forEach(wrapper => {
                 wrapper.classList.remove('active');
             });
+
+            // Toggle current endpoint
+            if (!isActive) {
+                element.classList.add('active');
+            }
         }
-    });
 
-    // Fade in animation on scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in');
+        // Close endpoint when clicking outside
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.endpoint-wrapper')) {
+                document.querySelectorAll('.endpoint-wrapper.active').forEach(wrapper => {
+                    wrapper.classList.remove('active');
+                });
             }
         });
-    }, observerOptions);
 
-    document.querySelectorAll('.feature-card, .endpoint-category, .stat-item').forEach(el => {
-        observer.observe(el);
-    });
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-    // Lightbox modal functionality
-    function openModal(src, caption) {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        const modalCaption = document.getElementById('modalCaption');
-        
-        modalImg.src = src;
-        modalCaption.textContent = caption || '';
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
 
-    function closeModalDirect() {
-        const modal = document.getElementById('imageModal');
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
+        document.querySelectorAll('.feature-card, .endpoint-category, .stat-item').forEach(el => {
+            observer.observe(el);
+        });
 
-    function closeModal(event) {
-        if (event.target.id === 'imageModal' || event.target.classList.contains('modal-close')) {
-            closeModalDirect();
+        // Lightbox modal functionality
+        function openModal(src, caption) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const modalCaption = document.getElementById('modalCaption');
+
+            modalImg.src = src;
+            modalCaption.textContent = caption || '';
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
-    }
 
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModalDirect();
+        function closeModalDirect() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
-    });
 
-</script>
+        function closeModal(event) {
+            if (event.target.id === 'imageModal' || event.target.classList.contains('modal-close')) {
+                closeModalDirect();
+            }
+        }
 
-<!-- Lightbox Image Modal -->
-<div id="imageModal" class="image-modal" onclick="closeModal(event)">
-    <div class="modal-content-wrapper">
-        <span class="modal-close" onclick="closeModalDirect()">&times;</span>
-        <img id="modalImage" class="modal-img" src="" alt="Enlarged Diagram">
-        <div id="modalCaption" class="modal-caption"></div>
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeModalDirect();
+            }
+        });
+
+    </script>
+
+    <!-- Lightbox Image Modal -->
+    <div id="imageModal" class="image-modal" onclick="closeModal(event)">
+        <div class="modal-content-wrapper">
+            <span class="modal-close" onclick="closeModalDirect()">&times;</span>
+            <img id="modalImage" class="modal-img" src="" alt="Enlarged Diagram">
+            <div id="modalCaption" class="modal-caption"></div>
+        </div>
     </div>
-</div>
 
 </body>
+
 </html>
